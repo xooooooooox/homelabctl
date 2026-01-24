@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 解析脚本真实路径
+homelabctl_resolve_script_dir() {
+    local src="${BASH_SOURCE[0]}"
+    while [[ -L "$src" ]]; do
+        local dir
+        dir="$(cd -P "$(dirname "$src")" && pwd)"
+        src="$(readlink "$src")"
+        [[ "$src" != /* ]] && src="$dir/$src"
+    done
+    cd -P "$(dirname "$src")" && pwd
+}
+
+# 获取项目根目录
+homelabctl_get_project_root() {
+    local bin_dir
+    bin_dir=$(homelabctl_resolve_script_dir)
+    dirname "$bin_dir"
+}
+
+# 主函数
+homelabctl_main() {
+    local project_root
+    project_root=$(homelabctl_get_project_root)
+
+    # 加载 radp-bash-framework
+    if ! command -v radp-bf &>/dev/null; then
+        echo "Error: radp-bash-framework not found. Please install it first." >&2
+        echo "  See: https://github.com/xooooooooox/radp-bash-framework" >&2
+        exit 1
+    fi
+
+    # 设置用户配置路径（在加载 framework 之前）
+    export GX_RADP_FW_USER_CONFIG_PATH="$project_root/src/main/shell/config"
+
+    # shellcheck source=/dev/null
+    source "$(radp-bf --print-run)"
+
+    # 设置应用信息
+    radp_cli_set_app_name "homelabctl"
+    radp_cli_set_commands_dir "$project_root/src/main/shell/commands"
+
+    # 设置 radp-vagrant-framework 相关路径
+    export HOMELABCTL_ROOT="$project_root"
+
+    # 加载项目私有库（如果存在）
+    if [[ -d "$project_root/src/main/shell/libs" ]]; then
+        local lib_file
+        while IFS= read -r -d '' lib_file; do
+            # shellcheck source=/dev/null
+            source "$lib_file"
+        done < <(find "$project_root/src/main/shell/libs" -type f -name "*.sh" -print0 | sort -z)
+    fi
+
+    # 运行
+    radp_app_run "$@"
+}
+
+homelabctl_main "$@"

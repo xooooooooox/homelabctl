@@ -1,3 +1,6 @@
+src/main/shell/config/config.sh
+src/main/shell/config/completion.sh
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
