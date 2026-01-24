@@ -1,0 +1,133 @@
+name: Create version tag
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  create-version-tag:
+    if: >-
+      ${{
+        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'pull_request' &&
+          github.event.pull_request.merged == true &&
+          startsWith(github.event.pull_request.head.ref, 'workflow/v'))
+      }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (manual)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Checkout (auto)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Fetch tags
+        run: git fetch --tags --force
+
+      - name: Resolve context
+        id: ctx
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            head_ref="${{ github.event.pull_request.head.ref }}"
+            expected_version="${head_ref#workflow/}"
+            echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
+            echo "tag_target=${{ github.event.pull_request.merge_commit_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "expected_version=" >> "$GITHUB_OUTPUT"
+            echo "tag_target=HEAD" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Read version
+        id: version
+        run: |
+          set -euo pipefail
+          constants_file="src/main/shell/vars/constants.sh"
+          version=$(sed -n 's/^declare -gr gr_homelabctl_version=//p' "$constants_file" | head -n 1)
+          if [[ -z "$version" ]]; then
+            echo "Failed to read gr_homelabctl_version from $constants_file" >&2
+            exit 1
+          fi
+          if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version '$version' does not match vx.y.z" >&2
+            exit 1
+          fi
+          expected_version="${{ steps.ctx.outputs.expected_version }}"
+          if [[ -n "$expected_version" && "$version" != "$expected_version" ]]; then
+            echo "Version mismatch: expected ${expected_version}, got ${version}" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate changelog
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+          version_no_prefix="${version#v}"
+          changelog_file="CHANGELOG.md"
+          if [[ ! -f "$changelog_file" ]]; then
+            echo "CHANGELOG.md not found; update changelog before tagging." >&2
+            exit 1
+          fi
+          if ! grep -Eq "^##[[:space:]]+v?${version_no_prefix}([[:space:]]|$)" "$changelog_file"; then
+            echo "CHANGELOG.md missing entry for ${version}; update changelog before tagging." >&2
+            exit 1
+          fi
+
+      - name: Validate spec versions
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+          version_no_prefix="${version#v}"
+          copr_spec_file="packaging/copr/homelabctl.spec"
+          obs_spec_file="packaging/obs/homelabctl.spec"
+          for spec_file in "$copr_spec_file" "$obs_spec_file"; do
+            if [[ ! -f "$spec_file" ]]; then
+              echo "Spec file not found: $spec_file" >&2
+              exit 1
+            fi
+            spec_version="$(awk -F'[: ]+' '/^Version:/{print $2; exit}' "$spec_file")"
+            if [[ -z "$spec_version" ]]; then
+              echo "Failed to read Version from $spec_file" >&2
+              exit 1
+            fi
+            if [[ "$spec_version" != "$version_no_prefix" ]]; then
+              echo "Spec version mismatch in $spec_file: expected $version_no_prefix, got $spec_version" >&2
+              echo "Run release-prep to sync spec versions before tagging." >&2
+              exit 1
+            fi
+          done
+
+      - name: Create and push tag
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+          tag_target="${{ steps.ctx.outputs.tag_target }}"
+          if [[ -z "$tag_target" ]]; then
+            tag_target="HEAD"
+          fi
+          if ! git cat-file -e "${tag_target}^{commit}" 2>/dev/null; then
+            echo "Tag target not found: ${tag_target}" >&2
+            exit 1
+          fi
+          if git rev-parse "$version" >/dev/null 2>&1; then
+            echo "Tag $version already exists."
+            exit 0
+          fi
+          git tag "$version" "$tag_target"
+          git push origin "$version"

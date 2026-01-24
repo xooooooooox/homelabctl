@@ -1,0 +1,16 @@
+Source: homelabctl
+Section: utils
+Priority: optional
+Maintainer: xooooooooox <xozoz.sos@gmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/xooooooooox/homelabctl
+Rules-Requires-Root: no
+
+Package: homelabctl
+Architecture: all
+Depends: ${misc:Depends}, bash, coreutils, radp-bash-framework
+Description: CLI tool for managing homelab infrastructure.
+ homelabctl is a CLI tool for managing homelab infrastructure, built on top of
+ radp-bash-framework. It provides a unified interface for orchestrating various
+ homelab components including Vagrant-based virtual machines.

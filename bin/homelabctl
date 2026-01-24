@@ -45,6 +45,10 @@ homelabctl_main() {
     # 设置 radp-vagrant-framework 相关路径
     export HOMELABCTL_ROOT="$project_root"
 
+    # 加载版本常量
+    # shellcheck source=/dev/null
+    source "$project_root/src/main/shell/vars/constants.sh"
+
     # 加载项目私有库（如果存在）
     if [[ -d "$project_root/src/main/shell/libs" ]]; then
         local lib_file

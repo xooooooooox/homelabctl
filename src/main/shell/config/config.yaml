@@ -23,4 +23,6 @@ radp:
   # Variables defined here will be available as gr_radp_extend_* in shell
   extend:
     homelabctl:
-      version: v0.1.0
+      # Add application-specific config here
+      # example:
+      #   some_setting: value
