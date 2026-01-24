@@ -29,13 +29,13 @@ Or see: https://github.com/xooooooooox/radp-bash-framework#installation
 ### Script (curl / wget / fetch)
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/tools/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash
 ```
 
 Or:
 
 ```shell
-wget -qO- https://raw.githubusercontent.com/xooooooooox/homelabctl/main/tools/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash
 ```
 
 Optional variables:
@@ -46,7 +46,7 @@ HOMELABCTL_VERSION=vX.Y.Z \
   HOMELABCTL_INSTALL_DIR="$HOME/.local/lib/homelabctl" \
   HOMELABCTL_BIN_DIR="$HOME/.local/bin" \
   HOMELABCTL_ALLOW_ANY_DIR=1 \
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/tools/install.sh)"
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh)"
 ```
 
 ### Homebrew

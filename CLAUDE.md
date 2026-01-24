@@ -55,8 +55,7 @@ homelabctl/
 │   └── obs/
 │       ├── homelabctl.spec     # RPM spec for OBS
 │       └── debian/             # Debian packaging files
-├── tools/
-│   └── install.sh              # Universal installer script
+├── install.sh                  # Universal installer script
 └── .github/workflows/          # CI/CD workflows
 ```
 
