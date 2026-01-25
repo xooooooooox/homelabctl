@@ -113,9 +113,25 @@ homelabctl vf dump-config
 homelabctl vf generate
 
 # Generate shell completion
-homelabctl completion bash >~/.bash_completion.d/homelabctl
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
 homelabctl completion zsh >~/.zfunc/_homelabctl
+
+# Verbose mode (show banner and info logs)
+homelabctl -v vf info
+homelabctl --verbose vg status
+
+# Debug mode (show banner, debug logs, and detailed output)
+homelabctl --debug vf info
 ```
+
+## Global Options
+
+| Option            | Description                                |
+|-------------------|--------------------------------------------|
+| `-v`, `--verbose` | Enable verbose output (banner + info logs) |
+| `--debug`         | Enable debug output (banner + debug logs)  |
+
+By default, homelabctl runs in quiet mode (no banner, only error logs).
 
 ## Commands
 
