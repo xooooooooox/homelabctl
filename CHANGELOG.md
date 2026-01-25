@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.0.2 - 2026-01-25
+
+### feat
+- e06791b add auto-detection of RADP_VF_HOME and improve Vagrantfile path resolution
+
 ## v0.0.1 - 2026-01-25
 
 ### feat
