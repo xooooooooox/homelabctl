@@ -20,6 +20,55 @@ homelabctl_get_project_root() {
     dirname "$bin_dir"
 }
 
+# 解析全局选项 (--verbose, --debug)
+# 返回: 设置环境变量并输出过滤后的参数
+homelabctl_parse_global_opts() {
+    local -a filtered_args=()
+    local verbose=false
+    local debug=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -v|--verbose)
+                verbose=true
+                shift
+                ;;
+            --debug)
+                debug=true
+                shift
+                ;;
+            --)
+                shift
+                filtered_args+=("$@")
+                break
+                ;;
+            *)
+                filtered_args+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    # 设置输出模式环境变量
+    if [[ "$debug" == "true" ]]; then
+        # Debug 模式: banner on, log level debug, debug enabled
+        export GX_RADP_FW_BANNER_MODE=on
+        export GX_RADP_FW_LOG_LEVEL=debug
+        export GX_RADP_FW_LOG_DEBUG=true
+    elif [[ "$verbose" == "true" ]]; then
+        # Verbose 模式: banner on, log level info
+        export GX_RADP_FW_BANNER_MODE=on
+        export GX_RADP_FW_LOG_LEVEL=info
+    else
+        # 默认模式: banner off, log level error (只显示错误)
+        export GX_RADP_FW_BANNER_MODE=off
+        export GX_RADP_FW_LOG_LEVEL=error
+    fi
+
+    # 输出过滤后的参数 (用 null 分隔以处理特殊字符)
+    printf '%s\0' "${filtered_args[@]}"
+}
+
 # 主函数
 homelabctl_main() {
     local project_root
@@ -32,8 +81,14 @@ homelabctl_main() {
         exit 1
     fi
 
-    # 生成补全脚本时禁用 banner 和控制台日志，避免污染输出
-    if [[ "${1:-}" == "completion" ]]; then
+    # 解析全局选项并获取过滤后的参数
+    local -a args=()
+    while IFS= read -r -d '' arg; do
+        args+=("$arg")
+    done < <(homelabctl_parse_global_opts "$@")
+
+    # 生成补全脚本时禁用所有输出
+    if [[ "${args[0]:-}" == "completion" ]]; then
         export GX_RADP_FW_BANNER_MODE=off
         export GX_RADP_FW_LOG_CONSOLE_ENABLED=false
     fi
@@ -65,7 +120,7 @@ homelabctl_main() {
     fi
 
     # 运行
-    radp_app_run "$@"
+    radp_app_run "${args[@]}"
 }
 
 homelabctl_main "$@"
