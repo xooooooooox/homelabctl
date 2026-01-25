@@ -29,7 +29,8 @@ export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 - `vf validate` - Validate YAML configuration files
 - `vf dump-config` - Export merged configuration (JSON/YAML, supports -f and -o options)
 - `vf generate` - Generate standalone Vagrantfile
-- `vf template` - Manage project templates (list, show)
+- `vf template list` - List available project templates
+- `vf template show` - Show template details and variables
 - `vf version` - Show radp-vagrant-framework version
 - `version` - Show homelabctl version
 - `completion <bash|zsh>` - Generate shell completion
@@ -51,7 +52,9 @@ homelabctl/
 │   │   │   ├── validate.sh
 │   │   │   ├── dump-config.sh
 │   │   │   ├── generate.sh
-│   │   │   ├── template.sh
+│   │   │   ├── template/       # homelabctl vf template <subcommand>
+│   │   │   │   ├── list.sh
+│   │   │   │   └── show.sh
 │   │   │   └── version.sh
 │   │   ├── version.sh
 │   │   └── completion.sh
