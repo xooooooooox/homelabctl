@@ -12,12 +12,6 @@ cmd_vf_init() {
     local template="${opt_template:-default}"
     local force="${opt_force:-false}"
 
-    # 检查 RADP_VF_HOME
-    if [[ -z "${RADP_VF_HOME:-}" ]]; then
-        radp_log_error "RADP_VF_HOME not set. Please install radp-vagrant-framework first."
-        return 1
-    fi
-
     # 创建目标目录
     mkdir -p "$target_dir"
 
@@ -33,13 +27,24 @@ cmd_vf_init() {
     # 创建目录结构
     mkdir -p "$target_dir"/{config,provisions/{definitions,scripts}}
 
-    # 复制示例配置
-    local sample_config="${RADP_VF_HOME}/src/main/ruby/config"
-    if [[ -d "$sample_config" ]]; then
+    # 尝试从 RADP_VF_HOME 复制示例配置
+    local sample_config="${RADP_VF_HOME:-}/src/main/ruby/config"
+    if [[ -n "${RADP_VF_HOME:-}" && -d "$sample_config" ]]; then
         cp "$sample_config/vagrant.yaml" "$target_dir/config/" 2>/dev/null || true
-        cp "$sample_config/vagrant-sample.yaml" "$target_dir/config/" 2>/dev/null || true
+        # 根据模板选择环境配置
+        case "$template" in
+            k8s)
+                cp "$sample_config/vagrant-k8s.yaml" "$target_dir/config/vagrant-local.yaml" 2>/dev/null || \
+                    cp "$sample_config/vagrant-sample.yaml" "$target_dir/config/vagrant-local.yaml" 2>/dev/null || true
+                ;;
+            *)
+                cp "$sample_config/vagrant-sample.yaml" "$target_dir/config/vagrant-local.yaml" 2>/dev/null || true
+                ;;
+        esac
+        radp_log_info "Copied sample configuration from RADP_VF_HOME"
     else
         # 生成基础配置
+        radp_log_info "Generating default configuration..."
         cat > "$target_dir/config/vagrant.yaml" << 'YAML'
 radp:
   env: local
@@ -77,9 +82,11 @@ YAML
     fi
 
     radp_log_info "Project initialized successfully!"
-    radp_log_info ""
+    echo ""
     radp_log_info "Next steps:"
     radp_log_info "  cd $target_dir"
     radp_log_info "  # Edit config/vagrant.yaml and config/vagrant-local.yaml"
-    radp_log_info "  homelabctl vg up"
+    radp_log_info "  homelabctl vf info       # Check environment"
+    radp_log_info "  homelabctl vf dump-config # Preview merged config"
+    radp_log_info "  homelabctl vg up         # Start VMs"
 }

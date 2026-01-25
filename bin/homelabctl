@@ -32,6 +32,12 @@ homelabctl_main() {
         exit 1
     fi
 
+    # 生成补全脚本时禁用 banner 和控制台日志，避免污染输出
+    if [[ "${1:-}" == "completion" ]]; then
+        export GX_RADP_FW_BANNER_MODE=off
+        export GX_RADP_FW_LOG_CONSOLE_ENABLED=false
+    fi
+
     # 设置用户配置路径（在加载 framework 之前）
     export GX_RADP_FW_USER_CONFIG_PATH="$project_root/src/main/shell/config"
 

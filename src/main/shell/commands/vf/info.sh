@@ -1,7 +1,7 @@
 # @cmd
 # @desc Show current environment information
 # @option -e, --env <name> Environment name
-# @option --json Output as JSON
+# @option -j, --json Output as JSON
 # @example vf info
 # @example vf info -e prod
 # @example vf info --json
@@ -34,11 +34,20 @@ cmd_vf_info() {
         vagrant_version=$(vagrant --version 2>/dev/null || echo "unknown")
     fi
 
+    # 检测 radp-vf 版本
+    local radp_vf_version=""
+    if [[ -n "${RADP_VF_HOME:-}" && -x "${RADP_VF_HOME}/bin/radp-vf" ]]; then
+        radp_vf_version=$("${RADP_VF_HOME}/bin/radp-vf" version 2>/dev/null || echo "unknown")
+    elif command -v radp-vf &>/dev/null; then
+        radp_vf_version=$(radp-vf version 2>/dev/null || echo "unknown")
+    fi
+
     if [[ "$json" == "true" ]]; then
         cat << JSON
 {
-  "homelabctl_version": "${homelabctl_version:-unknown}",
+  "homelabctl_version": "${gr_homelabctl_version:-unknown}",
   "radp_vf_home": "${RADP_VF_HOME:-}",
+  "radp_vf_version": "${radp_vf_version:-}",
   "config_dir": "$config_dir",
   "environment": "$env",
   "vagrant_version": "$vagrant_version"
@@ -48,8 +57,9 @@ JSON
         echo "homelabctl Environment Info"
         echo "============================"
         echo ""
-        printf "%-20s %s\n" "homelabctl:" "${homelabctl_version:-unknown}"
+        printf "%-20s %s\n" "homelabctl:" "${gr_homelabctl_version:-unknown}"
         printf "%-20s %s\n" "RADP_VF_HOME:" "${RADP_VF_HOME:-<not set>}"
+        printf "%-20s %s\n" "radp-vf:" "${radp_vf_version:-<not found>}"
         printf "%-20s %s\n" "Config directory:" "${config_dir:-<not found>}"
         printf "%-20s %s\n" "Environment:" "${env:-<not set>}"
         printf "%-20s %s\n" "Vagrant:" "${vagrant_version:-<not found>}"
