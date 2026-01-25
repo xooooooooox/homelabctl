@@ -129,6 +129,80 @@ homelabctl completion zsh >~/.zfunc/_homelabctl
 | `version`            | Show homelabctl version          |
 | `completion <shell>` | Generate shell completion script |
 
+## Environment Variables
+
+| Variable                  | Description                                        |
+|---------------------------|----------------------------------------------------|
+| `RADP_VF_HOME`            | Path to radp-vagrant-framework installation        |
+| `RADP_VAGRANT_CONFIG_DIR` | Configuration directory path (default: `./config`) |
+| `RADP_VAGRANT_ENV`        | Override environment name                          |
+
+## CI/CD
+
+This project includes GitHub Actions workflows for automated releases.
+
+### Workflow Chain
+
+```
+release-prep (manual trigger)
+       │
+       ▼
+   PR merged
+       │
+       ▼
+create-version-tag
+       │
+       ├──────────────────────┬──────────────────────┐
+       ▼                      ▼                      ▼
+update-spec-version    update-homebrew-tap    (GitHub Release)
+       │
+       ├──────────────┐
+       ▼              ▼
+build-copr-package  build-obs-package
+```
+
+### Release Process
+
+1. Trigger `release-prep` workflow with bump_type (patch/minor/major/manual)
+2. Review and merge the generated PR
+3. Subsequent workflows run automatically
+
+### Required Secrets
+
+Configure these secrets in your GitHub repository settings (`Settings > Secrets and variables > Actions`):
+
+#### Homebrew Tap (required for `update-homebrew-tap`)
+
+| Secret               | Description                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| `HOMEBREW_TAP_TOKEN` | GitHub Personal Access Token with `repo` scope for homebrew-radp repository |
+
+#### COPR (required for `build-copr-package`)
+
+| Secret          | Description                                                    |
+|-----------------|----------------------------------------------------------------|
+| `COPR_LOGIN`    | COPR API login (from <https://copr.fedorainfracloud.org/api/>) |
+| `COPR_TOKEN`    | COPR API token                                                 |
+| `COPR_USERNAME` | COPR username                                                  |
+| `COPR_PROJECT`  | COPR project name (e.g., `radp`)                               |
+
+#### OBS (required for `build-obs-package`)
+
+| Secret         | Description                                                    |
+|----------------|----------------------------------------------------------------|
+| `OBS_USERNAME` | OBS username                                                   |
+| `OBS_PASSWORD` | OBS password or API token                                      |
+| `OBS_PROJECT`  | OBS project name                                               |
+| `OBS_PACKAGE`  | OBS package name                                               |
+| `OBS_API_URL`  | (Optional) OBS API URL, defaults to `https://api.opensuse.org` |
+
+### Skipping Workflows
+
+If you don't need certain distribution channels:
+
+- Delete the corresponding workflow file from `.github/workflows/`
+- Or leave secrets unconfigured (workflow will skip with missing secrets)
+
 ## License
 
 MIT
