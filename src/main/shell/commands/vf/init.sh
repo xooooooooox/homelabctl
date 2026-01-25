@@ -2,8 +2,12 @@
 # @cmd
 # @desc Initialize a new radp-vagrant-framework project
 # @arg dir Target directory (default: current directory)
+# @option -t, --template <name> Use a template (default: base)
+# @option --set* <var>=<value> Set template variable (can be repeated)
 # @example vf init
 # @example vf init ~/my-lab
+# @example vf init ~/my-lab -t k8s-cluster
+# @example vf init ~/my-lab -t k8s-cluster --set cluster_name=homelab --set worker_count=3
 
 cmd_vf_init() {
     local target_dir="${1:-.}"
@@ -20,8 +24,24 @@ cmd_vf_init() {
         return 1
     fi
 
+    # 构建参数
+    local -a args=()
+    args+=("$target_dir")
+
+    # 添加 template 选项
+    if [[ -n "${opt_template:-}" ]]; then
+        args+=("-t" "$opt_template")
+    fi
+
+    # 添加 --set 选项 (opt_set 是数组)
+    if [[ -n "${opt_set:-}" ]]; then
+        for var in "${opt_set[@]}"; do
+            args+=("--set" "$var")
+        done
+    fi
+
     # 调用 radp-vf init
-    "$radp_vf" init "$target_dir"
+    "$radp_vf" init "${args[@]}"
 
     echo ""
     radp_log_info "homelabctl commands:"
