@@ -2,10 +2,10 @@
 # @cmd
 # @desc List clusters and guests from configuration
 # @option -e, --env <name> Override environment name
-# @flag -v, --verbose Show detailed info (box, network, provisions, etc.)
-# @flag --provisions Show provisions only
-# @flag --synced-folders Show synced folders only
-# @flag --triggers Show triggers only
+# @option -v, --verbose Show detailed info (box, network, provisions, etc.)
+# @option --provisions Show provisions only
+# @option --synced-folders Show synced folders only
+# @option --triggers Show triggers only
 # @arg filter Filter by guest ID or machine name
 # @example vf list
 # @example vf list -e prod

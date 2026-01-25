@@ -21,13 +21,22 @@ homelabctl_get_project_root() {
 }
 
 # 解析全局选项 (--verbose, --debug)
+# 全局选项只在子命令之前有效，子命令之后的选项传递给子命令
 # 返回: 设置环境变量并输出过滤后的参数
 homelabctl_parse_global_opts() {
     local -a filtered_args=()
     local verbose=false
     local debug=false
+    local found_command=false
 
     while [[ $# -gt 0 ]]; do
+        # 一旦遇到非选项参数（子命令），后续所有参数都传递给子命令
+        if [[ "$found_command" == "true" ]]; then
+            filtered_args+=("$1")
+            shift
+            continue
+        fi
+
         case "$1" in
             -v|--verbose)
                 verbose=true
@@ -42,7 +51,14 @@ homelabctl_parse_global_opts() {
                 filtered_args+=("$@")
                 break
                 ;;
+            -*)
+                # 未知的全局选项，保留传递
+                filtered_args+=("$1")
+                shift
+                ;;
             *)
+                # 遇到子命令，标记后续参数直接传递
+                found_command=true
                 filtered_args+=("$1")
                 shift
                 ;;
