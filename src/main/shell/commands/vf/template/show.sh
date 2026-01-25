@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 # @cmd
-# @desc Manage project templates
-# @arg subcommand! Subcommand (list, show)
-# @arg args~ Additional arguments
-# @example vf template list
+# @desc Show template details and variables
+# @arg name! Template name
 # @example vf template show base
 # @example vf template show k8s-cluster
 
-cmd_vf_template() {
-    local subcommand="${1:-list}"
-    shift || true
+cmd_vf_template_show() {
+    local name="${1:-}"
+
+    if [[ -z "$name" ]]; then
+        radp_log_error "Template name required"
+        echo "Usage: homelabctl vf template show <name>"
+        return 1
+    fi
 
     # 查找 radp-vf CLI
     local radp_vf=""
@@ -23,6 +26,5 @@ cmd_vf_template() {
         return 1
     fi
 
-    # 调用 radp-vf template
-    "$radp_vf" template "$subcommand" "$@"
+    "$radp_vf" template show "$name"
 }
