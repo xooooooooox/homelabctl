@@ -135,15 +135,16 @@ By default, homelabctl runs in quiet mode (no banner, only error logs).
 
 ## Commands
 
-| Command              | Description                      |
-|----------------------|----------------------------------|
-| `vg <cmd>`           | Vagrant command passthrough      |
-| `vf init`            | Initialize a vagrant project     |
-| `vf info`            | Show environment information     |
-| `vf dump-config`     | Export merged configuration      |
-| `vf generate`        | Generate standalone Vagrantfile  |
-| `version`            | Show homelabctl version          |
-| `completion <shell>` | Generate shell completion script |
+| Command              | Description                             |
+|----------------------|-----------------------------------------|
+| `vg <cmd>`           | Vagrant command passthrough             |
+| `vf init`            | Initialize a vagrant project            |
+| `vf info`            | Show environment information            |
+| `vf dump-config`     | Export merged configuration (JSON)      |
+| `vf generate`        | Generate standalone Vagrantfile         |
+| `vf version`         | Show radp-vagrant-framework version     |
+| `version`            | Show homelabctl version                 |
+| `completion <shell>` | Generate shell completion script        |
 
 ## Environment Variables
 

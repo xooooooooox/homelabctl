@@ -134,15 +134,16 @@ homelabctl --debug vf info
 
 ## 命令
 
-| 命令                   | 描述                |
-|----------------------|-------------------|
-| `vg <cmd>`           | Vagrant 命令透传      |
-| `vf init`            | 初始化 Vagrant 项目    |
-| `vf info`            | 显示环境信息            |
-| `vf dump-config`     | 导出合并后的配置          |
-| `vf generate`        | 生成独立的 Vagrantfile |
-| `version`            | 显示 homelabctl 版本  |
-| `completion <shell>` | 生成 Shell 补全脚本     |
+| 命令                   | 描述                            |
+|----------------------|-------------------------------|
+| `vg <cmd>`           | Vagrant 命令透传                  |
+| `vf init`            | 初始化 Vagrant 项目                |
+| `vf info`            | 显示环境信息                        |
+| `vf dump-config`     | 导出合并后的配置（JSON 格式）             |
+| `vf generate`        | 生成独立的 Vagrantfile             |
+| `vf version`         | 显示 radp-vagrant-framework 版本  |
+| `version`            | 显示 homelabctl 版本              |
+| `completion <shell>` | 生成 Shell 补全脚本                 |
 
 ## 环境变量
 

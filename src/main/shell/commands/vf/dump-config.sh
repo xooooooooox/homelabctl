@@ -1,19 +1,14 @@
 # @cmd
-# @desc Export merged configuration
-# @option -e, --env <name> Environment name
-# @option -g, --guest <id> Filter by guest ID or machine name
-# @option -f, --format <fmt> Output format: json or yaml (default: json)
-# @option -o, --output <file> Output file (default: stdout)
+# @desc Export merged configuration (JSON format)
+# @option -e, --env <name> Override environment name
+# @arg filter Filter by guest ID or machine name
 # @example vf dump-config
 # @example vf dump-config -e prod
-# @example vf dump-config -g node-1
-# @example vf dump-config -f yaml
+# @example vf dump-config node-1
 
 cmd_vf_dump_config() {
     local env="${opt_env:-}"
-    local guest="${opt_guest:-}"
-    local format="${opt_format:-json}"
-    local output="${opt_output:-}"
+    local filter="${1:-}"
 
     # 查找 radp-vf CLI
     local radp_vf=""
@@ -27,31 +22,20 @@ cmd_vf_dump_config() {
         return 1
     fi
 
-    # 构建命令参数
-    local -a args=("dump-config")
-
-    # 设置配置目录
-    if [[ -d "./config" ]]; then
-        args+=("-c" "./config")
+    # 设置配置目录环境变量
+    if [[ -d "./config" && -z "${RADP_VAGRANT_CONFIG_DIR:-}" ]]; then
+        export RADP_VAGRANT_CONFIG_DIR="$(pwd)/config"
     fi
 
+    # 设置环境变量覆盖
     if [[ -n "$env" ]]; then
-        args+=("-e" "$env")
+        export RADP_VAGRANT_ENV="$env"
     fi
 
-    if [[ -n "$guest" ]]; then
-        args+=("-g" "$guest")
-    fi
-
-    if [[ -n "$format" ]]; then
-        args+=("-f" "$format")
-    fi
-
-    # 执行
-    if [[ -n "$output" ]]; then
-        "$radp_vf" "${args[@]}" > "$output"
-        radp_log_info "Config dumped to: $output"
+    # 执行 radp-vf dump-config [filter]
+    if [[ -n "$filter" ]]; then
+        "$radp_vf" dump-config "$filter"
     else
-        "$radp_vf" "${args[@]}"
+        "$radp_vf" dump-config
     fi
 }

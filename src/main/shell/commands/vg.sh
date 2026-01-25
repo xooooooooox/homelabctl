@@ -45,8 +45,15 @@ cmd_vg() {
     fi
 
     # 设置 Vagrantfile 路径（如果 RADP_VF_HOME 可用）
-    if [[ -n "${RADP_VF_HOME:-}" && -f "${RADP_VF_HOME}/src/main/ruby/Vagrantfile" ]]; then
-        export VAGRANT_VAGRANTFILE="${RADP_VF_HOME}/src/main/ruby/Vagrantfile"
+    # 支持两种安装模式:
+    # 1. Development: ${RADP_VF_HOME}/src/main/ruby/Vagrantfile
+    # 2. Homebrew: ${RADP_VF_HOME}/Vagrantfile
+    if [[ -n "${RADP_VF_HOME:-}" ]]; then
+        if [[ -f "${RADP_VF_HOME}/src/main/ruby/Vagrantfile" ]]; then
+            export VAGRANT_VAGRANTFILE="${RADP_VF_HOME}/src/main/ruby/Vagrantfile"
+        elif [[ -f "${RADP_VF_HOME}/Vagrantfile" ]]; then
+            export VAGRANT_VAGRANTFILE="${RADP_VF_HOME}/Vagrantfile"
+        fi
     fi
 
     # 执行 vagrant 命令

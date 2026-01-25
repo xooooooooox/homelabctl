@@ -1,16 +1,14 @@
 # @cmd
 # @desc Generate standalone Vagrantfile
-# @option -e, --env <name> Environment name
-# @option -o, --output <file> Output file (default: Vagrantfile.generated)
-# @option -d, --dry-run Preview without saving
+# @option -e, --env <name> Override environment name
+# @arg output Output file path (default: stdout)
 # @example vf generate
-# @example vf generate -o Vagrantfile
-# @example vf generate --dry-run
+# @example vf generate Vagrantfile.standalone
+# @example vf generate -e prod Vagrantfile.prod
 
 cmd_vf_generate() {
     local env="${opt_env:-}"
-    local output="${opt_output:-Vagrantfile.generated}"
-    local dry_run="${opt_dry_run:-false}"
+    local output="${1:-}"
 
     # 查找 radp-vf CLI
     local radp_vf=""
@@ -24,26 +22,20 @@ cmd_vf_generate() {
         return 1
     fi
 
-    # 构建命令参数
-    local -a args=("generate")
-
-    # 设置配置目录
-    if [[ -d "./config" ]]; then
-        args+=("-c" "./config")
+    # 设置配置目录环境变量
+    if [[ -d "./config" && -z "${RADP_VAGRANT_CONFIG_DIR:-}" ]]; then
+        export RADP_VAGRANT_CONFIG_DIR="$(pwd)/config"
     fi
 
+    # 设置环境变量覆盖
     if [[ -n "$env" ]]; then
-        args+=("-e" "$env")
+        export RADP_VAGRANT_ENV="$env"
     fi
 
-    # 执行
-    if [[ "$dry_run" == "true" ]]; then
-        radp_log_info "Dry run - preview Vagrantfile:"
-        echo "---"
-        "$radp_vf" "${args[@]}"
-        echo "---"
+    # 执行 radp-vf generate [output]
+    if [[ -n "$output" ]]; then
+        "$radp_vf" generate "$output"
     else
-        "$radp_vf" "${args[@]}" -o "$output"
-        radp_log_info "Vagrantfile generated: $output"
+        "$radp_vf" generate
     fi
 }
