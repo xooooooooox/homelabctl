@@ -23,12 +23,13 @@ export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 
 ### Available Commands
 - `vg <cmd>` - Vagrant command passthrough (sets VAGRANT_VAGRANTFILE automatically)
-- `vf init` - Initialize a vagrant project with config templates
+- `vf init` - Initialize a vagrant project (supports -t/--template, --set options)
 - `vf info` - Show environment information (versions, paths, plugins)
 - `vf list` - List clusters and guests (supports -v, --provisions, --synced-folders, --triggers)
 - `vf validate` - Validate YAML configuration files
 - `vf dump-config` - Export merged configuration (JSON/YAML, supports -f and -o options)
 - `vf generate` - Generate standalone Vagrantfile
+- `vf template` - Manage project templates (list, show)
 - `vf version` - Show radp-vagrant-framework version
 - `version` - Show homelabctl version
 - `completion <bash|zsh>` - Generate shell completion
@@ -50,6 +51,7 @@ homelabctl/
 │   │   │   ├── validate.sh
 │   │   │   ├── dump-config.sh
 │   │   │   ├── generate.sh
+│   │   │   ├── template.sh
 │   │   │   └── version.sh
 │   │   ├── version.sh
 │   │   └── completion.sh
