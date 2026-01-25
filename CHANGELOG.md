@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.0.3 - 2026-01-25
+
+### feat
+- f4a0dc7 add template support to `vf init` and new `vf template` command for managing project templates
+
+### docs
+- 955d4d3 update CLAUDE.md to include `vf template` command and enhancements to `vf init`
+
 ## v0.0.2 - 2026-01-25
 
 ### feat
