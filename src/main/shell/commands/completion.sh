@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Generate shell completion script
 # @arg shell! Shell type (bash or zsh)

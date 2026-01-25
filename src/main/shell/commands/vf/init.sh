@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Initialize a new radp-vagrant-framework project
 # @arg dir Target directory (default: current directory)

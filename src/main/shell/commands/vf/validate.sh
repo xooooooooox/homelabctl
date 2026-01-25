@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Validate YAML configuration files
 # @option -e, --env <name> Override environment name

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Generate standalone Vagrantfile
 # @option -e, --env <name> Override environment name

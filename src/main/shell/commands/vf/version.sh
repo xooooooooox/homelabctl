@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Show radp-vagrant-framework version
 # @example vf version

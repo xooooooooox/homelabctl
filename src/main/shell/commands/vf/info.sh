@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Show current environment information
 # @option -e, --env <name> Environment name

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Export merged configuration
 # @option -e, --env <name> Override environment name

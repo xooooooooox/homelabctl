@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc Run vagrant commands (passthrough to vagrant)
 # @arg cmd! Vagrant command (up, halt, ssh, destroy, status, etc.)

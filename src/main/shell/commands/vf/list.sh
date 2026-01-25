@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # @cmd
 # @desc List clusters and guests from configuration
 # @option -e, --env <name> Override environment name
