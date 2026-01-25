@@ -55,6 +55,8 @@ homelabctl/
 ├── packaging/
 │   ├── copr/
 │   │   └── homelabctl.spec     # RPM spec for COPR
+│   ├── homebrew/
+│   │   └── homelabctl.rb       # Homebrew formula template
 │   └── obs/
 │       ├── homelabctl.spec     # RPM spec for OBS
 │       └── debian/             # Debian packaging files
