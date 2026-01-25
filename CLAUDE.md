@@ -13,16 +13,19 @@ homelabctl is a CLI tool for managing homelab infrastructure, built on top of ra
 # Ensure radp-bash-framework is in PATH
 export PATH="/path/to/radp-bash-framework/src/main/shell/bin:$PATH"
 
+# Set radp-vagrant-framework home (for vf commands)
+export RADP_VF_HOME="/path/to/radp-vagrant-framework"
+
 ./bin/homelabctl --help
 ./bin/homelabctl vf info
 ./bin/homelabctl vg up
 ```
 
 ### Available Commands
-- `vg <cmd>` - Vagrant command passthrough
-- `vf init` - Initialize a vagrant project
-- `vf info` - Show environment information
-- `vf dump-config` - Export merged configuration
+- `vg <cmd>` - Vagrant command passthrough (sets VAGRANT_VAGRANTFILE automatically)
+- `vf init` - Initialize a vagrant project with config templates
+- `vf info` - Show environment information (versions, paths, plugins)
+- `vf dump-config` - Export merged configuration (JSON/YAML)
 - `vf generate` - Generate standalone Vagrantfile
 - `version` - Show version
 - `completion <bash|zsh>` - Generate shell completion
@@ -107,6 +110,11 @@ cmd_vf_init() {
 - `HOMEBREW_TAP_TOKEN` - GitHub token for homebrew-radp repository
 
 ## Dependencies
-- radp-bash-framework (required)
-- radp-vagrant-framework (for vf commands)
-- vagrant (for vg commands)
+- radp-bash-framework (required) - CLI framework
+- radp-vagrant-framework (for vf commands) - set `RADP_VF_HOME` env var
+- vagrant (for vg commands) - Vagrant CLI
+
+## Environment Variables
+- `RADP_VF_HOME` - Path to radp-vagrant-framework (required for vf commands)
+- `RADP_VAGRANT_CONFIG_DIR` - Override config directory (default: ./config)
+- `RADP_VAGRANT_ENV` - Override environment name
