@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.0.4 - 2026-01-25
+
+### docs
+- aeb5110 refine CLAUDE.md to detail `vf template list` and `vf template show` subcommands
+
+### refactor
+- 3f2632c split `vf template` command into dedicated `list` and `show` subcommands
+
 ## v0.0.3 - 2026-01-25
 
 ### feat
