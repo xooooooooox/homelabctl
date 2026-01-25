@@ -112,8 +112,8 @@ homelabctl vf dump-config
 homelabctl vf generate
 
 # 生成 Shell 补全脚本
-homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
-homelabctl completion zsh > ~/.zfunc/_homelabctl
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
+homelabctl completion zsh >~/.zfunc/_homelabctl
 
 # Verbose 模式（显示 banner 和 info 日志）
 homelabctl -v vf info
@@ -125,10 +125,10 @@ homelabctl --debug vf info
 
 ## 全局选项
 
-| 选项 | 描述 |
-|------|------|
-| `-v`, `--verbose` | 启用详细输出（显示 banner 和 info 日志） |
-| `--debug` | 启用调试输出（显示 banner 和 debug 日志） |
+| 选项                | 描述                           |
+|-------------------|------------------------------|
+| `-v`, `--verbose` | 启用详细输出（显示 banner 和 info 日志）  |
+| `--debug`         | 启用调试输出（显示 banner 和 debug 日志） |
 
 默认情况下，homelabctl 以静默模式运行（无 banner，仅显示错误日志）。
 
