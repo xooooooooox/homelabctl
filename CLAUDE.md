@@ -32,6 +32,12 @@ export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 - `vf template list` - List available project templates
 - `vf template show` - Show template details and variables
 - `vf version` - Show radp-vagrant-framework version
+- `setup install <name>` - Install a software package (-v version, --dry-run)
+- `setup list` - List available packages (-c category, --installed, --categories)
+- `setup info <name>` - Show package details
+- `setup profile list` - List available setup profiles
+- `setup profile show <name>` - Show profile details
+- `setup profile apply <name>` - Apply a profile (--dry-run, --continue, --skip-installed)
 - `version` - Show homelabctl version
 - `completion <bash|zsh>` - Generate shell completion
 
@@ -59,6 +65,14 @@ homelabctl/
 │   │   │   │   ├── list.sh
 │   │   │   │   └── show.sh
 │   │   │   └── version.sh
+│   │   ├── setup/              # homelabctl setup <subcommand>
+│   │   │   ├── install.sh
+│   │   │   ├── list.sh
+│   │   │   ├── info.sh
+│   │   │   └── profile/        # homelabctl setup profile <subcommand>
+│   │   │       ├── list.sh
+│   │   │       ├── show.sh
+│   │   │       └── apply.sh
 │   │   ├── version.sh
 │   │   └── completion.sh
 │   ├── config/
@@ -66,6 +80,23 @@ homelabctl/
 │   ├── vars/
 │   │   └── constants.sh        # Version constants (gr_homelabctl_version)
 │   └── libs/                   # Project-specific libraries
+│       └── setup/              # Setup feature libraries
+│           ├── _common.sh      # Shared helper functions
+│           ├── registry.sh     # Registry management
+│           ├── installer.sh    # Installer utilities
+│           ├── registry.yaml   # Package registry
+│           ├── profiles/       # Profile definitions
+│           │   ├── osx-dev.yaml
+│           │   ├── linux-dev.yaml
+│           │   └── devops.yaml
+│           └── installers/     # Package installers
+│               ├── fzf.sh
+│               ├── bat.sh
+│               ├── fd.sh
+│               ├── jq.sh
+│               ├── neovim.sh
+│               ├── nodejs.sh
+│               └── jdk.sh
 ├── packaging/
 │   ├── copr/
 │   │   └── homelabctl.spec     # RPM spec for COPR
@@ -134,3 +165,79 @@ cmd_vf_init() {
 - `RADP_VF_HOME` - Path to radp-vagrant-framework (required for vf commands)
 - `RADP_VAGRANT_CONFIG_DIR` - Override config directory (default: ./config)
 - `RADP_VAGRANT_ENV` - Override environment name
+
+## Setup Feature
+
+The setup command manages software installation across different platforms.
+
+### Usage Examples
+```bash
+# List available packages
+homelabctl setup list
+homelabctl setup list -c cli-tools
+homelabctl setup list --installed
+
+# Show package info
+homelabctl setup info fzf
+
+# Install packages
+homelabctl setup install fzf
+homelabctl setup install nodejs -v 20.10.0
+homelabctl setup install jdk -v 17
+
+# Profiles
+homelabctl setup profile list
+homelabctl setup profile show osx-dev
+homelabctl setup profile apply osx-dev --dry-run
+homelabctl setup profile apply linux-dev --continue
+```
+
+### User Extensions
+
+Users can extend the setup feature by adding custom packages and profiles in `~/.config/homelabctl/setup/`:
+
+```
+~/.config/homelabctl/setup/
+├── registry.yaml           # Custom package definitions
+├── profiles/               # Custom profiles
+│   └── my-profile.yaml
+└── installers/             # Custom installers
+    └── my-tool.sh
+```
+
+User files take precedence over builtin files.
+
+### Adding a Custom Package
+
+1. Define the package in `~/.config/homelabctl/setup/registry.yaml`:
+```yaml
+packages:
+  my-tool:
+    desc: My custom tool
+    category: cli-tools
+    check-cmd: my-tool
+```
+
+2. Create installer at `~/.config/homelabctl/setup/installers/my-tool.sh`:
+```bash
+#!/usr/bin/env bash
+_setup_install_my_tool() {
+    local version="${1:-latest}"
+    # Installation logic here
+}
+```
+
+### Adding a Custom Profile
+
+Create `~/.config/homelabctl/setup/profiles/my-profile.yaml`:
+```yaml
+name: my-profile
+desc: My custom profile
+platform: any
+
+packages:
+  - name: fzf
+  - name: bat
+  - name: my-tool
+    version: "1.0.0"
+```
