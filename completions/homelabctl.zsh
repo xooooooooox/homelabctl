@@ -42,8 +42,7 @@ _homelabctl() {
                 completion)
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
-                        '1:shell:_files' \
-
+                        '1:shell:_files'
                     ;;
                 setup)
                     local subcommands=(
@@ -56,8 +55,7 @@ _homelabctl() {
                     info)
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            '1:name:->arg_name' \
-
+                            '1:name:->arg_name'
 
                         case "$state" in
                             arg_name)
@@ -72,8 +70,7 @@ _homelabctl() {
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-v --version)'{-v,--version}[Specific version (default: latest)]:ver:' \
                             (-d --dry-run)'{-d,--dry-run}[Show what would be installed without installing]' \
-                            '1:name:->arg_name' \
-
+                            '1:name:->arg_name'
 
                         case "$state" in
                             arg_name)
@@ -114,8 +111,7 @@ _homelabctl() {
                                 (-d --dry-run)'{-d,--dry-run}[Show what would be installed]' \
                                 (-c --continue)'{-c,--continue}[Continue on error]' \
                                 (-s --skip-installed)'{-s,--skip-installed}[Skip already installed packages]' \
-                                '1:name:->arg_name' \
-
+                                '1:name:->arg_name'
 
                             case "$state" in
                                 arg_name)
@@ -134,8 +130,7 @@ _homelabctl() {
                         show)
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                '1:name:->arg_name' \
-
+                                '1:name:->arg_name'
 
                             case "$state" in
                                 arg_name)
@@ -178,15 +173,13 @@ _homelabctl() {
                             (-e --env)'{-e,--env}[Override environment name]:name:' \
                             (-f --format)'{-f,--format}[Output format (json or yaml, default: json)]:format:' \
                             (-o --output)'{-o,--output}[Output file path]:file:' \
-                            '1:filter:_files' \
-
+                            '1:filter:_files'
                         ;;
                     generate)
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-e --env)'{-e,--env}[Override environment name]:name:' \
-                            '1:output:_files' \
-
+                            '1:output:_files'
                         ;;
                     info)
                         _arguments \
@@ -200,8 +193,7 @@ _homelabctl() {
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-t --template)'{-t,--template}[Use a template (default: base)]:name:' \
                             (-s --set)'{-s,--set}[]:var:' \
-                            '1:dir:_files' \
-
+                            '1:dir:_files'
                         ;;
                     list)
                         _arguments \
@@ -211,8 +203,7 @@ _homelabctl() {
                             (-p --provisions)'{-p,--provisions}[Show provisions only]' \
                             (-s --synced-folders)'{-s,--synced-folders}[Show synced folders only]' \
                             (-t --triggers)'{-t,--triggers}[Show triggers only]' \
-                            '1:filter:_files' \
-
+                            '1:filter:_files'
                         ;;
                     template)
                         local subcommands=(
@@ -228,8 +219,7 @@ _homelabctl() {
                         show)
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                '1:name:_files' \
-
+                                '1:name:_files'
                             ;;
                             *)
                                 _describe 'subcommand' subcommands
