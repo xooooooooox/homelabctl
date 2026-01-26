@@ -273,11 +273,22 @@ jobs:
 
       - name: Regenerate completion scripts
         run: |
-          set -euo pipefail
           export PATH="$HOME/.local/bin:$PATH"
+
+          echo "=== Step 1: Check radp-bash-framework ==="
+          radp-bf --version
+          radp-bf --print-run
+
+          echo "=== Step 2: Check homelabctl version ==="
+          ./bin/homelabctl version
+
+          echo "=== Step 3: Generate bash completion ==="
           ./bin/homelabctl completion bash > completions/homelabctl.bash
+          echo "Done: $(wc -l < completions/homelabctl.bash) lines"
+
+          echo "=== Step 4: Generate zsh completion ==="
           ./bin/homelabctl completion zsh > completions/homelabctl.zsh
-          echo "Completion scripts regenerated"
+          echo "Done: $(wc -l < completions/homelabctl.zsh) lines"
 
       - name: Commit changes
         id: commit
