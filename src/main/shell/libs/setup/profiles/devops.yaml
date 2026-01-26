@@ -1,0 +1,16 @@
+# DevOps Tools Profile
+name: devops
+desc: DevOps and infrastructure tooling
+platform: any
+
+packages:
+  # Core CLI tools
+  - name: jq
+
+  # Container and orchestration
+  - name: kubectl
+  - name: helm
+
+  # Infrastructure as code
+  - name: terraform
+  - name: ansible

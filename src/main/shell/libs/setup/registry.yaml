@@ -1,0 +1,146 @@
+# Package registry for homelabctl setup
+# This file defines available packages and their metadata
+
+packages:
+  # CLI Tools
+  fzf:
+    desc: Fuzzy finder for command line
+    category: cli-tools
+    check-cmd: fzf
+    homepage: https://github.com/junegunn/fzf
+
+  bat:
+    desc: Cat clone with syntax highlighting
+    category: cli-tools
+    check-cmd: bat
+    homepage: https://github.com/sharkdp/bat
+
+  fd:
+    desc: Fast and user-friendly find alternative
+    category: cli-tools
+    check-cmd: fd
+    homepage: https://github.com/sharkdp/fd
+
+  jq:
+    desc: Lightweight JSON processor
+    category: cli-tools
+    check-cmd: jq
+    homepage: https://jqlang.github.io/jq/
+
+  ripgrep:
+    desc: Fast recursive grep alternative
+    category: cli-tools
+    check-cmd: rg
+    homepage: https://github.com/BurntSushi/ripgrep
+
+  eza:
+    desc: Modern replacement for ls
+    category: cli-tools
+    check-cmd: eza
+    homepage: https://github.com/eza-community/eza
+
+  zoxide:
+    desc: Smarter cd command
+    category: cli-tools
+    check-cmd: zoxide
+    homepage: https://github.com/ajeetdsouza/zoxide
+
+  # Editors
+  neovim:
+    desc: Hyperextensible Vim-based text editor
+    category: editors
+    check-cmd: nvim
+    homepage: https://neovim.io/
+
+  # Languages and Runtimes
+  nodejs:
+    desc: JavaScript runtime
+    category: languages
+    check-cmd: node
+    homepage: https://nodejs.org/
+
+  jdk:
+    desc: Java Development Kit
+    category: languages
+    check-cmd: java
+    homepage: https://adoptium.net/
+
+  python:
+    desc: Python programming language
+    category: languages
+    check-cmd: python3
+    homepage: https://www.python.org/
+
+  go:
+    desc: Go programming language
+    category: languages
+    check-cmd: go
+    homepage: https://go.dev/
+
+  rust:
+    desc: Rust programming language
+    category: languages
+    check-cmd: rustc
+    homepage: https://www.rust-lang.org/
+
+  # DevOps Tools
+  kubectl:
+    desc: Kubernetes command-line tool
+    category: devops
+    check-cmd: kubectl
+    homepage: https://kubernetes.io/docs/reference/kubectl/
+
+  helm:
+    desc: Kubernetes package manager
+    category: devops
+    check-cmd: helm
+    homepage: https://helm.sh/
+
+  docker:
+    desc: Container runtime
+    category: devops
+    check-cmd: docker
+    homepage: https://www.docker.com/
+
+  terraform:
+    desc: Infrastructure as code tool
+    category: devops
+    check-cmd: terraform
+    homepage: https://www.terraform.io/
+
+  ansible:
+    desc: IT automation platform
+    category: devops
+    check-cmd: ansible
+    homepage: https://www.ansible.com/
+
+  # Shell Tools
+  zsh:
+    desc: Z shell
+    category: shell
+    check-cmd: zsh
+    homepage: https://www.zsh.org/
+
+  tmux:
+    desc: Terminal multiplexer
+    category: shell
+    check-cmd: tmux
+    homepage: https://github.com/tmux/tmux
+
+  starship:
+    desc: Cross-shell prompt
+    category: shell
+    check-cmd: starship
+    homepage: https://starship.rs/
+
+categories:
+  cli-tools:
+    desc: Command line utilities and productivity tools
+  editors:
+    desc: Text editors and IDEs
+  languages:
+    desc: Programming languages and runtimes
+  devops:
+    desc: DevOps, containers, and infrastructure tools
+  shell:
+    desc: Shell utilities and terminal tools

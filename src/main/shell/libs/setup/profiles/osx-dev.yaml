@@ -1,0 +1,19 @@
+# macOS Development Environment Profile
+name: osx-dev
+desc: macOS development environment with essential CLI tools
+platform: darwin
+
+packages:
+  # Core CLI tools
+  - name: fzf
+  - name: bat
+  - name: fd
+  - name: jq
+  - name: ripgrep
+
+  # Shell enhancements
+  - name: eza
+  - name: zoxide
+
+  # Editor
+  - name: neovim
