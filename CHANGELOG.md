@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.0.9 - 2026-01-26
+
+### fix
+- 2f0f772 vg cmd
+
+### chore
+- a2159b4 use latest release of radp-bash-framework
+
 ## v0.0.8 - 2026-01-26
 
 ### feat
