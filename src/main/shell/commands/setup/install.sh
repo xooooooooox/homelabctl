@@ -2,6 +2,7 @@
 # @cmd
 # @desc Install a software package
 # @arg name! Package name to install
+# @complete name _homelabctl_complete_packages
 # @option -v, --version <ver> Specific version (default: latest)
 # @option --dry-run Show what would be installed without installing
 # @example setup install fzf
