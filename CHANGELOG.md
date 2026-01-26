@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## v0.0.8 - 2026-01-26
+
+### feat
+- c64adb0 enhance setup commands with dynamic shell completions
+- e5f85b2 add shell completion helper functions for setup commands
+- 9c3a2e7 enhance shell completions with dynamic suggestions
+- 116d590 add setup commands for profile and package management
+
+### chore
+- 140402c debug workflow
+- 1f36b0f debug workflow
+
+### docs
+- f356135 expand CONTRIBUTING.md with setup feature details
+- 05f5453 update CLAUDE.md with detailed setup feature documentation
+- bdf01da update README and README_CN with revamped structure and feature details
+- dc89581 add IDE code completion reference for shell scripts
+
+### refactor
+- 6906d07 simplify and modernize shell completion scripts for dynamic completions
+
+### other
+- 5134856 install radp-bash-framework from main branch for latest fixes before release
+- 34aa5e3 format code
+
 ## v0.0.7 - 2026-01-26
 
 ### docs
