@@ -29,6 +29,10 @@ class Homelabctl < Formula
       #!/bin/bash
       exec "#{libexec}/bin/homelabctl" "$@"
     EOS
+
+    # Install shell completions
+    bash_completion.install "completions/homelabctl.bash" => "homelabctl"
+    zsh_completion.install "completions/homelabctl.zsh" => "_homelabctl"
   end
 
   def caveats
@@ -37,6 +41,25 @@ class Homelabctl < Formula
 
       For Vagrant integration, also install radp-vagrant-framework:
         brew install radp-vagrant-framework
+
+      Shell Completions:
+        Completions are installed to Homebrew's standard directories.
+
+        For Bash, ensure bash-completion is configured:
+          brew install bash-completion@2
+          # Add to ~/.bash_profile or ~/.bashrc:
+          [[ -r "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]] && \\
+            source "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+
+        For Zsh, completions should work automatically if using Homebrew's site-functions.
+        If not, add to ~/.zshrc (before compinit):
+          fpath=(#{HOMEBREW_PREFIX}/share/zsh/site-functions $fpath)
+
+        Alternative: Dynamic completion (always up-to-date):
+          # Bash: Add to ~/.bashrc
+          eval "$(homelabctl completion bash)"
+          # Zsh: Add to ~/.zshrc
+          eval "$(homelabctl completion zsh)"
 
       Quick start:
         homelabctl --help
