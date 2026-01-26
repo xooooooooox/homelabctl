@@ -254,11 +254,7 @@ _homelabctl() {
                 vg)
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
-                        (-e --env)'{-e,--env}[Environment name]:name:' \
-                        (-c --config)'{-c,--config}[Config directory path]:dir:' \
-                        '1:cmd:_files' \
-                        '*:args~:_files' \
-
+                        '*:args:'
                     ;;
                 *)
                     _files

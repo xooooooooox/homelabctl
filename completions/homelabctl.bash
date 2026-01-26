@@ -57,10 +57,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "info install list profile  --help" -- "$cur"))
             ;;
         'setup info')
-            case "$prev" in
-                *)
-            esac
-            # 计算参数位置
+            # 计算参数位置（减去命令路径深度）
             local arg_idx=0
             for ((i = 1; i < cword; i++)); do
                 case "${words[i]}" in
@@ -68,6 +65,7 @@ _homelabctl() {
                     *) ((arg_idx++)) ;;
                 esac
             done
+            ((arg_idx -= 2)) || true
             # 根据参数位置补全
             case "$arg_idx" in
                 0)
@@ -80,12 +78,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         'setup install')
-            case "$prev" in
-                *)
-                    # 检查是否是需要值的选项
-                    ;;
-            esac
-            # 计算参数位置
+            # 计算参数位置（减去命令路径深度）
             local arg_idx=0
             for ((i = 1; i < cword; i++)); do
                 case "${words[i]}" in
@@ -93,6 +86,7 @@ _homelabctl() {
                     *) ((arg_idx++)) ;;
                 esac
             done
+            ((arg_idx -= 2)) || true
             # 根据参数位置补全
             case "$arg_idx" in
                 0)
@@ -118,9 +112,6 @@ _homelabctl() {
                     COMPREPLY=($(compgen -W "$completions" -- "$cur"))
                     return
                     ;;
-                *)
-                    # 检查是否是需要值的选项
-                    ;;
             esac
             COMPREPLY=($(compgen -W "--help -c --category -i --installed -c --categories -n --names-only -c --category-names" -- "$cur"))
             ;;
@@ -128,10 +119,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "apply list show  --help" -- "$cur"))
             ;;
         'setup profile apply')
-            case "$prev" in
-                *)
-            esac
-            # 计算参数位置
+            # 计算参数位置（减去命令路径深度）
             local arg_idx=0
             for ((i = 1; i < cword; i++)); do
                 case "${words[i]}" in
@@ -139,6 +127,7 @@ _homelabctl() {
                     *) ((arg_idx++)) ;;
                 esac
             done
+            ((arg_idx -= 3)) || true
             # 根据参数位置补全
             case "$arg_idx" in
                 0)
@@ -154,10 +143,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help -n --names-only" -- "$cur"))
             ;;
         'setup profile show')
-            case "$prev" in
-                *)
-            esac
-            # 计算参数位置
+            # 计算参数位置（减去命令路径深度）
             local arg_idx=0
             for ((i = 1; i < cword; i++)); do
                 case "${words[i]}" in
@@ -165,6 +151,7 @@ _homelabctl() {
                     *) ((arg_idx++)) ;;
                 esac
             done
+            ((arg_idx -= 3)) || true
             # 根据参数位置补全
             case "$arg_idx" in
                 0)
@@ -213,7 +200,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         'vg')
-            COMPREPLY=($(compgen -W "--help -e --env -c --config" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         *)
             COMPREPLY=()
