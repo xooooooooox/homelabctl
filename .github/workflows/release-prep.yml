@@ -283,7 +283,18 @@ jobs:
           ./bin/homelabctl version
 
           echo "=== Step 3: Generate bash completion ==="
-          ./bin/homelabctl completion bash > completions/homelabctl.bash
+          set +e
+          ./bin/homelabctl completion bash > completions/homelabctl.bash 2> /tmp/bash_completion_err.txt
+          exit_code=$?
+          set -e
+          if [[ $exit_code -ne 0 ]]; then
+            echo "FAILED with exit code: $exit_code"
+            echo "=== STDERR ==="
+            cat /tmp/bash_completion_err.txt
+            echo "=== STDOUT (partial) ==="
+            head -20 completions/homelabctl.bash || echo "(empty)"
+            exit 1
+          fi
           echo "Done: $(wc -l < completions/homelabctl.bash) lines"
 
           echo "=== Step 4: Generate zsh completion ==="
