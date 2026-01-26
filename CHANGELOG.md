@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.0.7 - 2026-01-26
+
+### docs
+- a8104fc update README with enhanced structure and detailed feature list
+- 9a40423 add detailed guides for configuration, installation, and contribution
+
 ## v0.0.6 - 2026-01-26
 
 ### feat
