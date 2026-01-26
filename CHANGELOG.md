@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.0.10 - 2026-01-26
+
+### fix
+- f0c4e98 ensure #compdef is first line for zsh completion
+
 ## v0.0.9 - 2026-01-26
 
 ### fix
