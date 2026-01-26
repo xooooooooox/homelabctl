@@ -265,41 +265,18 @@ jobs:
       - name: Install radp-bash-framework
         run: |
           set -euo pipefail
-          # Install radp-bash-framework from main branch
-          # Using RADP_BF_REF=main to get latest fixes before release
+          # Install latest release of radp-bash-framework
           curl -fsSL https://raw.githubusercontent.com/xooooooooox/radp-bash-framework/main/install.sh | \
-            RADP_BF_INSTALL_MODE=manual RADP_BF_REF=main bash
+            RADP_BF_INSTALL_MODE=manual bash
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Regenerate completion scripts
         run: |
+          set -euo pipefail
           export PATH="$HOME/.local/bin:$PATH"
-
-          echo "=== Step 1: Check radp-bash-framework ==="
-          radp-bf --version
-          radp-bf --print-run
-
-          echo "=== Step 2: Check homelabctl version ==="
-          ./bin/homelabctl version
-
-          echo "=== Step 3: Generate bash completion ==="
-          set +e
-          ./bin/homelabctl completion bash > completions/homelabctl.bash 2> /tmp/bash_completion_err.txt
-          exit_code=$?
-          set -e
-          if [[ $exit_code -ne 0 ]]; then
-            echo "FAILED with exit code: $exit_code"
-            echo "=== STDERR ==="
-            cat /tmp/bash_completion_err.txt
-            echo "=== STDOUT (partial) ==="
-            head -20 completions/homelabctl.bash || echo "(empty)"
-            exit 1
-          fi
-          echo "Done: $(wc -l < completions/homelabctl.bash) lines"
-
-          echo "=== Step 4: Generate zsh completion ==="
+          ./bin/homelabctl completion bash > completions/homelabctl.bash
           ./bin/homelabctl completion zsh > completions/homelabctl.zsh
-          echo "Done: $(wc -l < completions/homelabctl.zsh) lines"
+          echo "Completion scripts regenerated"
 
       - name: Commit changes
         id: commit
