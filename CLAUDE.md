@@ -42,6 +42,9 @@ export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 homelabctl/
 ├── bin/
 │   └── homelabctl              # CLI entry point
+├── completions/
+│   ├── homelabctl.bash         # Bash completion script
+│   └── homelabctl.zsh          # Zsh completion script
 ├── src/main/shell/
 │   ├── commands/               # Command implementations
 │   │   ├── vg.sh               # homelabctl vg <cmd>
