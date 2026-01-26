@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.0.6 - 2026-01-26
+
+### feat
+- fa1a1c6 regenerate completion scripts before create PR
+- 48b77d1 Add rebuild zsh completion cache instructions
+
 ## v0.0.5 - 2026-01-26
 
 ### feat
