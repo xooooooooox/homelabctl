@@ -16,11 +16,12 @@
 
 - **Vagrant 集成** - 透传 Vagrant 命令，自动检测 Vagrantfile
 - **RADP Vagrant Framework** - 初始化、配置和管理多虚拟机环境
-- **模板系统** - 从预定义模板创建项目（`k8s-cluster`、`single-node` 等）
-- **Shell 补全** - 支持 Bash 和 Zsh 补全
-- **Verbose/Debug 模式** - 可配置的输出级别，便于问题排查
+- **软件安装** - 跨平台安装 CLI 工具、编程语言和 DevOps 工具，支持配置文件批量安装
+- **Shell 补全** - 支持 Bash 和 Zsh 补全，包含软件包和配置文件的动态补全
 
-## 前置要求
+## 安装
+
+### 前置要求
 
 homelabctl 需要安装 radp-bash-framework：
 
@@ -28,10 +29,6 @@ homelabctl 需要安装 radp-bash-framework：
 brew tap xooooooooox/radp
 brew install radp-bash-framework
 ```
-
-或参考：https://github.com/xooooooooox/radp-bash-framework#installation
-
-## 安装
 
 ### Homebrew（推荐）
 
@@ -53,75 +50,157 @@ sudo dnf copr enable -y xooooooooox/radp
 sudo dnf install -y homelabctl
 ```
 
-更多安装选项（OBS、手动安装、升级）请参阅[安装指南](docs/installation.md)。
+更多安装选项请参阅[安装指南](docs/installation.md)。
 
-## 使用方法
+## 快速开始
 
 ```shell
 # 显示帮助
 homelabctl --help
 
+# 安装开发工具
+homelabctl setup install fzf
+homelabctl setup profile apply osx-dev
+
+# 管理 Vagrant 虚拟机
+homelabctl vf init myproject --template k8s-cluster
+homelabctl vg up
+```
+
+## 命令
+
+### Vagrant 集成 (vg, vf)
+
+管理 Vagrant 虚拟机，支持自动 Vagrantfile 检测和多虚拟机配置。
+
+| 命令                 | 描述               |
+|--------------------|--------------------|
+| `vg <cmd>`         | Vagrant 命令透传   |
+| `vf init [dir]`    | 初始化 Vagrant 项目 |
+| `vf list`          | 列出集群和虚拟机   |
+| `vf info`          | 显示环境信息       |
+| `vf validate`      | 验证 YAML 配置     |
+| `vf dump-config`   | 导出合并后的配置   |
+| `vf generate`      | 生成独立 Vagrantfile |
+| `vf template list` | 列出可用模板       |
+| `vf template show` | 显示模板详情       |
+| `vf version`       | 显示框架版本       |
+
+**示例：**
+
+```shell
 # Vagrant 命令透传
 homelabctl vg up
 homelabctl vg ssh
 homelabctl vg status
 
-# Vagrant 框架命令
+# 从模板初始化项目
 homelabctl vf init myproject
 homelabctl vf init myproject --template k8s-cluster
+
+# 查看配置
 homelabctl vf list
 homelabctl vf info
-homelabctl vf dump-config
-
-# Shell 补全
-homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
-homelabctl completion zsh >~/.zfunc/_homelabctl
-
-# Verbose/Debug 模式
-homelabctl -v vf info # Verbose 输出
-homelabctl --debug vg up # Debug 输出
+homelabctl vf dump-config -f yaml
 ```
 
-## 命令
+**环境变量：**
 
-| 命令                   | 描述               |
-|----------------------|------------------|
-| `vg <cmd>`           | Vagrant 命令透传     |
-| `vf init [dir]`      | 初始化 Vagrant 项目   |
-| `vf list`            | 列出集群和虚拟机         |
-| `vf info`            | 显示环境信息           |
-| `vf validate`        | 验证 YAML 配置       |
-| `vf dump-config`     | 导出合并后的配置         |
-| `vf generate`        | 生成独立 Vagrantfile |
-| `vf template list`   | 列出可用模板           |
-| `vf template show`   | 显示模板详情           |
-| `version`            | 显示 homelabctl 版本 |
-| `completion <shell>` | 生成 Shell 补全脚本    |
+| 变量                      | 描述                             |
+|---------------------------|----------------------------------|
+| `RADP_VF_HOME`            | radp-vagrant-framework 安装路径  |
+| `RADP_VAGRANT_CONFIG_DIR` | 配置目录路径（默认：`./config`） |
+| `RADP_VAGRANT_ENV`        | 覆盖环境名称                     |
+
+虚拟机配置详情请参阅 [radp-vagrant-framework 配置参考](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/configuration-reference.md)。
+
+### 软件安装 (setup)
+
+跨平台安装和管理软件包。支持单独安装和通过配置文件批量安装。
+
+| 命令                           | 描述           |
+|--------------------------------|----------------|
+| `setup list`                   | 列出可用软件包 |
+| `setup info <name>`            | 显示软件包详情 |
+| `setup install <name>`         | 安装软件包     |
+| `setup profile list`           | 列出可用配置文件 |
+| `setup profile show <name>`    | 显示配置文件详情 |
+| `setup profile apply <name>`   | 应用配置文件   |
+
+**示例：**
+
+```shell
+# 列出和搜索软件包
+homelabctl setup list
+homelabctl setup list -c cli-tools
+homelabctl setup list --installed
+
+# 安装软件包
+homelabctl setup install fzf
+homelabctl setup install nodejs -v 20
+homelabctl setup install jdk -v 17
+
+# 使用配置文件
+homelabctl setup profile list
+homelabctl setup profile show osx-dev
+homelabctl setup profile apply osx-dev --dry-run
+homelabctl setup profile apply linux-dev --continue
+```
+
+**可用分类：**
+
+- **cli-tools** - 命令行工具 (fzf, bat, fd, jq, ripgrep, eza, zoxide)
+- **editors** - 文本编辑器 (neovim)
+- **languages** - 编程语言 (nodejs, jdk, python, go, rust)
+- **devops** - DevOps 工具 (kubectl, helm, docker, terraform, ansible)
+- **shell** - Shell 工具 (zsh, tmux, starship)
+
+**内置配置文件：**
+
+| 配置文件    | 描述                  |
+|-------------|-----------------------|
+| `osx-dev`   | macOS 开发环境        |
+| `linux-dev` | Linux 开发环境        |
+| `devops`    | DevOps 和基础设施工具 |
+
+**用户扩展：**
+
+在 `~/.config/homelabctl/setup/` 添加自定义软件包和配置文件：
+
+```
+~/.config/homelabctl/setup/
+├── registry.yaml      # 自定义软件包定义
+├── profiles/          # 自定义配置文件
+└── installers/        # 自定义安装器
+```
 
 ## 全局选项
 
-| 选项                | 描述                           |
-|-------------------|------------------------------|
-| `-v`, `--verbose` | 启用详细输出（显示 banner 和 info 日志）  |
+| 选项              | 描述                             |
+|-------------------|----------------------------------|
+| `-v`, `--verbose` | 启用详细输出（显示 banner 和 info 日志） |
 | `--debug`         | 启用调试输出（显示 banner 和 debug 日志） |
+| `--help`          | 显示帮助                         |
+| `--version`       | 显示版本                         |
 
 默认情况下，homelabctl 以静默模式运行（无 banner，仅显示错误日志）。
 
-## 环境变量
+## Shell 补全
 
-| 变量                        | 描述                          |
-|---------------------------|-----------------------------|
-| `RADP_VF_HOME`            | radp-vagrant-framework 安装路径 |
-| `RADP_VAGRANT_CONFIG_DIR` | 配置目录路径（默认：`./config`）       |
-| `RADP_VAGRANT_ENV`        | 覆盖环境名称                      |
+```shell
+# Bash
+homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
+
+# Zsh
+homelabctl completion zsh > ~/.zfunc/_homelabctl
+```
+
+补全功能包含软件包名称、配置文件名称和分类的动态建议。
 
 ## 文档
 
 - [安装指南](docs/installation.md) - 完整安装选项、升级、Shell 补全
 - [配置说明](docs/configuration.md) - YAML 配置系统
-
-Vagrant
-虚拟机配置请参阅 [radp-vagrant-framework 配置参考](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/configuration-reference.md)。
 
 ## 贡献
 

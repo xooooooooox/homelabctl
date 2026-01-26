@@ -17,22 +17,19 @@ on [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework).
 
 - **Vagrant Integration** - Passthrough to Vagrant commands with automatic Vagrantfile detection
 - **RADP Vagrant Framework** - Initialize, configure, and manage multi-VM environments
-- **Template System** - Create projects from predefined templates (`k8s-cluster`, `single-node`, etc.)
-- **Shell Completion** - Bash and Zsh completion support
-- **Verbose/Debug Modes** - Configurable output levels for troubleshooting
+- **Software Setup** - Install CLI tools, languages, and DevOps tools across platforms with profiles
+- **Shell Completion** - Bash and Zsh completion with dynamic package/profile suggestions
 
-## Prerequisites
+## Installation
 
-homelabctl requires radp-bash-framework to be installed:
+### Prerequisites
+
+homelabctl requires radp-bash-framework:
 
 ```shell
 brew tap xooooooooox/radp
 brew install radp-bash-framework
 ```
-
-Or see: https://github.com/xooooooooox/radp-bash-framework#installation
-
-## Installation
 
 ### Homebrew (Recommended)
 
@@ -54,74 +51,159 @@ sudo dnf copr enable -y xooooooooox/radp
 sudo dnf install -y homelabctl
 ```
 
-See [Installation Guide](docs/installation.md) for more options (OBS, manual install, upgrade).
+See [Installation Guide](docs/installation.md) for more options.
 
-## Usage
+## Quick Start
 
 ```shell
 # Show help
 homelabctl --help
 
+# Install development tools
+homelabctl setup install fzf
+homelabctl setup profile apply osx-dev
+
+# Manage Vagrant VMs
+homelabctl vf init myproject --template k8s-cluster
+homelabctl vg up
+```
+
+## Commands
+
+### Vagrant Integration (vg, vf)
+
+Manage Vagrant virtual machines with automatic Vagrantfile detection and multi-VM configuration.
+
+| Command            | Description                     |
+|--------------------|---------------------------------|
+| `vg <cmd>`         | Vagrant command passthrough     |
+| `vf init [dir]`    | Initialize a vagrant project    |
+| `vf list`          | List clusters and guests        |
+| `vf info`          | Show environment information    |
+| `vf validate`      | Validate YAML configuration     |
+| `vf dump-config`   | Export merged configuration     |
+| `vf generate`      | Generate standalone Vagrantfile |
+| `vf template list` | List available templates        |
+| `vf template show` | Show template details           |
+| `vf version`       | Show framework version          |
+
+**Examples:**
+
+```shell
 # Vagrant passthrough
 homelabctl vg up
 homelabctl vg ssh
 homelabctl vg status
 
-# Vagrant framework commands
+# Initialize project from template
 homelabctl vf init myproject
 homelabctl vf init myproject --template k8s-cluster
+
+# View configuration
 homelabctl vf list
 homelabctl vf info
-homelabctl vf dump-config
-
-# Shell completion
-homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
-homelabctl completion zsh > ~/.zfunc/_homelabctl
-
-# Verbose/Debug modes
-homelabctl -v vf info      # Verbose output
-homelabctl --debug vg up   # Debug output
+homelabctl vf dump-config -f yaml
 ```
 
-## Commands
+**Environment Variables:**
 
-| Command | Description |
-|---------|-------------|
-| `vg <cmd>` | Vagrant command passthrough |
-| `vf init [dir]` | Initialize a vagrant project |
-| `vf list` | List clusters and guests |
-| `vf info` | Show environment information |
-| `vf validate` | Validate YAML configuration |
-| `vf dump-config` | Export merged configuration |
-| `vf generate` | Generate standalone Vagrantfile |
-| `vf template list` | List available templates |
-| `vf template show` | Show template details |
-| `version` | Show homelabctl version |
-| `completion <shell>` | Generate shell completion |
+| Variable                  | Description                                        |
+|---------------------------|----------------------------------------------------|
+| `RADP_VF_HOME`            | Path to radp-vagrant-framework installation        |
+| `RADP_VAGRANT_CONFIG_DIR` | Configuration directory path (default: `./config`) |
+| `RADP_VAGRANT_ENV`        | Override environment name                          |
+
+For VM configuration details,
+see [radp-vagrant-framework Configuration Reference](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/configuration-reference.md).
+
+### Software Setup (setup)
+
+Install and manage software packages across different platforms. Supports individual package installation and batch
+installation via profiles.
+
+| Command                      | Description             |
+|------------------------------|-------------------------|
+| `setup list`                 | List available packages |
+| `setup info <name>`          | Show package details    |
+| `setup install <name>`       | Install a package       |
+| `setup profile list`         | List available profiles |
+| `setup profile show <name>`  | Show profile details    |
+| `setup profile apply <name>` | Apply a profile         |
+
+**Examples:**
+
+```shell
+# List and search packages
+homelabctl setup list
+homelabctl setup list -c cli-tools
+homelabctl setup list --installed
+
+# Install packages
+homelabctl setup install fzf
+homelabctl setup install nodejs -v 20
+homelabctl setup install jdk -v 17
+
+# Work with profiles
+homelabctl setup profile list
+homelabctl setup profile show osx-dev
+homelabctl setup profile apply osx-dev --dry-run
+homelabctl setup profile apply linux-dev --continue
+```
+
+**Available Categories:**
+
+- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide)
+- **editors** - Text editors (neovim)
+- **languages** - Programming languages (nodejs, jdk, python, go, rust)
+- **devops** - DevOps tools (kubectl, helm, docker, terraform, ansible)
+- **shell** - Shell utilities (zsh, tmux, starship)
+
+**Built-in Profiles:**
+
+| Profile     | Description                     |
+|-------------|---------------------------------|
+| `osx-dev`   | macOS development environment   |
+| `linux-dev` | Linux development environment   |
+| `devops`    | DevOps and infrastructure tools |
+
+**User Extensions:**
+
+Add custom packages and profiles in `~/.config/homelabctl/setup/`:
+
+```
+~/.config/homelabctl/setup/
+├── registry.yaml      # Custom package definitions
+├── profiles/          # Custom profiles
+└── installers/        # Custom installers
+```
 
 ## Global Options
 
-| Option | Description |
-|--------|-------------|
+| Option            | Description                                |
+|-------------------|--------------------------------------------|
 | `-v`, `--verbose` | Enable verbose output (banner + info logs) |
-| `--debug` | Enable debug output (banner + debug logs) |
+| `--debug`         | Enable debug output (banner + debug logs)  |
+| `--help`          | Show help                                  |
+| `--version`       | Show version                               |
 
 By default, homelabctl runs in quiet mode (no banner, only error logs).
 
-## Environment Variables
+## Shell Completion
 
-| Variable | Description |
-|----------|-------------|
-| `RADP_VF_HOME` | Path to radp-vagrant-framework installation |
-| `RADP_VAGRANT_CONFIG_DIR` | Configuration directory path (default: `./config`) |
-| `RADP_VAGRANT_ENV` | Override environment name |
+```shell
+# Bash
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
+
+# Zsh
+homelabctl completion zsh >~/.zfunc/_homelabctl
+```
+
+Completions include dynamic suggestions for package names, profile names, and categories.
 
 ## Documentation
 
 - [Installation Guide](docs/installation.md) - Full installation options, upgrade, shell completion
 - [Configuration](docs/configuration.md) - YAML configuration system
-
-For vagrant VM configuration, see [radp-vagrant-framework Configuration Reference](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/configuration-reference.md).
 
 ## Contributing
 
