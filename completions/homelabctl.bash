@@ -43,7 +43,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         'vf')
-            COMPREPLY=($(compgen -W "dump-config generate info init list validate version  --help" -- "$cur"))
+            COMPREPLY=($(compgen -W "dump-config generate info init list template validate version  --help" -- "$cur"))
             ;;
         'vf dump-config')
             COMPREPLY=($(compgen -W "--help -e --env -f --format -o --output" -- "$cur"))
@@ -59,6 +59,15 @@ _homelabctl() {
             ;;
         'vf list')
             COMPREPLY=($(compgen -W "--help -e --env -v --verbose -p --provisions -s --synced-folders -t --triggers" -- "$cur"))
+            ;;
+        'vf template')
+            COMPREPLY=($(compgen -W "list show  --help" -- "$cur"))
+            ;;
+        'vf template list')
+            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+            ;;
+        'vf template show')
+            COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         'vf validate')
             COMPREPLY=($(compgen -W "--help -e --env" -- "$cur"))
