@@ -45,10 +45,26 @@ homelabctl/
 │   │   │   ├── info.sh
 │   │   │   ├── list.sh
 │   │   │   └── ...
+│   │   ├── setup/              # homelabctl setup <subcommand>
+│   │   │   ├── install.sh
+│   │   │   ├── list.sh
+│   │   │   ├── info.sh
+│   │   │   └── profile/        # homelabctl setup profile <subcommand>
+│   │   │       ├── list.sh
+│   │   │       ├── show.sh
+│   │   │       └── apply.sh
 │   │   ├── version.sh
 │   │   └── completion.sh
 │   ├── config/
 │   │   └── config.yaml         # YAML configuration
+│   ├── libs/                   # Project-specific libraries
+│   │   └── setup/              # Setup feature libraries
+│   │       ├── _common.sh      # Shared helper functions
+│   │       ├── registry.sh     # Registry management
+│   │       ├── installer.sh    # Installer utilities
+│   │       ├── registry.yaml   # Package registry
+│   │       ├── profiles/       # Profile definitions
+│   │       └── installers/     # Package installers
 │   └── vars/
 │       └── constants.sh        # Version constants
 ├── packaging/                  # Distribution packaging
@@ -144,3 +160,125 @@ If you don't need certain distribution channels:
 
 - Delete the corresponding workflow file from `.github/workflows/`
 - Or leave secrets unconfigured (workflow will skip with missing secrets)
+
+## Setup Feature
+
+The `setup` command manages software installation across different platforms.
+
+### Directory Structure
+
+```
+src/main/shell/libs/setup/
+├── _common.sh              # Shared helper functions (prefixed with _)
+├── registry.sh             # Registry management functions
+├── installer.sh            # Installer utilities
+├── registry.yaml           # Package registry definitions
+├── profiles/               # Profile definitions
+│   ├── osx-dev.yaml
+│   ├── linux-dev.yaml
+│   └── devops.yaml
+└── installers/             # Package installers
+    ├── fzf.sh
+    ├── bat.sh
+    └── ...
+```
+
+### Adding a New Package
+
+1. **Add package definition** to `src/main/shell/libs/setup/registry.yaml`:
+
+```yaml
+packages:
+  my-tool:
+    desc: "My tool description"
+    category: cli-tools        # Category for grouping
+    homepage: https://...      # Optional
+    check-cmd: my-tool         # Command to check if installed
+    # Or use check-path for non-command packages:
+    # check-path: ~/.my-tool/bin
+```
+
+2. **Create installer** at `src/main/shell/libs/setup/installers/my-tool.sh`:
+
+```bash
+#!/usr/bin/env bash
+
+# Required function: _setup_install_<package_name>
+# Arguments:
+#   $1 - version (may be empty for latest)
+# Returns:
+#   0 - success
+#   1 - failure
+_setup_install_my_tool() {
+    local version="${1:-}"
+
+    # Use helper functions from _common.sh:
+    # - _setup_detect_os        # Returns: darwin, linux
+    # - _setup_detect_arch      # Returns: x86_64, arm64, aarch64
+    # - _setup_log_info "msg"   # Info logging
+    # - _setup_log_error "msg"  # Error logging
+    # - _setup_download_file url dest  # Download with curl/wget
+    # - _setup_extract_archive file dest  # Extract tar.gz/zip
+    # - _setup_ensure_dir dir   # Create directory if not exists
+    # - _setup_add_to_path dir  # Add to PATH in shell config
+
+    local os arch
+    os="$(_setup_detect_os)"
+    arch="$(_setup_detect_arch)"
+
+    _setup_log_info "Installing my-tool ${version:-latest} for $os/$arch"
+
+    # Installation logic here...
+
+    return 0
+}
+```
+
+### Adding a New Profile
+
+Create profile at `src/main/shell/libs/setup/profiles/my-profile.yaml`:
+
+```yaml
+name: my-profile
+desc: "Profile description"
+platform: any                 # any, darwin, linux
+
+packages:
+  - name: fzf
+  - name: bat
+  - name: my-tool
+    version: "1.0.0"          # Optional: specific version
+```
+
+### User Extensions
+
+Users can extend the setup feature by creating files in `~/.config/homelabctl/setup/`:
+
+```
+~/.config/homelabctl/setup/
+├── registry.yaml           # Custom package definitions (merged with builtin)
+├── profiles/               # Custom profiles
+│   └── my-profile.yaml
+└── installers/             # Custom installers
+    └── my-tool.sh
+```
+
+User files take precedence over builtin files when names conflict.
+
+### Testing
+
+```bash
+# List packages
+./bin/homelabctl setup list
+./bin/homelabctl setup list -c cli-tools
+
+# Show package info
+./bin/homelabctl setup info fzf
+
+# Dry-run installation
+./bin/homelabctl setup install my-tool --dry-run
+
+# Test profile
+./bin/homelabctl setup profile show my-profile
+./bin/homelabctl setup profile apply my-profile --dry-run
+```
