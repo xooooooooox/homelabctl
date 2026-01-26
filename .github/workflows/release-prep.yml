@@ -262,6 +262,22 @@ jobs:
           print(f"Updated version to {version} (last tag: {last_tag or 'none'})")
           PY
 
+      - name: Install radp-bash-framework
+        run: |
+          set -euo pipefail
+          # Install latest release of radp-bash-framework
+          curl -fsSL https://raw.githubusercontent.com/xooooooooox/radp-bash-framework/main/install.sh | \
+            RADP_BF_INSTALL_MODE=manual bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Regenerate completion scripts
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          ./bin/homelabctl completion bash > completions/homelabctl.bash
+          ./bin/homelabctl completion zsh > completions/homelabctl.zsh
+          echo "Completion scripts regenerated"
+
       - name: Commit changes
         id: commit
         run: |
@@ -280,6 +296,8 @@ jobs:
             src/main/shell/vars/constants.sh \
             packaging/copr/homelabctl.spec \
             packaging/obs/homelabctl.spec \
+            completions/homelabctl.bash \
+            completions/homelabctl.zsh \
             CHANGELOG.md
           git commit -m "Release prep ${{ steps.version.outputs.version }}"
 
