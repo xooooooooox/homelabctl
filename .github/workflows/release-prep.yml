@@ -265,9 +265,10 @@ jobs:
       - name: Install radp-bash-framework
         run: |
           set -euo pipefail
-          # Install latest release of radp-bash-framework
+          # Install radp-bash-framework from main branch
+          # Using RADP_BF_REF=main to get latest fixes before release
           curl -fsSL https://raw.githubusercontent.com/xooooooooox/radp-bash-framework/main/install.sh | \
-            RADP_BF_INSTALL_MODE=manual bash
+            RADP_BF_INSTALL_MODE=manual RADP_BF_REF=main bash
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Regenerate completion scripts
