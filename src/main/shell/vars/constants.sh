@@ -10,4 +10,4 @@
 # shellcheck source=../config/completion.sh
 
 # homelabctl version - single source of truth for release management
-declare -gr gr_homelabctl_version=v0.0.7
+declare -gr gr_homelabctl_version=v0.0.8
