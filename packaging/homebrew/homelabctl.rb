@@ -51,9 +51,10 @@ class Homelabctl < Formula
           [[ -r "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]] && \\
             source "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
 
-        For Zsh, completions should work automatically if using Homebrew's site-functions.
-        If not, add to ~/.zshrc (before compinit):
-          fpath=(#{HOMEBREW_PREFIX}/share/zsh/site-functions $fpath)
+        For Zsh, rebuild completion cache after installation:
+          rm -f ~/.zcompdump* ~/.cache/zsh/zcompdump*
+          compinit
+        Or simply restart your terminal.
 
         Alternative: Dynamic completion (always up-to-date):
           # Bash: Add to ~/.bashrc
