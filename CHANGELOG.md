@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.0.5 - 2026-01-26
+
+### feat
+- c04259b Optimize brew formula to support install completion
+- a359ece Add shell completion file for bash and zsh
+
+### other
+- 363da95 docs; Update CLAUDE.md
+
 ## v0.0.4 - 2026-01-25
 
 ### docs
