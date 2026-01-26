@@ -13,11 +13,27 @@ cmd_completion() {
     return 1
   fi
 
-  # Output completion helper functions first
-  _completion_output_helpers
-
-  # Output standard completion script
-  radp_cli_completion_generate "$shell"
+  case "$shell" in
+  bash)
+    # For bash: helpers first, then completion script
+    _completion_output_helpers
+    radp_cli_completion_generate "$shell"
+    ;;
+  zsh)
+    # For zsh: #compdef must be first line
+    # Output #compdef header first
+    echo "#compdef homelabctl"
+    echo ""
+    # Then helper functions
+    _completion_output_helpers
+    # Then rest of completion script (skip the #compdef line from generator)
+    radp_cli_completion_generate "$shell" | tail -n +2
+    ;;
+  *)
+    radp_log_error "Unsupported shell: $shell (supported: bash, zsh)"
+    return 1
+    ;;
+  esac
 }
 
 #######################################

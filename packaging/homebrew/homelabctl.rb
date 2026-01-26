@@ -43,24 +43,34 @@ class Homelabctl < Formula
         brew install radp-vagrant-framework
 
       Shell Completions:
-        Completions are installed to Homebrew's standard directories.
+        Completions are installed to: #{HOMEBREW_PREFIX}/share/zsh/site-functions/
 
-        For Bash, ensure bash-completion is configured:
+        For standard Zsh setup (recommended):
+          # Rebuild completion cache
+          rm -f ~/.zcompdump* && compinit
+          # Or restart your terminal
+
+        For Zinit users:
+          # Option 1: Add Homebrew's site-functions to fpath (before zinit init)
+          fpath=(#{HOMEBREW_PREFIX}/share/zsh/site-functions $fpath)
+
+          # Option 2: Use zinit snippet
+          zinit ice as"completion"
+          zinit snippet #{HOMEBREW_PREFIX}/share/zsh/site-functions/_homelabctl
+
+        For Oh-My-Zsh users:
+          ln -sf #{HOMEBREW_PREFIX}/share/zsh/site-functions/_homelabctl \\
+            ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/homelabctl/_homelabctl
+
+        For Bash:
           brew install bash-completion@2
           # Add to ~/.bash_profile or ~/.bashrc:
           [[ -r "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]] && \\
             source "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
 
-        For Zsh, rebuild completion cache after installation:
-          rm -f ~/.zcompdump* ~/.cache/zsh/zcompdump*
-          compinit
-        Or simply restart your terminal.
-
-        Alternative: Dynamic completion (always up-to-date):
-          # Bash: Add to ~/.bashrc
-          eval "$(homelabctl completion bash)"
-          # Zsh: Add to ~/.zshrc
-          eval "$(homelabctl completion zsh)"
+        Alternative - Dynamic completion (always up-to-date):
+          # Bash: eval "$(homelabctl completion bash)"
+          # Zsh:  eval "$(homelabctl completion zsh)"
 
       Quick start:
         homelabctl --help
