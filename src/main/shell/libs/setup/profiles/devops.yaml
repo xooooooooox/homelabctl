@@ -10,6 +10,7 @@ packages:
   # Container and orchestration
   - name: kubectl
   - name: helm
+  - name: kubecm
 
   # Infrastructure as code
   - name: terraform

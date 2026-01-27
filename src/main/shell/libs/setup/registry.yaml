@@ -2,6 +2,19 @@
 # This file defines available packages and their metadata
 
 packages:
+  # System Prerequisites
+  homebrew:
+    desc: macOS package manager
+    category: system
+    check-cmd: brew
+    homepage: https://brew.sh/
+
+  gnu-getopt:
+    desc: GNU getopt for argument parsing
+    category: system
+    check-cmd: getopt
+    homepage: https://github.com/util-linux/util-linux
+
   # CLI Tools
   fzf:
     desc: Fuzzy finder for command line
@@ -45,6 +58,18 @@ packages:
     check-cmd: zoxide
     homepage: https://github.com/ajeetdsouza/zoxide
 
+  mc:
+    desc: MinIO client for S3-compatible storage
+    category: cli-tools
+    check-cmd: mc
+    homepage: https://min.io/docs/minio/linux/reference/minio-mc.html
+
+  fastfetch:
+    desc: Fast system information tool
+    category: cli-tools
+    check-cmd: fastfetch
+    homepage: https://github.com/fastfetch-cli/fastfetch
+
   # Editors
   neovim:
     desc: Hyperextensible Vim-based text editor
@@ -83,6 +108,18 @@ packages:
     check-cmd: rustc
     homepage: https://www.rust-lang.org/
 
+  vfox:
+    desc: Cross-platform version manager
+    category: languages
+    check-cmd: vfox
+    homepage: https://vfox.lhan.me/
+
+  ruby:
+    desc: Ruby programming language
+    category: languages
+    check-cmd: ruby
+    homepage: https://www.ruby-lang.org/
+
   # DevOps Tools
   kubectl:
     desc: Kubernetes command-line tool
@@ -95,6 +132,18 @@ packages:
     category: devops
     check-cmd: helm
     homepage: https://helm.sh/
+
+  kubecm:
+    desc: Kubernetes context manager
+    category: devops
+    check-cmd: kubecm
+    homepage: https://kubecm.cloud/
+
+  vagrant:
+    desc: Virtual machine management
+    category: devops
+    check-cmd: vagrant
+    homepage: https://www.vagrantup.com/
 
   docker:
     desc: Container runtime
@@ -134,6 +183,8 @@ packages:
     homepage: https://starship.rs/
 
 categories:
+  system:
+    desc: System-level prerequisites and package managers
   cli-tools:
     desc: Command line utilities and productivity tools
   editors:

@@ -15,5 +15,8 @@ packages:
   - name: eza
   - name: zoxide
 
+  # System info
+  - name: fastfetch
+
   # Editor
   - name: neovim
