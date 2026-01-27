@@ -70,7 +70,66 @@ packages:
     check-cmd: fastfetch
     homepage: https://github.com/fastfetch-cli/fastfetch
 
+  yadm:
+    desc: Yet Another Dotfiles Manager
+    category: cli-tools
+    check-cmd: yadm
+    homepage: https://yadm.io/
+
+  markdownlint-cli:
+    desc: Markdown linting tool
+    category: cli-tools
+    check-cmd: markdownlint
+    homepage: https://github.com/igorshubovych/markdownlint-cli
+
+  gpg:
+    desc: GNU Privacy Guard
+    category: cli-tools
+    check-cmd: gpg
+    homepage: https://gnupg.org/
+
+  git-credential-manager:
+    desc: Cross-platform Git credential storage
+    category: cli-tools
+    check-cmd: git-credential-manager
+    homepage: https://github.com/git-ecosystem/git-credential-manager
+
+  lazygit:
+    desc: Simple terminal UI for git commands
+    category: cli-tools
+    check-cmd: lazygit
+    homepage: https://github.com/jesseduffield/lazygit
+
+  pass:
+    desc: Standard unix password manager
+    category: cli-tools
+    check-cmd: pass
+    homepage: https://www.passwordstore.org/
+
+  shellcheck:
+    desc: Shell script static analysis tool
+    category: cli-tools
+    check-cmd: shellcheck
+    homepage: https://www.shellcheck.net/
+
+  tig:
+    desc: Text-mode interface for git
+    category: cli-tools
+    check-cmd: tig
+    homepage: https://jonas.github.io/tig/
+
+  git:
+    desc: Distributed version control system
+    category: cli-tools
+    check-cmd: git
+    homepage: https://git-scm.com/
+
   # Editors
+  vim:
+    desc: Vi improved text editor
+    category: editors
+    check-cmd: vim
+    homepage: https://www.vim.org/
   neovim:
     desc: Hyperextensible Vim-based text editor
     category: editors
@@ -119,6 +178,12 @@ packages:
     category: languages
     check-cmd: ruby
     homepage: https://www.ruby-lang.org/
+
+  mvn:
+    desc: Apache Maven build tool
+    category: languages
+    check-cmd: mvn
+    homepage: https://maven.apache.org/
 
   # DevOps Tools
   kubectl:
@@ -175,6 +240,12 @@ packages:
     category: shell
     check-cmd: tmux
     homepage: https://github.com/tmux/tmux
+
+  ohmyzsh:
+    desc: Framework for managing Zsh configuration
+    category: shell
+    check-cmd: omz
+    homepage: https://ohmyz.sh/
 
   starship:
     desc: Cross-shell prompt
