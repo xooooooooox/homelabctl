@@ -225,9 +225,39 @@ setup_repo() {
   esac
 }
 
+# Refresh package manager cache
+refresh_cache() {
+  local pkm="$1"
+
+  log "Refreshing package cache..."
+
+  case "${pkm}" in
+    homebrew)
+      brew update >/dev/null 2>&1 || true
+      ;;
+    dnf)
+      sudo dnf clean all >/dev/null 2>&1 || true
+      sudo dnf makecache >/dev/null 2>&1 || true
+      ;;
+    yum)
+      sudo yum clean all >/dev/null 2>&1 || true
+      sudo yum makecache >/dev/null 2>&1 || true
+      ;;
+    apt)
+      sudo apt-get update >/dev/null 2>&1 || true
+      ;;
+    zypper)
+      sudo zypper refresh >/dev/null 2>&1 || true
+      ;;
+  esac
+}
+
 # Install using package manager
 install_via_pkm() {
   local pkm="$1"
+
+  # Refresh cache to ensure we get the latest version
+  refresh_cache "${pkm}"
 
   log "Installing ${REPO_NAME} via ${pkm}..."
 
