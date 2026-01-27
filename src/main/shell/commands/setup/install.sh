@@ -10,9 +10,16 @@
 # @example setup install jdk -v 17
 
 cmd_setup_install() {
-  local name="$1"
+  local name="${1:-}"
   local version="${opt_version:-latest}"
   local dry_run="${opt_dry_run:-}"
+
+  if [[ -z "$name" ]]; then
+    radp_log_error "Package name required"
+    radp_log_info "Usage: homelabctl setup install <package>"
+    radp_log_info "Run 'homelabctl setup list' to see available packages"
+    return 1
+  fi
 
   # Initialize registry
   _setup_registry_init

@@ -7,7 +7,14 @@
 # @example setup profile show linux-dev
 
 cmd_setup_profile_show() {
-  local name="$1"
+  local name="${1:-}"
+
+  if [[ -z "$name" ]]; then
+    radp_log_error "Profile name required"
+    radp_log_info "Usage: homelabctl setup profile show <profile>"
+    radp_log_info "Run 'homelabctl setup profile list' to see available profiles"
+    return 1
+  fi
 
   _setup_registry_init
 

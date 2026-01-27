@@ -11,10 +11,17 @@
 # @example setup profile apply linux-dev --continue
 
 cmd_setup_profile_apply() {
-  local profile_name="$1"
+  local profile_name="${1:-}"
   local dry_run="${opt_dry_run:-}"
   local continue_on_error="${opt_continue:-}"
   local skip_installed="${opt_skip_installed:-}"
+
+  if [[ -z "$profile_name" ]]; then
+    radp_log_error "Profile name required"
+    radp_log_info "Usage: homelabctl setup profile apply <profile>"
+    radp_log_info "Run 'homelabctl setup profile list' to see available profiles"
+    return 1
+  fi
 
   _setup_registry_init
 

@@ -7,7 +7,14 @@
 # @example setup info nodejs
 
 cmd_setup_info() {
-  local name="$1"
+  local name="${1:-}"
+
+  if [[ -z "$name" ]]; then
+    radp_log_error "Package name required"
+    radp_log_info "Usage: homelabctl setup info <package>"
+    radp_log_info "Run 'homelabctl setup list' to see available packages"
+    return 1
+  fi
 
   _setup_registry_init
 
