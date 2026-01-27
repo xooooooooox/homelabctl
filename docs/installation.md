@@ -39,6 +39,8 @@ bash install.sh --ref main
 bash install.sh --ref v0.2.0-rc1
 bash install.sh --mode manual
 bash install.sh --mode dnf
+
+curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash -s -- ref main
 ```
 
 | Option              | Description                                                              | Default                   |
