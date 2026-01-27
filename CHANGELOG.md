@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.0.12 - 2026-01-26
+
+- TODO: no commits found; add summary manually.
+
+## v0.0.11 - 2026-01-26
+
+### fix
+- f3de509 ensure #compdef is first line for zsh completion
+
 ## v0.0.10 - 2026-01-26
 
 ### fix
