@@ -679,6 +679,21 @@ main() {
     ;;
   esac
 
+  # Check for existing manual installation and remove it
+  local manual_install_dir="${OPT_INSTALL_DIR:-$HOME/.local/lib/${REPO_NAME}}"
+  if [[ -f "${manual_install_dir}/.install-method" ]] &&
+    [[ "$(cat "${manual_install_dir}/.install-method")" == "manual" ]]; then
+    log "Detected existing manual installation at ${manual_install_dir}"
+    log "Removing manual installation to avoid conflicts..."
+    local manual_bin_dir="${OPT_BIN_DIR:-$HOME/.local/bin}"
+    local manual_link="${manual_bin_dir}/homelabctl"
+    if [[ -L "${manual_link}" ]]; then
+      rm -f "${manual_link}"
+    fi
+    rm -rf "${manual_install_dir}"
+    log "Manual installation removed"
+  fi
+
   # Setup repository if needed
   if ! check_repo_configured "${pkm}"; then
     log "Repository not configured for ${pkm}"
