@@ -83,17 +83,17 @@ homelabctl vg up
 管理 Vagrant 虚拟机，支持自动 Vagrantfile 检测和多虚拟机配置。
 
 | 命令                 | 描述               |
-|--------------------|--------------------|
-| `vg <cmd>`         | Vagrant 命令透传   |
-| `vf init [dir]`    | 初始化 Vagrant 项目 |
-| `vf list`          | 列出集群和虚拟机   |
-| `vf info`          | 显示环境信息       |
-| `vf validate`      | 验证 YAML 配置     |
-| `vf dump-config`   | 导出合并后的配置   |
+|--------------------|------------------|
+| `vg <cmd>`         | Vagrant 命令透传     |
+| `vf init [dir]`    | 初始化 Vagrant 项目   |
+| `vf list`          | 列出集群和虚拟机         |
+| `vf info`          | 显示环境信息           |
+| `vf validate`      | 验证 YAML 配置       |
+| `vf dump-config`   | 导出合并后的配置         |
 | `vf generate`      | 生成独立 Vagrantfile |
-| `vf template list` | 列出可用模板       |
-| `vf template show` | 显示模板详情       |
-| `vf version`       | 显示框架版本       |
+| `vf template list` | 列出可用模板           |
+| `vf template show` | 显示模板详情           |
+| `vf version`       | 显示框架版本           |
 
 **示例：**
 
@@ -115,11 +115,11 @@ homelabctl vf dump-config -f yaml
 
 **环境变量：**
 
-| 变量                      | 描述                             |
-|---------------------------|----------------------------------|
-| `RADP_VF_HOME`            | radp-vagrant-framework 安装路径  |
-| `RADP_VAGRANT_CONFIG_DIR` | 配置目录路径（默认：`./config`） |
-| `RADP_VAGRANT_ENV`        | 覆盖环境名称                     |
+| 变量                        | 描述                          |
+|---------------------------|-----------------------------|
+| `RADP_VF_HOME`            | radp-vagrant-framework 安装路径 |
+| `RADP_VAGRANT_CONFIG_DIR` | 配置目录路径（默认：`./config`）       |
+| `RADP_VAGRANT_ENV`        | 覆盖环境名称                      |
 
 虚拟机配置详情请参阅 [radp-vagrant-framework 配置参考](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/configuration-reference.md)。
 
@@ -127,14 +127,14 @@ homelabctl vf dump-config -f yaml
 
 跨平台安装和管理软件包。支持单独安装和通过配置文件批量安装。
 
-| 命令                           | 描述           |
-|--------------------------------|----------------|
-| `setup list`                   | 列出可用软件包 |
-| `setup info <name>`            | 显示软件包详情 |
-| `setup install <name>`         | 安装软件包     |
-| `setup profile list`           | 列出可用配置文件 |
-| `setup profile show <name>`    | 显示配置文件详情 |
-| `setup profile apply <name>`   | 应用配置文件   |
+| 命令                           | 描述       |
+|------------------------------|----------|
+| `setup list`                 | 列出可用软件包  |
+| `setup info <name>`          | 显示软件包详情  |
+| `setup install <name>`       | 安装软件包    |
+| `setup profile list`         | 列出可用配置文件 |
+| `setup profile show <name>`  | 显示配置文件详情 |
+| `setup profile apply <name>` | 应用配置文件   |
 
 **示例：**
 
@@ -166,10 +166,10 @@ homelabctl setup profile apply linux-dev --continue
 
 **内置配置文件：**
 
-| 配置文件    | 描述                  |
-|-------------|-----------------------|
-| `osx-dev`   | macOS 开发环境        |
-| `linux-dev` | Linux 开发环境        |
+| 配置文件        | 描述             |
+|-------------|----------------|
+| `osx-dev`   | macOS 开发环境     |
+| `linux-dev` | Linux 开发环境     |
 | `devops`    | DevOps 和基础设施工具 |
 
 **用户扩展：**
@@ -185,11 +185,11 @@ homelabctl setup profile apply linux-dev --continue
 
 ## 全局选项
 
-| 选项              | 描述                             |
-|-------------------|----------------------------------|
-| `-v`, `--verbose` | 启用详细输出（显示 banner 和 info 日志） |
+| 选项                | 描述                           |
+|-------------------|------------------------------|
+| `-v`, `--verbose` | 启用详细输出（显示 banner 和 info 日志）  |
 | `--debug`         | 启用调试输出（显示 banner 和 debug 日志） |
-| `--help`          | 显示帮助                         |
+| `-h`, `--help`    | 显示帮助                         |
 | `--version`       | 显示版本                         |
 
 默认情况下，homelabctl 以静默模式运行（无 banner，仅显示错误日志）。
@@ -198,10 +198,10 @@ homelabctl setup profile apply linux-dev --continue
 
 ```shell
 # Bash
-homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
 
 # Zsh
-homelabctl completion zsh > ~/.zfunc/_homelabctl
+homelabctl completion zsh >~/.zfunc/_homelabctl
 ```
 
 补全功能包含软件包名称、配置文件名称和分类的动态建议。

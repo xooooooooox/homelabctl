@@ -192,7 +192,7 @@ Add custom packages and profiles in `~/.config/homelabctl/setup/`:
 |-------------------|--------------------------------------------|
 | `-v`, `--verbose` | Enable verbose output (banner + info logs) |
 | `--debug`         | Enable debug output (banner + debug logs)  |
-| `--help`          | Show help                                  |
+| `-h`, `--help`    | Show help                                  |
 | `--version`       | Show version                               |
 
 By default, homelabctl runs in quiet mode (no banner, only error logs).
