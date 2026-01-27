@@ -51,7 +51,7 @@ _setup_neovim_from_release() {
 
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' EXIT
+    trap 'rm -rf "$tmpdir"' RETURN
 
     case "$os" in
         darwin)

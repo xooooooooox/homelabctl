@@ -108,7 +108,7 @@ _setup_nodejs_from_nodesource() {
     # Download and run NodeSource setup script
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' EXIT
+    trap 'rm -rf "$tmpdir"' RETURN
 
     local setup_url="https://deb.nodesource.com/setup_${major_version}.x"
     radp_io_download "$setup_url" "$tmpdir/setup.sh" || return 1
@@ -139,7 +139,7 @@ _setup_nodejs_from_binary() {
 
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' EXIT
+    trap 'rm -rf "$tmpdir"' RETURN
 
     radp_log_info "Downloading nodejs $version..."
     radp_io_download "$url" "$tmpdir/$filename" || return 1

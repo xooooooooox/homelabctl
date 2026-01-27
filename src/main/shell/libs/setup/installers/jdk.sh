@@ -137,7 +137,7 @@ _setup_jdk_from_adoptium() {
 
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' EXIT
+    trap 'rm -rf "$tmpdir"' RETURN
 
     local filename="jdk.tar.gz"
 

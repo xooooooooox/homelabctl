@@ -31,7 +31,7 @@ _setup_helm_from_script() {
 
   local tmpdir
   tmpdir=$(_setup_mktemp_dir)
-  trap 'rm -rf "$tmpdir"' EXIT
+  trap 'rm -rf "$tmpdir"' RETURN
 
   radp_log_info "Installing helm via official install script..."
   radp_io_download "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3" "$tmpdir/get_helm.sh" || return 1

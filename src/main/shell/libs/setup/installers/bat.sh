@@ -77,7 +77,7 @@ _setup_bat_from_release() {
 
   local tmpdir
   tmpdir=$(_setup_mktemp_dir)
-  trap 'rm -rf "$tmpdir"' EXIT
+  trap 'rm -rf "$tmpdir"' RETURN
 
   radp_log_info "Downloading bat $version..."
   radp_io_download "$url" "$tmpdir/$filename" || return 1
