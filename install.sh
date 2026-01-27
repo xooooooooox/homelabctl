@@ -614,7 +614,7 @@ print_post_install() {
   log "  - radp-bash-framework must be installed and in PATH"
   log "  See: https://github.com/xooooooooox/radp-bash-framework"
   log ""
-  log "Run: homelabctl --help"
+  log "Run: hash -r && homelabctl --help"
 }
 
 # ============================================================================
