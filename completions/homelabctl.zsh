@@ -69,9 +69,6 @@ _homelabctl() {
         args)
             case "${words[1]}" in
                 completion)
-                    # Shift words array for nested subcommand (depth=1)
-                    words=("${words[@]:1}")
-                    (( CURRENT -= 1 ))
 
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
@@ -87,8 +84,8 @@ _homelabctl() {
                     case "${words[2]}" in
                     info)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -96,8 +93,8 @@ _homelabctl() {
                         ;;
                     install)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -107,8 +104,8 @@ _homelabctl() {
                         ;;
                     list)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -128,8 +125,8 @@ _homelabctl() {
                         case "${words[3]}" in
                         apply)
                             # Shift words array for nested subcommand (depth=3)
-                            words=("${words[@]:3}")
-                            (( CURRENT -= 3 ))
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
 
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
@@ -140,8 +137,8 @@ _homelabctl() {
                             ;;
                         list)
                             # Shift words array for nested subcommand (depth=3)
-                            words=("${words[@]:3}")
-                            (( CURRENT -= 3 ))
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
 
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
@@ -150,8 +147,8 @@ _homelabctl() {
                             ;;
                         show)
                             # Shift words array for nested subcommand (depth=3)
-                            words=("${words[@]:3}")
-                            (( CURRENT -= 3 ))
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
 
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
@@ -168,9 +165,6 @@ _homelabctl() {
                     esac
                     ;;
                 version)
-                    # Shift words array for nested subcommand (depth=1)
-                    words=("${words[@]:1}")
-                    (( CURRENT -= 1 ))
 
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
@@ -190,8 +184,8 @@ _homelabctl() {
                     case "${words[2]}" in
                     dump-config)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -202,8 +196,8 @@ _homelabctl() {
                         ;;
                     generate)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -212,8 +206,8 @@ _homelabctl() {
                         ;;
                     info)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -223,8 +217,8 @@ _homelabctl() {
                         ;;
                     init)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -234,8 +228,8 @@ _homelabctl() {
                         ;;
                     list)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -254,8 +248,8 @@ _homelabctl() {
                         case "${words[3]}" in
                         list)
                             # Shift words array for nested subcommand (depth=3)
-                            words=("${words[@]:3}")
-                            (( CURRENT -= 3 ))
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
 
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
@@ -263,8 +257,8 @@ _homelabctl() {
                             ;;
                         show)
                             # Shift words array for nested subcommand (depth=3)
-                            words=("${words[@]:3}")
-                            (( CURRENT -= 3 ))
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
 
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
@@ -277,8 +271,8 @@ _homelabctl() {
                         ;;
                     validate)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -287,8 +281,8 @@ _homelabctl() {
                         ;;
                     version)
                         # Shift words array for nested subcommand (depth=2)
-                        words=("${words[@]:2}")
-                        (( CURRENT -= 2 ))
+                        words=("${words[1]}" "${words[@]:3}")
+                        (( CURRENT -= 1 ))
 
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
@@ -300,9 +294,6 @@ _homelabctl() {
                     esac
                     ;;
                 vg)
-                    # Shift words array for nested subcommand (depth=1)
-                    words=("${words[@]:1}")
-                    (( CURRENT -= 1 ))
 
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
