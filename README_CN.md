@@ -158,10 +158,11 @@ homelabctl setup profile apply linux-dev --continue
 
 **可用分类：**
 
-- **cli-tools** - 命令行工具 (fzf, bat, fd, jq, ripgrep, eza, zoxide)
+- **system** - 系统前置工具和包管理器 (homebrew, gnu-getopt)
+- **cli-tools** - 命令行工具 (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch)
 - **editors** - 文本编辑器 (neovim)
-- **languages** - 编程语言 (nodejs, jdk, python, go, rust)
-- **devops** - DevOps 工具 (kubectl, helm, docker, terraform, ansible)
+- **languages** - 编程语言 (nodejs, jdk, python, go, rust, vfox, ruby)
+- **devops** - DevOps 工具 (kubectl, helm, kubecm, vagrant, docker, terraform, ansible)
 - **shell** - Shell 工具 (zsh, tmux, starship)
 
 **内置配置文件：**

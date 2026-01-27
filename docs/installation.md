@@ -32,6 +32,28 @@ Or with wget:
 wget -qO- https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash
 ```
 
+#### Script Options
+
+```shell
+bash install.sh --ref main
+bash install.sh --ref v0.2.0-rc1
+bash install.sh --mode manual
+bash install.sh --mode dnf
+```
+
+| Option              | Description                                                              | Default                   |
+|---------------------|--------------------------------------------------------------------------|---------------------------|
+| `--ref <ref>`       | Install from a git ref (branch, tag, SHA). Implies manual install.       | latest release            |
+| `--mode <mode>`     | `auto`, `manual`, or specific: `homebrew`, `dnf`, `yum`, `apt`, `zypper` | `auto`                    |
+| `--install-dir <d>` | Manual install location                                                  | `~/.local/lib/homelabctl` |
+| `--bin-dir <d>`     | Symlink location                                                         | `~/.local/bin`            |
+
+Environment variables (`HOMELABCTL_REF`, `HOMELABCTL_VERSION`, `HOMELABCTL_INSTALL_MODE`, `HOMELABCTL_INSTALL_DIR`,
+`HOMELABCTL_BIN_DIR`) are also supported as fallbacks.
+
+When `--ref` is used and a package-manager version is already installed, the script automatically removes it first to
+avoid conflicts.
+
 ### RPM (Fedora/RHEL/CentOS)
 
 **Via COPR:**
@@ -98,6 +120,21 @@ curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install
 
 ## Uninstalling
 
+### Uninstall Script (Recommended)
+
+```shell
+bash uninstall.sh
+bash uninstall.sh --yes # Skip confirmation
+bash uninstall.sh --deps --yes # Also remove radp-bash-framework
+```
+
+The script auto-detects both package-manager and manual installations and removes them.
+
+| Option   | Description                        |
+|----------|------------------------------------|
+| `--deps` | Also uninstall radp-bash-framework |
+| `--yes`  | Skip confirmation prompt           |
+
 ### Homebrew
 
 ```shell
@@ -112,7 +149,12 @@ sudo dnf remove homelabctl
 
 ### Manual
 
-Remove the cloned directory and any PATH/completion configurations.
+Remove the install directory and symlink:
+
+```shell
+rm -rf ~/.local/lib/homelabctl
+rm -f ~/.local/bin/homelabctl
+```
 
 ## Shell Completion
 
