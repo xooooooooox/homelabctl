@@ -20,11 +20,14 @@ homelabctl_get_project_root() {
   dirname "$bin_dir"
 }
 
+# 全局变量：存储过滤后的参数
+declare -ga __homelabctl_filtered_args=()
+
 # 解析全局选项 (--verbose, --debug)
 # 全局选项只在子命令之前有效，子命令之后的选项传递给子命令
-# 返回: 设置环境变量并输出过滤后的参数
+# 注意：此函数必须直接调用（不能在子 shell 中），以便 export 生效
 homelabctl_parse_global_opts() {
-  local -a filtered_args=()
+  __homelabctl_filtered_args=()
   local verbose=false
   local debug=false
   local found_command=false
@@ -32,7 +35,7 @@ homelabctl_parse_global_opts() {
   while [[ $# -gt 0 ]]; do
     # 一旦遇到非选项参数（子命令），后续所有参数都传递给子命令
     if [[ "$found_command" == "true" ]]; then
-      filtered_args+=("$1")
+      __homelabctl_filtered_args+=("$1")
       shift
       continue
     fi
@@ -48,18 +51,18 @@ homelabctl_parse_global_opts() {
       ;;
     --)
       shift
-      filtered_args+=("$@")
+      __homelabctl_filtered_args+=("$@")
       break
       ;;
     -*)
       # 未知的全局选项，保留传递
-      filtered_args+=("$1")
+      __homelabctl_filtered_args+=("$1")
       shift
       ;;
     *)
       # 遇到子命令，标记后续参数直接传递
       found_command=true
-      filtered_args+=("$1")
+      __homelabctl_filtered_args+=("$1")
       shift
       ;;
     esac
@@ -80,12 +83,6 @@ homelabctl_parse_global_opts() {
     export GX_RADP_FW_BANNER_MODE=off
     export GX_RADP_FW_LOG_LEVEL=error
   fi
-
-  # 输出过滤后的参数 (用 null 分隔以处理特殊字符)
-  # 注意：当数组为空时不输出任何内容
-  if [[ ${#filtered_args[@]} -gt 0 ]]; then
-    printf '%s\0' "${filtered_args[@]}"
-  fi
 }
 
 # 主函数
@@ -100,11 +97,9 @@ homelabctl_main() {
     exit 1
   fi
 
-  # 解析全局选项并获取过滤后的参数
-  local -a args=()
-  while IFS= read -r -d '' arg; do
-    args+=("$arg")
-  done < <(homelabctl_parse_global_opts "$@")
+  # 解析全局选项并获取过滤后的参数（直接调用以保证 export 生效）
+  homelabctl_parse_global_opts "$@"
+  local -a args=("${__homelabctl_filtered_args[@]}")
 
   # 生成补全脚本时禁用所有输出
   if [[ "${args[0]:-}" == "completion" ]]; then
