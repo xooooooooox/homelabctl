@@ -22,13 +22,13 @@ _setup_install_fzf() {
   dnf | yum)
     radp_log_info "Installing fzf via dnf..."
     if ! radp_os_install_pkgs fzf 2>/dev/null; then
-      radp_log_info "fzf not available in repos, falling back to git install..."
-      _setup_fzf_from_git
+      radp_log_info "fzf not available in repos, falling back to binary release..."
+      _setup_fzf_from_release "$version" || _setup_fzf_from_git
     fi
     ;;
   apt | apt-get)
-    # apt version is often outdated, use git install
-    _setup_fzf_from_git
+    # apt version is often outdated, prefer binary release
+    _setup_fzf_from_release "$version" || _setup_fzf_from_git
     ;;
   pacman)
     radp_log_info "Installing fzf via pacman..."
@@ -42,6 +42,11 @@ _setup_install_fzf() {
 
 _setup_fzf_from_git() {
   local fzf_home="$HOME/.fzf"
+
+  if ! command -v git >/dev/null 2>&1; then
+    radp_log_error "git is required for fzf git install but not found"
+    return 1
+  fi
 
   radp_log_info "Installing fzf from git..."
 

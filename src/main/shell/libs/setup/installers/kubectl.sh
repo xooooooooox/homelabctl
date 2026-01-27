@@ -30,8 +30,13 @@ _setup_kubectl_from_binary() {
   local version="$1"
 
   if [[ "$version" == "latest" ]]; then
-    version=$(curl -fsSL https://dl.k8s.io/release/stable.txt 2>/dev/null)
-    [[ -z "$version" ]] && version="v1.31.0"
+    local stable_tmpdir
+    stable_tmpdir=$(_setup_mktemp_dir)
+    if radp_io_download "https://dl.k8s.io/release/stable.txt" "$stable_tmpdir/stable.txt" 2>/dev/null; then
+      version=$(< "$stable_tmpdir/stable.txt")
+    fi
+    rm -rf "$stable_tmpdir"
+    [[ -z "$version" || "$version" == "latest" ]] && version="v1.31.0"
     # Ensure version starts with v
     [[ "$version" != v* ]] && version="v$version"
   else
