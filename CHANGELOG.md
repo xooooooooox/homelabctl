@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.1.3 - 2026-01-27
+
+### feat
+- 78b871e Add 8 packages
+
+### docs
+- 029388c Update CLAUDE
+- cb4ebdc Update README
+
 ## v0.1.2 - 2026-01-27
 
 ### feat
