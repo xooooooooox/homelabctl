@@ -78,7 +78,7 @@ _setup_fzf_from_release() {
 
   local tmpdir
   tmpdir=$(_setup_mktemp_dir)
-  trap 'rm -rf "$tmpdir"' RETURN
+  trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
   radp_log_info "Downloading fzf $version..."
   radp_io_download "$url" "$tmpdir/$filename" || return 1

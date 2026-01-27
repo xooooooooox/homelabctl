@@ -137,7 +137,7 @@ _setup_jdk_from_adoptium() {
 
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' RETURN
+    trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
     local filename="jdk.tar.gz"
 
@@ -160,16 +160,14 @@ _setup_jdk_from_adoptium() {
 
     # Install to appropriate location
     local install_dir="/usr/local/java"
-    local sudo_cmd=""
-    [[ ! -w "/usr/local" ]] && sudo_cmd="${gr_sudo:-sudo}"
 
-    $sudo_cmd mkdir -p "$install_dir" || return 1
-    $sudo_cmd rm -rf "$install_dir/jdk-${major_version}" || return 1
-    $sudo_cmd mv "$jdk_dir" "$install_dir/jdk-${major_version}" || return 1
+    $gr_sudo mkdir -p "$install_dir" || return 1
+    $gr_sudo rm -rf "$install_dir/jdk-${major_version}" || return 1
+    $gr_sudo mv "$jdk_dir" "$install_dir/jdk-${major_version}" || return 1
 
     # Create symlinks
-    $sudo_cmd ln -sf "$install_dir/jdk-${major_version}/bin/java" /usr/local/bin/java || return 1
-    $sudo_cmd ln -sf "$install_dir/jdk-${major_version}/bin/javac" /usr/local/bin/javac || return 1
+    $gr_sudo ln -sf "$install_dir/jdk-${major_version}/bin/java" /usr/local/bin/java || return 1
+    $gr_sudo ln -sf "$install_dir/jdk-${major_version}/bin/javac" /usr/local/bin/javac || return 1
 
     radp_log_info "JDK installed to $install_dir/jdk-${major_version}"
     radp_log_info "Set JAVA_HOME=$install_dir/jdk-${major_version}"

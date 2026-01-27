@@ -35,7 +35,7 @@ _setup_mc_from_binary() {
 
   local tmpdir
   tmpdir=$(_setup_mktemp_dir)
-  trap 'rm -rf "$tmpdir"' RETURN
+  trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
   radp_log_info "Downloading mc (MinIO client)..."
   radp_io_download "$url" "$tmpdir/mc" || return 1

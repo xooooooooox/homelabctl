@@ -108,12 +108,12 @@ _setup_nodejs_from_nodesource() {
     # Download and run NodeSource setup script
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' RETURN
+    trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
     local setup_url="https://deb.nodesource.com/setup_${major_version}.x"
     radp_io_download "$setup_url" "$tmpdir/setup.sh" || return 1
 
-    ${gr_sudo:-sudo} bash "$tmpdir/setup.sh" || return 1
+    $gr_sudo bash "$tmpdir/setup.sh" || return 1
     radp_os_install_pkgs nodejs || return 1
 }
 
@@ -139,7 +139,7 @@ _setup_nodejs_from_binary() {
 
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' RETURN
+    trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
     radp_log_info "Downloading nodejs $version..."
     radp_io_download "$url" "$tmpdir/$filename" || return 1
@@ -147,8 +147,5 @@ _setup_nodejs_from_binary() {
     _setup_extract_archive "$tmpdir/$filename" "$tmpdir" || return 1
 
     # Install to /usr/local
-    local sudo_cmd=""
-    [[ ! -w "/usr/local" ]] && sudo_cmd="${gr_sudo:-sudo}"
-
-    $sudo_cmd cp -r "$tmpdir/node-v${version}-${os}-${node_arch}"/* /usr/local/ || return 1
+    $gr_sudo cp -r "$tmpdir/node-v${version}-${os}-${node_arch}"/* /usr/local/ || return 1
 }

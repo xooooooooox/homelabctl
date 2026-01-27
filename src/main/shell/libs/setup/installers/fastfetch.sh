@@ -19,7 +19,10 @@ _setup_install_fastfetch() {
     ;;
   dnf | yum)
     radp_log_info "Installing fastfetch via dnf..."
-    radp_os_install_pkgs fastfetch || return 1
+    if ! radp_os_install_pkgs fastfetch 2>/dev/null; then
+      radp_log_info "fastfetch not available in repos, falling back to binary release..."
+      _setup_fastfetch_from_release "$version"
+    fi
     ;;
   apt | apt-get)
     radp_log_info "Installing fastfetch via apt..."
@@ -77,11 +80,19 @@ _setup_fastfetch_from_release() {
 
   local tmpdir
   tmpdir=$(_setup_mktemp_dir)
-  trap 'rm -rf "$tmpdir"' RETURN
+  trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
   radp_log_info "Downloading fastfetch $version..."
   radp_io_download "$url" "$tmpdir/$filename" || return 1
 
   _setup_extract_archive "$tmpdir/$filename" "$tmpdir" || return 1
-  _setup_install_binary "$tmpdir/fastfetch-*/usr/bin/fastfetch" "fastfetch" || return 1
+
+  # Find the extracted binary (glob must be unquoted to expand)
+  local bin_path
+  bin_path=$(find "$tmpdir" -name "fastfetch" -type f -path "*/usr/bin/fastfetch" | head -1)
+  if [[ -z "$bin_path" ]]; then
+    radp_log_error "Could not find fastfetch binary in extracted archive"
+    return 1
+  fi
+  _setup_install_binary "$bin_path" "fastfetch" || return 1
 }

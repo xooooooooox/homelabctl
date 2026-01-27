@@ -69,7 +69,7 @@ _setup_jq_from_release() {
 
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' RETURN
+    trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
     radp_log_info "Downloading jq $version..."
     radp_io_download "$url" "$tmpdir/jq" || return 1

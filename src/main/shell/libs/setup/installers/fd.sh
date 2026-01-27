@@ -19,7 +19,10 @@ _setup_install_fd() {
             ;;
         dnf|yum)
             radp_log_info "Installing fd via dnf..."
-            radp_os_install_pkgs fd-find || return 1
+            if ! radp_os_install_pkgs fd-find 2>/dev/null; then
+                radp_log_info "fd-find not available in repos, falling back to binary release..."
+                _setup_fd_from_release "$version"
+            fi
             ;;
         apt|apt-get)
             radp_log_info "Installing fd via apt..."
@@ -77,7 +80,7 @@ _setup_fd_from_release() {
 
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' RETURN
+    trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
     radp_log_info "Downloading fd $version..."
     radp_io_download "$url" "$tmpdir/$filename" || return 1

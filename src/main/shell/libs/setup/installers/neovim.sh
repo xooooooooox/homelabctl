@@ -19,7 +19,10 @@ _setup_install_neovim() {
             ;;
         dnf|yum)
             radp_log_info "Installing neovim via dnf..."
-            radp_os_install_pkgs neovim || return 1
+            if ! radp_os_install_pkgs neovim 2>/dev/null; then
+                radp_log_info "neovim not available in repos, falling back to binary release..."
+                _setup_neovim_from_release "$version"
+            fi
             ;;
         apt|apt-get)
             # apt version is often outdated, use appimage or PPA
@@ -49,15 +52,25 @@ _setup_neovim_from_release() {
     arch=$(_setup_get_arch)
     os=$(_setup_get_os)
 
+    # Map arch to neovim release naming (uses x86_64 not amd64)
+    local nvim_arch="$arch"
+    [[ "$arch" == "amd64" ]] && nvim_arch="x86_64"
+
     local tmpdir
     tmpdir=$(_setup_mktemp_dir)
-    trap 'rm -rf "$tmpdir"' RETURN
+    trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
+
+    # Build release tag: version "stable" stays as-is, others get "v" prefix
+    local tag
+    if [[ "$version" == "stable" ]]; then
+        tag="stable"
+    else
+        tag="v${version}"
+    fi
 
     case "$os" in
         darwin)
-            local filename="nvim-macos-${arch}.tar.gz"
-            local tag="$version"
-            [[ "$version" == "stable" ]] && tag="stable"
+            local filename="nvim-macos-${nvim_arch}.tar.gz"
             local url="https://github.com/neovim/neovim/releases/download/${tag}/${filename}"
 
             radp_log_info "Downloading neovim $version..."
@@ -65,38 +78,22 @@ _setup_neovim_from_release() {
 
             _setup_extract_archive "$tmpdir/$filename" "$tmpdir" || return 1
 
-            # Move to /usr/local
-            local sudo_cmd=""
-            [[ ! -w "/usr/local" ]] && sudo_cmd="${gr_sudo:-sudo}"
-
-            $sudo_cmd rm -rf /usr/local/nvim
-            $sudo_cmd mv "$tmpdir/nvim-macos-${arch}" /usr/local/nvim || return 1
-            $sudo_cmd ln -sf /usr/local/nvim/bin/nvim /usr/local/bin/nvim || return 1
+            $gr_sudo rm -rf /usr/local/nvim
+            $gr_sudo mv "$tmpdir/nvim-macos-${nvim_arch}" /usr/local/nvim || return 1
+            $gr_sudo ln -sf /usr/local/nvim/bin/nvim /usr/local/bin/nvim || return 1
             ;;
         linux)
-            # Use AppImage on Linux
-            local filename="nvim.appimage"
-            local tag="$version"
-            [[ "$version" == "stable" ]] && tag="stable"
+            local filename="nvim-linux-${nvim_arch}.tar.gz"
             local url="https://github.com/neovim/neovim/releases/download/${tag}/${filename}"
 
-            radp_log_info "Downloading neovim $version (AppImage)..."
+            radp_log_info "Downloading neovim $version..."
             radp_io_download "$url" "$tmpdir/$filename" || return 1
 
-            chmod +x "$tmpdir/$filename"
+            _setup_extract_archive "$tmpdir/$filename" "$tmpdir" || return 1
 
-            # Try to extract AppImage (better compatibility)
-            if "$tmpdir/$filename" --appimage-extract &>/dev/null; then
-                local sudo_cmd=""
-                [[ ! -w "/usr/local/bin" ]] && sudo_cmd="${gr_sudo:-sudo}"
-
-                $sudo_cmd rm -rf /usr/local/nvim
-                $sudo_cmd mv "$tmpdir/squashfs-root" /usr/local/nvim
-                $sudo_cmd ln -sf /usr/local/nvim/usr/bin/nvim /usr/local/bin/nvim
-            else
-                # Use AppImage directly
-                _setup_install_binary "$tmpdir/$filename" "nvim" || return 1
-            fi
+            $gr_sudo rm -rf /usr/local/nvim
+            $gr_sudo mv "$tmpdir/nvim-linux-${nvim_arch}" /usr/local/nvim || return 1
+            $gr_sudo ln -sf /usr/local/nvim/bin/nvim /usr/local/bin/nvim || return 1
             ;;
         *)
             radp_log_error "Unsupported OS: $os"

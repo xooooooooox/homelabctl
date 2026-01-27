@@ -41,7 +41,7 @@ _setup_vfox_rpm_repo() {
 name=vfox Repo
 baseurl=https://yum.fury.io/versionfox/
 enabled=1
-gpgcheck=0' | ${gr_sudo:-sudo} tee "$repo_file" >/dev/null
+gpgcheck=0' | $gr_sudo tee "$repo_file" >/dev/null
   fi
 }
 
@@ -50,8 +50,8 @@ _setup_vfox_deb_repo() {
   if [[ ! -f "$list_file" ]]; then
     radp_log_info "Adding vfox APT repository..."
     echo "deb [trusted=yes] https://apt.fury.io/versionfox/ /" | \
-      ${gr_sudo:-sudo} tee "$list_file" >/dev/null || return 1
-    ${gr_sudo:-sudo} apt-get update -qq || return 1
+      $gr_sudo tee "$list_file" >/dev/null || return 1
+    $gr_sudo apt-get update -qq || return 1
   fi
 }
 
@@ -89,7 +89,7 @@ _setup_vfox_from_release() {
 
   local tmpdir
   tmpdir=$(_setup_mktemp_dir)
-  trap 'rm -rf "$tmpdir"' RETURN
+  trap 'rm -rf "$tmpdir"; trap - RETURN' RETURN
 
   radp_log_info "Downloading vfox $version..."
   radp_io_download "$url" "$tmpdir/$filename" || return 1
