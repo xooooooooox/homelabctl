@@ -1,172 +1,59 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 解析脚本真实路径
-homelabctl_resolve_script_dir() {
+# 解析脚本真实路径（支持 symlink，如 Homebrew 安装）
+__resolve_project_root() {
   local src="${BASH_SOURCE[0]}"
+  local dir
   while [[ -L "$src" ]]; do
-    local dir
     dir="$(cd -P "$(dirname "$src")" && pwd)"
     src="$(readlink "$src")"
     [[ "$src" != /* ]] && src="$dir/$src"
   done
-  cd -P "$(dirname "$src")" && pwd
-}
-
-# 获取项目根目录
-homelabctl_get_project_root() {
   local bin_dir
-  bin_dir=$(homelabctl_resolve_script_dir)
+  bin_dir="$(cd -P "$(dirname "$src")" && pwd)"
   dirname "$bin_dir"
 }
 
-# 全局变量：存储过滤后的参数
-declare -ga __homelabctl_filtered_args=()
+export RADP_APP_ROOT="$(__resolve_project_root)"
 
-# 解析全局选项 (--verbose, --debug)
-# 全局选项只在子命令之前有效，子命令之后的选项传递给子命令
-# 注意：此函数必须直接调用（不能在子 shell 中），以便 export 生效
-homelabctl_parse_global_opts() {
-  __homelabctl_filtered_args=()
-  local verbose=false
-  local debug=false
-  local found_command=false
+# 加载 radp-bash-framework
+if ! command -v radp-bf &>/dev/null; then
+  echo "Error: radp-bash-framework not found. Please install it first." >&2
+  echo "  See: https://github.com/xooooooooox/radp-bash-framework" >&2
+  exit 1
+fi
 
-  while [[ $# -gt 0 ]]; do
-    # 一旦遇到非选项参数（子命令），后续所有参数都传递给子命令
-    if [[ "$found_command" == "true" ]]; then
-      __homelabctl_filtered_args+=("$1")
-      shift
-      continue
-    fi
+# shellcheck source=/dev/null
+source "$RADP_APP_ROOT/src/main/shell/vars/constants.sh"
 
-    case "$1" in
-    -v | --verbose)
-      verbose=true
-      shift
-      ;;
-    --debug)
-      debug=true
-      shift
-      ;;
-    --)
-      shift
-      __homelabctl_filtered_args+=("$@")
-      break
-      ;;
-    -*)
-      # 未知的全局选项，保留传递
-      __homelabctl_filtered_args+=("$1")
-      shift
-      ;;
-    *)
-      # 遇到子命令，标记后续参数直接传递
-      found_command=true
-      __homelabctl_filtered_args+=("$1")
-      shift
-      ;;
-    esac
-  done
-
-  # 设置输出模式环境变量
-  if [[ "$debug" == "true" ]]; then
-    # Debug 模式: banner on, log level debug, debug enabled
-    export GX_RADP_FW_BANNER_MODE=on
-    export GX_RADP_FW_LOG_LEVEL=debug
-    export GX_RADP_FW_LOG_DEBUG=true
-  elif [[ "$verbose" == "true" ]]; then
-    # Verbose 模式: banner on, log level info
-    export GX_RADP_FW_BANNER_MODE=on
-    export GX_RADP_FW_LOG_LEVEL=info
-  else
-    # 默认模式: banner off, log level error (只显示错误)
-    export GX_RADP_FW_BANNER_MODE=off
-    export GX_RADP_FW_LOG_LEVEL=error
-  fi
-}
-
-# 主函数
-homelabctl_main() {
-  local project_root
-  project_root=$(homelabctl_get_project_root)
-
-  # 加载 radp-bash-framework
-  if ! command -v radp-bf &>/dev/null; then
-    echo "Error: radp-bash-framework not found. Please install it first." >&2
-    echo "  See: https://github.com/xooooooooox/radp-bash-framework" >&2
-    exit 1
+# 自定义 banner（在 framework 之前定义，framework 会在 context 完成时调用）
+# shellcheck disable=SC2154
+radp_app_banner() {
+  local vf_version=""
+  if command -v radp-vf &>/dev/null; then
+    vf_version=$(radp-vf version 2>/dev/null || echo "")
   fi
 
-  # 解析全局选项并获取过滤后的参数（直接调用以保证 export 生效）
-  homelabctl_parse_global_opts "$@"
-  local -a args=("${__homelabctl_filtered_args[@]}")
-
-  # 生成补全脚本时禁用所有输出
-  if [[ "${args[0]:-}" == "completion" ]]; then
-    export GX_RADP_FW_BANNER_MODE=off
-    export GX_RADP_FW_LOG_CONSOLE_ENABLED=false
-  fi
-
-  # 设置用户配置路径
-  # 开发态: src/main/shell/config 目录存在 → 使用项目内路径
-  # 安装态: 目录不存在 → 使用 XDG 标准路径
-  if [[ -d "$project_root/src/main/shell/config" ]]; then
-    export GX_RADP_FW_USER_CONFIG_PATH="$project_root/src/main/shell/config"
-  else
-    export GX_RADP_FW_USER_CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/homelabctl"
-  fi
-
-  # 加载版本常量（在 framework 之前，供 banner 使用）
-  # shellcheck source=/dev/null
-  source "$project_root/src/main/shell/vars/constants.sh"
-
-  # 定义自定义 banner（在 framework 之前定义，framework 会在 context 完成时调用）
-  # shellcheck disable=SC2154
-  radp_app_banner() {
-    local vf_version=""
-    if command -v radp-vf &>/dev/null; then
-      vf_version=$(radp-vf version 2>/dev/null || echo "")
-    fi
-
-    cat <<'EOF'
+  cat <<'EOF'
     __                         __      __         __  __
    / /_  ____  ____ ___  ___  / /___ _/ /_  _____/ /_/ /
   / __ \/ __ \/ __ `__ \/ _ \/ / __ `/ __ \/ ___/ __/ /
  / / / / /_/ / / / / / /  __/ / /_/ / /_/ / /__/ /_/ /
 /_/ /_/\____/_/ /_/ /_/\___/_/\__,_/_.___/\___/\__/_/
 EOF
-    printf ' :: homelabctl ::                          (%s)\n' "$gr_homelabctl_version"
-    printf ' :: radp-bash-framework ::                 (%s)\n' "$gr_fw_version"
-    [[ -n "$vf_version" ]] && printf ' :: radp-vagrant-framework ::              (%s)\n' "$vf_version"
-  }
-
-  # shellcheck source=/dev/null
-  source "$(radp-bf --print-run)"
-
-  # 设置应用信息
-  radp_cli_set_app_name "homelabctl"
-  radp_cli_set_commands_dir "$project_root/src/main/shell/commands"
-  radp_cli_set_global_options "-v" "--verbose" "--debug"
-
-  # 设置 radp-vagrant-framework 相关路径
-  export HOMELABCTL_ROOT="$project_root"
-
-  # 加载项目私有库（如果存在）
-  if [[ -d "$project_root/src/main/shell/libs" ]]; then
-    local lib_file
-    while IFS= read -r -d '' lib_file; do
-      # shellcheck source=/dev/null
-      source "$lib_file"
-    done < <(find "$project_root/src/main/shell/libs" -type f -name "*.sh" -print0 | sort -z)
-  fi
-
-  # 运行
-  # 当没有参数时，显示帮助
-  if [[ ${#args[@]} -eq 0 ]]; then
-    radp_app_run --help
-  else
-    radp_app_run "${args[@]}"
-  fi
+  printf ' :: homelabctl ::                          (%s)\n' "$gr_homelabctl_version"
+  printf ' :: radp-bash-framework ::                 (%s)\n' "$gr_fw_version"
+  [[ -n "$vf_version" ]] && printf ' :: radp-vagrant-framework ::              (%s)\n' "$vf_version"
 }
 
-homelabctl_main "$@"
+# 应用声明式配置
+export RADP_APP_NAME="homelabctl"
+export RADP_APP_GLOBAL_OPTIONS="-v --verbose --debug"
+
+# 项目特有导出
+export HOMELABCTL_ROOT="$RADP_APP_ROOT"
+
+# 启动：框架负责全部初始化和 dispatch
+# shellcheck source=/dev/null
+source "$(radp-bf path launcher)" "$@"
