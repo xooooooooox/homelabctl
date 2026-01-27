@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.0.14 - 2026-01-27
+
+### fix
+- 1d3afb4 setup cmd
+- 5b4f704 setup cmd
+- 918cebb setup cmd
+
 ## v0.0.13 - 2026-01-27
 
 ### fix
