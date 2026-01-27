@@ -2,7 +2,7 @@
 # @cmd
 # @desc Generate shell completion script
 # @arg shell! Shell type (bash or zsh)
-# @example completion bash > ~/.bash_completion.d/homelabctl
+# @example completion bash > ~/.local/share/bash-completion/completions/homelabctl
 # @example completion zsh > ~/.zfunc/_homelabctl
 
 cmd_completion() {
