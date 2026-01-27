@@ -9,7 +9,7 @@ cmd_completion() {
   local shell="${1:-}"
 
   if [[ -z "$shell" ]]; then
-    radp_log_error "Shell type required (bash or zsh)"
+    radp_cli_help_command "completion"
     return 1
   fi
 
