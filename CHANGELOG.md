@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.1.2 - 2026-01-27
+
+### feat
+- 550a121 update entrypoint to use the latest bash framework
+
 ## v0.1.1 - 2026-01-27
 
 ### fix
