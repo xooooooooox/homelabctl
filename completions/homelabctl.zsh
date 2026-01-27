@@ -65,6 +65,10 @@ _homelabctl() {
         args)
             case "${words[1]}" in
                 completion)
+                    # Shift words array for nested subcommand (depth=1)
+                    words=("${words[@]:1}")
+                    (( CURRENT -= 1 ))
+
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
                         '1:shell:_files'
@@ -78,11 +82,19 @@ _homelabctl() {
                     )
                     case "${words[2]}" in
                     info)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             '1:name:_homelabctl_arg_setup_info_name'
                         ;;
                     install)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-v --version)'{-v,--version}[Specific version (default: latest)]:ver:' \
@@ -90,6 +102,10 @@ _homelabctl() {
                             '1:name:_homelabctl_arg_setup_install_name'
                         ;;
                     list)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-c --category)'{-c,--category}[Filter by category]:name:_homelabctl_opt_setup_list_category' \
@@ -107,6 +123,10 @@ _homelabctl() {
                         )
                         case "${words[3]}" in
                         apply)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[@]:3}")
+                            (( CURRENT -= 3 ))
+
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 (-d --dry-run)'{-d,--dry-run}[Show what would be installed]' \
@@ -115,12 +135,20 @@ _homelabctl() {
                                 '1:name:_homelabctl_arg_setup_profile_apply_name'
                             ;;
                         list)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[@]:3}")
+                            (( CURRENT -= 3 ))
+
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 (-n --names-only)'{-n,--names-only}[Output profile names only (for completion)]' \
                                 '*:file:_files'
                             ;;
                         show)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[@]:3}")
+                            (( CURRENT -= 3 ))
+
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 '1:name:_homelabctl_arg_setup_profile_show_name'
@@ -136,6 +164,10 @@ _homelabctl() {
                     esac
                     ;;
                 version)
+                    # Shift words array for nested subcommand (depth=1)
+                    words=("${words[@]:1}")
+                    (( CURRENT -= 1 ))
+
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
                         '*:file:_files'
@@ -153,6 +185,10 @@ _homelabctl() {
                     )
                     case "${words[2]}" in
                     dump-config)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-e --env)'{-e,--env}[Override environment name]:name:' \
@@ -161,12 +197,20 @@ _homelabctl() {
                             '1:filter:_files'
                         ;;
                     generate)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-e --env)'{-e,--env}[Override environment name]:name:' \
                             '1:output:_files'
                         ;;
                     info)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-e --env)'{-e,--env}[Environment name]:name:' \
@@ -174,6 +218,10 @@ _homelabctl() {
                             '*:file:_files'
                         ;;
                     init)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-t --template)'{-t,--template}[Use a template (default: base)]:name:' \
@@ -181,6 +229,10 @@ _homelabctl() {
                             '1:dir:_files'
                         ;;
                     list)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-e --env)'{-e,--env}[Override environment name]:name:' \
@@ -197,11 +249,19 @@ _homelabctl() {
                         )
                         case "${words[3]}" in
                         list)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[@]:3}")
+                            (( CURRENT -= 3 ))
+
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 '*:file:_files'
                             ;;
                         show)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[@]:3}")
+                            (( CURRENT -= 3 ))
+
                             _arguments \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 '1:name:_files'
@@ -212,12 +272,20 @@ _homelabctl() {
                         esac
                         ;;
                     validate)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             (-e --env)'{-e,--env}[Override environment name]:name:' \
                             '*:file:_files'
                         ;;
                     version)
+                        # Shift words array for nested subcommand (depth=2)
+                        words=("${words[@]:2}")
+                        (( CURRENT -= 2 ))
+
                         _arguments \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             '*:file:_files'
@@ -228,6 +296,10 @@ _homelabctl() {
                     esac
                     ;;
                 vg)
+                    # Shift words array for nested subcommand (depth=1)
+                    words=("${words[@]:1}")
+                    (( CURRENT -= 1 ))
+
                     _arguments \
                         '(-h --help)'{-h,--help}'[Show help]' \
                         '*:args:'

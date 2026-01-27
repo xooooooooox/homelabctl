@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.0.13 - 2026-01-27
+
+### fix
+- 85aecbe setup cmd
+
 ## v0.0.12 - 2026-01-26
 
 - TODO: no commits found; add summary manually.
