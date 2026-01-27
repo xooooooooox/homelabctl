@@ -107,9 +107,14 @@ homelabctl_main() {
     export GX_RADP_FW_LOG_CONSOLE_ENABLED=false
   fi
 
-  # 设置用户配置路径（在加载 framework 之前）
-  # 使用用户目录（可写），而不是安装目录（系统安装时不可写）
-  export GX_RADP_FW_USER_CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/homelabctl"
+  # 设置用户配置路径
+  # 开发态: src/main/shell/config 目录存在 → 使用项目内路径
+  # 安装态: 目录不存在 → 使用 XDG 标准路径
+  if [[ -d "$project_root/src/main/shell/config" ]]; then
+    export GX_RADP_FW_USER_CONFIG_PATH="$project_root/src/main/shell/config"
+  else
+    export GX_RADP_FW_USER_CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/homelabctl"
+  fi
 
   # 加载版本常量（在 framework 之前，供 banner 使用）
   # shellcheck source=/dev/null
