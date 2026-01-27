@@ -86,6 +86,6 @@ _setup_get_arch() {
 #######################################
 _setup_get_os() {
     local os
-    os=$(radp_os_get_distro_os 2>/dev/null || uname -s | tr '[:upper:]' '[:lower:]')
-    echo "$os"
+    os=$(radp_os_get_distro_os 2>/dev/null || uname -s)
+    echo "${os,,}"
 }

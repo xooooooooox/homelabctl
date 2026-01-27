@@ -137,15 +137,9 @@ _setup_install_binary() {
         return 1
     fi
 
-    # Use sudo if needed
-    local sudo_cmd=""
-    if [[ ! -w "$dest_dir" ]]; then
-        sudo_cmd="${gr_sudo:-sudo}"
-    fi
-
-    $sudo_cmd mkdir -p "$dest_dir" || return 1
-    $sudo_cmd cp "$src" "$dest_dir/$name" || return 1
-    $sudo_cmd chmod +x "$dest_dir/$name" || return 1
+    $gr_sudo mkdir -p "$dest_dir" || return 1
+    $gr_sudo cp "$src" "$dest_dir/$name" || return 1
+    $gr_sudo chmod +x "$dest_dir/$name" || return 1
 
     radp_log_info "Installed $name to $dest_dir"
     return 0
