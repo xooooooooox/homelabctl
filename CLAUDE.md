@@ -90,13 +90,23 @@ homelabctl/
 │           │   ├── linux-dev.yaml
 │           │   └── devops.yaml
 │           └── installers/     # Package installers
-│               ├── fzf.sh
 │               ├── bat.sh
+│               ├── fastfetch.sh
 │               ├── fd.sh
+│               ├── fzf.sh
+│               ├── gnu-getopt.sh
+│               ├── helm.sh
+│               ├── homebrew.sh
+│               ├── jdk.sh
 │               ├── jq.sh
+│               ├── kubectl.sh
+│               ├── kubecm.sh
+│               ├── mc.sh
 │               ├── neovim.sh
 │               ├── nodejs.sh
-│               └── jdk.sh
+│               ├── ruby.sh
+│               ├── vagrant.sh
+│               └── vfox.sh
 ├── packaging/
 │   ├── copr/
 │   │   └── homelabctl.spec     # RPM spec for COPR
