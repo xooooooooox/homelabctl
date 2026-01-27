@@ -69,7 +69,11 @@ _setup_nodejs_via_vfox() {
     fi
 
     vfox install "nodejs@$version" || return 1
-    vfox use --global "nodejs@$version" || return 1
+    # vfox use --global may fail in non-interactive shells without vfox activate,
+    # but it still writes to ~/.vfox/.tool-versions successfully
+    if ! vfox use --global "nodejs@$version" 2>/dev/null; then
+        radp_log_info "Set nodejs@$version as global default. Run 'vfox activate' in your shell to use it."
+    fi
 }
 
 _setup_nodejs_via_nvm() {
