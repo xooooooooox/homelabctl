@@ -9,8 +9,7 @@ cmd_vf_template_show() {
     local name="${1:-}"
 
     if [[ -z "$name" ]]; then
-        radp_log_error "Template name required"
-        echo "Usage: homelabctl vf template show <name>"
+        radp_cli_help_command "vf template show"
         return 1
     fi
 

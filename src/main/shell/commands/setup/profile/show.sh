@@ -10,7 +10,7 @@ cmd_setup_profile_show() {
   local name="${1:-}"
 
   if [[ -z "$name" ]]; then
-radp_cli_help_command "setup profile show"
+    radp_cli_help_command "setup profile show"
     return 1
   fi
 
