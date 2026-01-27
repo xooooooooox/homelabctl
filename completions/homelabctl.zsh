@@ -48,6 +48,10 @@ _homelabctl() {
     typeset -A opt_args
 
     _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--version[Show version]' \
+        '(-v --verbose)'{-v,--verbose}'[Enable verbose output]' \
+        '--debug[Enable debug output]' \
         '1: :->command' \
         '*:: :->args'
 

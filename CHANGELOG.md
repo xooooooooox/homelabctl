@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.1.0 - 2026-01-27
+
+### feat
+- 416472d Update completion help example
+- 80b6ea1 Add global cli args
+
+### docs
+- 2f4c03c Update README
+
 ## v0.0.17 - 2026-01-27
 
 ### chore
