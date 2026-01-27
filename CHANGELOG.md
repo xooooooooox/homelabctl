@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.1.1 - 2026-01-27
+
+### fix
+- 87fc7b3 fix zsh completion
+- fe8ef0c optimize user config dir
+
 ## v0.1.0 - 2026-01-27
 
 ### feat
