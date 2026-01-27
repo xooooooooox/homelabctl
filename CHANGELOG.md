@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v0.0.16 - 2026-01-27
+
+### fix
+- 27b85a4 subshell problem
+
+### chore
+- 44eca29 Optimize install.sh
+- a1891be Optimize install.sh
+
+### docs
+- 826cee9 Add badges
+
 ## v0.0.15 - 2026-01-27
 
 ### fix
