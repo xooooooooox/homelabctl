@@ -161,10 +161,11 @@ homelabctl setup profile apply linux-dev --continue
 
 **Available Categories:**
 
-- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide)
+- **system** - System prerequisites and package managers (homebrew, gnu-getopt)
+- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch)
 - **editors** - Text editors (neovim)
-- **languages** - Programming languages (nodejs, jdk, python, go, rust)
-- **devops** - DevOps tools (kubectl, helm, docker, terraform, ansible)
+- **languages** - Programming languages (nodejs, jdk, python, go, rust, vfox, ruby)
+- **devops** - DevOps tools (kubectl, helm, kubecm, vagrant, docker, terraform, ansible)
 - **shell** - Shell utilities (zsh, tmux, starship)
 
 **Built-in Profiles:**
