@@ -10,9 +10,7 @@ cmd_setup_profile_show() {
   local name="${1:-}"
 
   if [[ -z "$name" ]]; then
-    radp_log_error "Profile name required"
-    radp_log_info "Usage: homelabctl setup profile show <profile>"
-    radp_log_info "Run 'homelabctl setup profile list' to see available profiles"
+radp_cli_help_command "setup profile show"
     return 1
   fi
 

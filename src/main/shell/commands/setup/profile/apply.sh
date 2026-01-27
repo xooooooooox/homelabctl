@@ -17,9 +17,7 @@ cmd_setup_profile_apply() {
   local skip_installed="${opt_skip_installed:-}"
 
   if [[ -z "$profile_name" ]]; then
-    radp_log_error "Profile name required"
-    radp_log_info "Usage: homelabctl setup profile apply <profile>"
-    radp_log_info "Run 'homelabctl setup profile list' to see available profiles"
+radp_cli_help_command "setup profile apply"
     return 1
   fi
 

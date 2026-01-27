@@ -10,9 +10,7 @@ cmd_setup_info() {
   local name="${1:-}"
 
   if [[ -z "$name" ]]; then
-    radp_log_error "Package name required"
-    radp_log_info "Usage: homelabctl setup info <package>"
-    radp_log_info "Run 'homelabctl setup list' to see available packages"
+radp_cli_help_command "setup info"
     return 1
   fi
 

@@ -15,9 +15,7 @@ cmd_setup_install() {
   local dry_run="${opt_dry_run:-}"
 
   if [[ -z "$name" ]]; then
-    radp_log_error "Package name required"
-    radp_log_info "Usage: homelabctl setup install <package>"
-    radp_log_info "Run 'homelabctl setup list' to see available packages"
+    radp_cli_help_command "setup install"
     return 1
   fi
 
