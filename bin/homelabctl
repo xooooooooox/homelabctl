@@ -141,6 +141,7 @@ EOF
   # 设置应用信息
   radp_cli_set_app_name "homelabctl"
   radp_cli_set_commands_dir "$project_root/src/main/shell/commands"
+  radp_cli_set_global_options "-v" "--verbose" "--debug"
 
   # 设置 radp-vagrant-framework 相关路径
   export HOMELABCTL_ROOT="$project_root"
