@@ -10,8 +10,8 @@
 #   0 if available, 1 if not
 #######################################
 _setup_is_installed() {
-    local cmd="$1"
-    command -v "$cmd" &>/dev/null
+  local cmd="$1"
+  command -v "$cmd" &>/dev/null
 }
 
 #######################################
@@ -22,7 +22,7 @@ _setup_is_installed() {
 #   Path to user setup directory
 #######################################
 _setup_get_user_dir() {
-    echo "${gr_radp_extend_homelabctl_setup_user_dir:-$HOME/.config/homelabctl/setup}"
+  echo "${gr_radp_extend_homelabctl_setup_user_dir:-$HOME/.config/homelabctl/setup}"
 }
 
 #######################################
@@ -33,7 +33,7 @@ _setup_get_user_dir() {
 #   Path to builtin setup directory
 #######################################
 _setup_get_builtin_dir() {
-    echo "${HOMELABCTL_ROOT:-}/src/main/shell/libs/setup"
+  echo "${HOMELABCTL_ROOT:-}/src/main/shell/libs/setup"
 }
 
 #######################################
@@ -46,10 +46,10 @@ _setup_get_builtin_dir() {
 #   Value for the key
 #######################################
 _setup_yaml_get_value() {
-    local key="$1"
-    local content="${2:-$(cat)}"
+  local key="$1"
+  local content="${2:-$(cat)}"
 
-    echo "$content" | grep -E "^[[:space:]]*${key}:" | head -1 | sed "s/^[[:space:]]*${key}:[[:space:]]*//" | sed 's/^["'"'"']//' | sed 's/["'"'"']$//'
+  echo "$content" | grep -E "^[[:space:]]*${key}:" | head -1 | sed "s/^[[:space:]]*${key}:[[:space:]]*//" | sed 's/^["'"'"']//' | sed 's/["'"'"']$//'
 }
 
 #######################################
@@ -60,7 +60,7 @@ _setup_yaml_get_value() {
 #   List items, one per line
 #######################################
 _setup_yaml_get_list_items() {
-    grep -E '^[[:space:]]*-[[:space:]]' | sed 's/^[[:space:]]*-[[:space:]]*//'
+  grep -E '^[[:space:]]*-[[:space:]]' | sed 's/^[[:space:]]*-[[:space:]]*//'
 }
 
 #######################################
@@ -69,14 +69,14 @@ _setup_yaml_get_list_items() {
 #   amd64 or arm64
 #######################################
 _setup_get_arch() {
-    local arch
-    arch=$(radp_os_get_distro_arch 2>/dev/null || uname -m)
+  local arch
+  arch=$(radp_os_get_distro_arch 2>/dev/null || uname -m)
 
-    case "$arch" in
-        x86_64|amd64) echo "amd64" ;;
-        aarch64|arm64) echo "arm64" ;;
-        *) echo "$arch" ;;
-    esac
+  case "$arch" in
+  x86_64 | amd64) echo "amd64" ;;
+  aarch64 | arm64) echo "arm64" ;;
+  *) echo "$arch" ;;
+  esac
 }
 
 #######################################
@@ -85,9 +85,9 @@ _setup_get_arch() {
 #   linux or darwin
 #######################################
 _setup_get_os() {
-    local os
-    os=$(radp_os_get_distro_os 2>/dev/null || uname -s)
-    echo "${os,,}"
+  local os
+  os=$(radp_os_get_distro_os 2>/dev/null || uname -s)
+  echo "${os,,}"
 }
 
 #######################################
@@ -99,11 +99,11 @@ _setup_get_os() {
 # available in non-interactive scripts.
 #######################################
 _setup_vfox_refresh_path() {
-    if ! _setup_is_installed vfox; then
-        return 0
-    fi
-    local shell_name
-    shell_name=$(basename "${SHELL:-bash}")
-    [[ "$shell_name" != "bash" && "$shell_name" != "zsh" ]] && shell_name="bash"
-    eval "$(vfox env -s "$shell_name" 2>/dev/null)" || true
+  if ! _setup_is_installed vfox; then
+    return 0
+  fi
+  local shell_name
+  shell_name=$(basename "${SHELL:-bash}")
+  [[ "$shell_name" != "bash" && "$shell_name" != "zsh" ]] && shell_name="bash"
+  eval "$(vfox env -s "$shell_name" 2>/dev/null)" || true
 }
