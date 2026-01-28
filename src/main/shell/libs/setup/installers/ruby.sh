@@ -64,8 +64,6 @@ _setup_ruby_via_vfox() {
 
   vfox install "ruby@$version" || return 1
   vfox use --global "ruby@$version" 2>/dev/null || true
-
-  # Add ruby to PATH directly
   _setup_vfox_add_sdk_to_path "ruby" "ruby"
   _setup_vfox_refresh_path
 }

@@ -91,6 +91,17 @@ _setup_get_os() {
 }
 
 #######################################
+# Get vfox home directory
+# Returns:
+#   Path to vfox home directory
+#######################################
+_setup_vfox_get_home() {
+  local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
+  [[ ! -d "$vfox_home" ]] && vfox_home="$HOME/.vfox"
+  echo "$vfox_home"
+}
+
+#######################################
 # Find vfox SDK bin directory
 # Arguments:
 #   1 - SDK name (nodejs, java, python, ruby, go)
@@ -101,9 +112,8 @@ _setup_get_os() {
 _setup_vfox_find_sdk_bin() {
   local sdk_name="$1"
   local check_binary="$2"
-
-  local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
-  [[ ! -d "$vfox_home" ]] && vfox_home="$HOME/.vfox"
+  local vfox_home
+  vfox_home=$(_setup_vfox_get_home)
 
   # Method 1: Check sdks directory (symlink created by vfox use)
   if [[ -d "$vfox_home/sdks/$sdk_name/bin" ]]; then
@@ -113,19 +123,17 @@ _setup_vfox_find_sdk_bin() {
     fi
   fi
 
-  # Method 2: Use find to search in cache directory (handles nested structure)
+  # Method 2: Search in cache directory (handles nested structure)
   # vfox cache structure: cache/<sdk>/v-<version>/<sdk>-<version>/bin/
   if [[ -d "$vfox_home/cache/$sdk_name" ]]; then
     local found_bin
     if [[ -n "$check_binary" ]]; then
-      # Find the binary directly
       found_bin=$(find "$vfox_home/cache/$sdk_name" -type f -name "$check_binary" -perm -111 2>/dev/null | head -1)
       if [[ -n "$found_bin" ]]; then
-        echo "$(dirname "$found_bin")"
+        dirname "$found_bin"
         return 0
       fi
     else
-      # Find any bin directory
       found_bin=$(find "$vfox_home/cache/$sdk_name" -type d -name "bin" 2>/dev/null | head -1)
       if [[ -n "$found_bin" ]]; then
         echo "$found_bin"
@@ -148,15 +156,12 @@ _setup_vfox_find_sdk_bin() {
 _setup_vfox_add_sdk_to_path() {
   local sdk_name="$1"
   local check_binary="$2"
-
   local bin_dir
   bin_dir=$(_setup_vfox_find_sdk_bin "$sdk_name" "$check_binary")
 
   if [[ -n "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]]; then
     export PATH="$bin_dir:$PATH"
-    # Clear bash command hash table so new PATH entries are found
     hash -r 2>/dev/null || true
-    radp_log_info "Added $bin_dir to PATH"
     return 0
   fi
 
@@ -165,54 +170,40 @@ _setup_vfox_add_sdk_to_path() {
 
 #######################################
 # Refresh PATH from vfox after install
-# Makes vfox-managed tools (node, java, ruby, etc.)
-# immediately available in the current shell session.
-# This is needed because vfox requires shell hooks
-# (vfox activate) to manage PATH, which are not
-# available in non-interactive scripts.
+# Makes vfox-managed tools immediately available
+# in non-interactive scripts where vfox activate
+# is not available.
 #######################################
 _setup_vfox_refresh_path() {
-  if ! _setup_is_installed vfox; then
-    return 0
+  _setup_is_installed vfox || return 0
+
+  local vfox_home bin_dir
+  vfox_home=$(_setup_vfox_get_home)
+
+  # Add shims directory
+  if [[ -d "$vfox_home/shims" && ":$PATH:" != *":$vfox_home/shims:"* ]]; then
+    export PATH="$vfox_home/shims:$PATH"
   fi
 
-  local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
-  [[ ! -d "$vfox_home" ]] && vfox_home="$HOME/.vfox"
-
-  # Method 1: Add vfox shims to PATH (standard vfox approach)
-  local shims_dir="$vfox_home/shims"
-  if [[ -d "$shims_dir" && ":$PATH:" != *":$shims_dir:"* ]]; then
-    export PATH="$shims_dir:$PATH"
-  fi
-
-  # Method 2: Add SDK bin directories from sdks symlinks
-  local sdk_dir
-  for sdk_dir in "$vfox_home"/sdks/*; do
-    if [[ -L "$sdk_dir" || -d "$sdk_dir" ]]; then
-      local bin_dir="$sdk_dir/bin"
-      if [[ -d "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]]; then
-        export PATH="$bin_dir:$PATH"
-      fi
+  # Add SDK bin directories from sdks symlinks
+  for bin_dir in "$vfox_home"/sdks/*/bin; do
+    if [[ -d "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]]; then
+      export PATH="$bin_dir:$PATH"
     fi
   done
 
-  # Method 3: Find and add all bin directories from cache (handles nested structure)
-  # vfox cache structure: cache/<sdk>/v-<version>/<sdk>-<version>/bin/
+  # Add bin directories from cache (nested structure)
   if [[ -d "$vfox_home/cache" ]]; then
-    local bin_dir
     while IFS= read -r bin_dir; do
-      if [[ -n "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]]; then
-        export PATH="$bin_dir:$PATH"
-      fi
+      [[ -n "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]] && export PATH="$bin_dir:$PATH"
     done < <(find "$vfox_home/cache" -type d -name "bin" 2>/dev/null)
   fi
 
-  # Method 4: Try vfox env as fallback
+  # Try vfox env as fallback
   local shell_name
   shell_name=$(basename "${SHELL:-bash}")
   [[ "$shell_name" != "bash" && "$shell_name" != "zsh" ]] && shell_name="bash"
   eval "$(vfox env -s "$shell_name" 2>/dev/null)" || true
 
-  # Clear bash command hash table so new PATH entries are found
   hash -r 2>/dev/null || true
 }

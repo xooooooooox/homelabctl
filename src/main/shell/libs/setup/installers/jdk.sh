@@ -81,16 +81,11 @@ _setup_jdk_via_vfox() {
   vfox install "java@$version" || return 1
   vfox use --global "java@$version" 2>/dev/null || true
 
-  # Add java to PATH directly (vfox use --global may not work without activation)
+  # Add java to PATH and set JAVA_HOME
   _setup_vfox_add_sdk_to_path "java" "java"
-
-  # Set JAVA_HOME
   local java_bin
   java_bin=$(_setup_vfox_find_sdk_bin "java" "java")
-  if [[ -n "$java_bin" ]]; then
-    export JAVA_HOME="${java_bin%/bin}"
-  fi
-
+  [[ -n "$java_bin" ]] && export JAVA_HOME="${java_bin%/bin}"
   _setup_vfox_refresh_path
 }
 

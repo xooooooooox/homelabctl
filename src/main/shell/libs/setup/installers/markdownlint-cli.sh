@@ -26,14 +26,13 @@ _setup_install_markdownlint_cli() {
       npm_cmd=$(command -v npm)
     else
       # Try to find npm in vfox directories
-      local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
-      [[ ! -d "$vfox_home" ]] && vfox_home="$HOME/.vfox"
+      local vfox_home
+      vfox_home=$(_setup_vfox_get_home)
       npm_cmd=$(find "$vfox_home" -name "npm" \( -type f -o -type l \) -perm -111 2>/dev/null | head -1)
       if [[ -z "$npm_cmd" ]]; then
         radp_log_error "npm is required to install markdownlint-cli. Install nodejs first."
         return 1
       fi
-      radp_log_info "Found npm at $npm_cmd"
     fi
 
     radp_log_info "Installing markdownlint-cli via npm..."

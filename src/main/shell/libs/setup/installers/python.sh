@@ -62,8 +62,6 @@ _setup_python_via_vfox() {
 
   vfox install "python@$version" || return 1
   vfox use --global "python@$version" 2>/dev/null || true
-
-  # Add python to PATH directly
   _setup_vfox_add_sdk_to_path "python" "python3"
   _setup_vfox_refresh_path
 }

@@ -45,8 +45,6 @@ _setup_go_via_vfox() {
 
   vfox install "golang@$version" || return 1
   vfox use --global "golang@$version" 2>/dev/null || true
-
-  # Add go to PATH directly (vfox uses "golang" as SDK name)
   _setup_vfox_add_sdk_to_path "golang" "go"
   _setup_vfox_refresh_path
 }
