@@ -3,8 +3,7 @@
 # @desc Show profile details
 # @arg name! Profile name
 # @complete name _homelabctl_complete_profiles
-# @example setup profile show osx-dev
-# @example setup profile show linux-dev
+# @example setup profile show recommend
 
 cmd_setup_profile_show() {
   local name="${1:-}"

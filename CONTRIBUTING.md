@@ -174,9 +174,7 @@ src/main/shell/libs/setup/
 ├── installer.sh            # Installer utilities
 ├── registry.yaml           # Package registry definitions
 ├── profiles/               # Profile definitions
-│   ├── osx-dev.yaml
-│   ├── linux-dev.yaml
-│   └── devops.yaml
+│   └── recommend.yaml
 └── installers/             # Package installers
     ├── fzf.sh
     ├── bat.sh

@@ -6,9 +6,9 @@
 # @option --dry-run Show what would be installed
 # @option --continue Continue on error
 # @option --skip-installed Skip already installed packages
-# @example setup profile apply osx-dev
-# @example setup profile apply devops --dry-run
-# @example setup profile apply linux-dev --continue
+# @example setup profile apply recommend
+# @example setup profile apply recommend --dry-run
+# @example setup profile apply recommend --continue
 
 cmd_setup_profile_apply() {
   local profile_name="${1:-}"

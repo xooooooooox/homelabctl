@@ -70,7 +70,7 @@ homelabctl --help
 
 # Install development tools
 homelabctl setup install fzf
-homelabctl setup profile apply osx-dev
+homelabctl setup profile apply recommend
 
 # Manage Vagrant VMs
 homelabctl vf init myproject --template k8s-cluster
@@ -154,9 +154,9 @@ homelabctl setup install jdk -v 17
 
 # Work with profiles
 homelabctl setup profile list
-homelabctl setup profile show osx-dev
-homelabctl setup profile apply osx-dev --dry-run
-homelabctl setup profile apply linux-dev --continue
+homelabctl setup profile show recommend
+homelabctl setup profile apply recommend --dry-run
+homelabctl setup profile apply recommend --continue
 ```
 
 **How It Works:**
@@ -186,11 +186,9 @@ For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com
 
 **Built-in Profiles:**
 
-| Profile     | Description                     |
-|-------------|---------------------------------|
-| `osx-dev`   | macOS development environment   |
-| `linux-dev` | Linux development environment   |
-| `devops`    | DevOps and infrastructure tools |
+| Profile     | Description                                        |
+|-------------|----------------------------------------------------|
+| `recommend` | Recommended development environment with essentials |
 
 **User Extensions:**
 

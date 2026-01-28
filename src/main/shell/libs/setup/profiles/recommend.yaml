@@ -1,0 +1,39 @@
+# recommend Development Environment Profile
+name: recommend
+desc: Recommend development environment with essential packages
+platform: any
+
+packages:
+  # Version control
+  - name: git
+  - name: lazygit
+  - name: git-credential-manager
+
+  # Terminal multiplexer
+  - name: tmux
+
+  # Editors
+  - name: vim
+  - name: neovim
+
+  # Security
+  - name: gpg
+
+  # Shell enhancements
+  - name: zoxide
+  - name: fzf
+  - name: fd
+  - name: jq
+  - name: bat
+
+  # Version manager
+  - name: vfox
+
+  # Language runtimes (with version)
+  - name: jdk
+    version: "17"
+  - name: nodejs
+    version: "20"
+
+  # Linters
+  - name: markdownlint-cli

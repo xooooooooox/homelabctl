@@ -69,7 +69,7 @@ homelabctl --help
 
 # 安装开发工具
 homelabctl setup install fzf
-homelabctl setup profile apply osx-dev
+homelabctl setup profile apply recommend
 
 # 管理 Vagrant 虚拟机
 homelabctl vf init myproject --template k8s-cluster
@@ -151,9 +151,9 @@ homelabctl setup install jdk -v 17
 
 # 使用配置文件
 homelabctl setup profile list
-homelabctl setup profile show osx-dev
-homelabctl setup profile apply osx-dev --dry-run
-homelabctl setup profile apply linux-dev --continue
+homelabctl setup profile show recommend
+homelabctl setup profile apply recommend --dry-run
+homelabctl setup profile apply recommend --continue
 ```
 
 **可用分类：**
@@ -167,11 +167,9 @@ homelabctl setup profile apply linux-dev --continue
 
 **内置配置文件：**
 
-| 配置文件        | 描述             |
-|-------------|----------------|
-| `osx-dev`   | macOS 开发环境     |
-| `linux-dev` | Linux 开发环境     |
-| `devops`    | DevOps 和基础设施工具 |
+| 配置文件        | 描述                 |
+|-------------|--------------------|
+| `recommend` | 推荐的开发环境基础工具集 |
 
 **用户扩展：**
 

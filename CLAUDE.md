@@ -86,9 +86,7 @@ homelabctl/
 │           ├── installer.sh    # Installer utilities
 │           ├── registry.yaml   # Package registry
 │           ├── profiles/       # Profile definitions
-│           │   ├── osx-dev.yaml
-│           │   ├── linux-dev.yaml
-│           │   └── devops.yaml
+│           │   └── recommend.yaml
 │           └── installers/     # Package installers (42 files)
 │               ├── ansible.sh
 │               ├── bat.sh
@@ -324,9 +322,9 @@ homelabctl setup install jdk -v 17
 
 # Profiles
 homelabctl setup profile list
-homelabctl setup profile show osx-dev
-homelabctl setup profile apply osx-dev --dry-run
-homelabctl setup profile apply linux-dev --continue
+homelabctl setup profile show recommend
+homelabctl setup profile apply recommend --dry-run
+homelabctl setup profile apply recommend --continue
 ```
 
 ### User Extensions
