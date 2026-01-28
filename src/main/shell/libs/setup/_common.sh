@@ -154,6 +154,8 @@ _setup_vfox_add_sdk_to_path() {
 
   if [[ -n "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]]; then
     export PATH="$bin_dir:$PATH"
+    # Clear bash command hash table so new PATH entries are found
+    hash -r 2>/dev/null || true
     radp_log_info "Added $bin_dir to PATH"
     return 0
   fi
@@ -210,4 +212,7 @@ _setup_vfox_refresh_path() {
   shell_name=$(basename "${SHELL:-bash}")
   [[ "$shell_name" != "bash" && "$shell_name" != "zsh" ]] && shell_name="bash"
   eval "$(vfox env -s "$shell_name" 2>/dev/null)" || true
+
+  # Clear bash command hash table so new PATH entries are found
+  hash -r 2>/dev/null || true
 }

@@ -20,8 +20,21 @@ _setup_install_markdownlint_cli() {
   *)
     # markdownlint-cli is an npm package
     if ! _setup_is_installed npm; then
-      radp_log_error "npm is required to install markdownlint-cli. Install nodejs first."
-      return 1
+      # Debug: try to find npm in vfox directories
+      local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
+      [[ ! -d "$vfox_home" ]] && vfox_home="$HOME/.vfox"
+      local npm_path
+      npm_path=$(find "$vfox_home" -name "npm" -type f -o -name "npm" -type l 2>/dev/null | head -1)
+      if [[ -n "$npm_path" && -x "$npm_path" ]]; then
+        radp_log_info "Found npm at $npm_path, adding to PATH"
+        export PATH="$(dirname "$npm_path"):$PATH"
+        hash -r 2>/dev/null || true
+      else
+        radp_log_error "npm is required to install markdownlint-cli. Install nodejs first."
+        radp_log_error "Debug: PATH=$PATH"
+        radp_log_error "Debug: vfox_home=$vfox_home"
+        return 1
+      fi
     fi
     radp_log_info "Installing markdownlint-cli via npm..."
     # Use npm from vfox without sudo (user-space installation)
