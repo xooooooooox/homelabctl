@@ -159,14 +159,30 @@ homelabctl setup profile apply osx-dev --dry-run
 homelabctl setup profile apply linux-dev --continue
 ```
 
+**How It Works:**
+
+```mermaid
+flowchart TD
+    A["homelabctl setup install &lt;name&gt;"] --> B["Registry Lookup<br/>(builtin + user registry.yaml)"]
+    B --> C["Load Installer<br/>(user ~/.config/.../ or builtin installers/name.sh)"]
+    C --> D["Detect Platform<br/>(brew / dnf / apt / ...)"]
+    D --> E1["macOS: Homebrew"]
+    D --> E2["Linux: native PM<br/>+ binary release fallback"]
+    D --> E3["Language runtimes:<br/>vfox + PATH refresh"]
+```
+
+The install system uses a layered architecture: a **registry** (`registry.yaml`) defines available packages and metadata, an **installer loader** (`installer.sh`) dynamically sources per-package scripts, and each **installer** (`installers/<name>.sh`) implements platform-specific install strategies. Users can extend both the registry and installers via `~/.config/homelabctl/setup/`.
+
+For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com/version-fox/vfox) is preferred when available. After a vfox-based install, the current shell PATH is refreshed via `vfox env` so that dependent tools (e.g., markdownlint-cli needs npm) can be installed in the same session.
+
 **Available Categories:**
 
 - **system** - System prerequisites and package managers (homebrew, gnu-getopt)
-- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch)
-- **editors** - Text editors (neovim)
-- **languages** - Programming languages (nodejs, jdk, python, go, rust, vfox, ruby)
+- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch, lazygit, tig, gpg, pass, shellcheck, git, git-credential-manager, markdownlint-cli, yadm)
+- **editors** - Text editors (neovim, vim)
+- **languages** - Programming languages (nodejs, jdk, python, go, rust, ruby, vfox, mvn)
 - **devops** - DevOps tools (kubectl, helm, kubecm, vagrant, docker, terraform, ansible)
-- **shell** - Shell utilities (zsh, tmux, starship)
+- **shell** - Shell utilities (zsh, ohmyzsh, tmux, starship, zoxide)
 
 **Built-in Profiles:**
 

@@ -89,24 +89,48 @@ homelabctl/
 │           │   ├── osx-dev.yaml
 │           │   ├── linux-dev.yaml
 │           │   └── devops.yaml
-│           └── installers/     # Package installers
+│           └── installers/     # Package installers (41 files)
+│               ├── ansible.sh
 │               ├── bat.sh
+│               ├── docker.sh
+│               ├── eza.sh
 │               ├── fastfetch.sh
 │               ├── fd.sh
 │               ├── fzf.sh
+│               ├── git-credential-manager.sh
+│               ├── git.sh
 │               ├── gnu-getopt.sh
+│               ├── go.sh
+│               ├── gpg.sh
 │               ├── helm.sh
 │               ├── homebrew.sh
 │               ├── jdk.sh
 │               ├── jq.sh
-│               ├── kubectl.sh
 │               ├── kubecm.sh
+│               ├── kubectl.sh
+│               ├── lazygit.sh
+│               ├── markdownlint-cli.sh
 │               ├── mc.sh
+│               ├── mvn.sh
 │               ├── neovim.sh
 │               ├── nodejs.sh
+│               ├── ohmyzsh.sh
+│               ├── pass.sh
+│               ├── python.sh
+│               ├── ripgrep.sh
 │               ├── ruby.sh
+│               ├── rust.sh
+│               ├── shellcheck.sh
+│               ├── starship.sh
+│               ├── terraform.sh
+│               ├── tig.sh
+│               ├── tmux.sh
 │               ├── vagrant.sh
-│               └── vfox.sh
+│               ├── vfox.sh
+│               ├── vim.sh
+│               ├── yadm.sh
+│               ├── zoxide.sh
+│               └── zsh.sh
 ├── packaging/
 │   ├── copr/
 │   │   └── homelabctl.spec     # RPM spec for COPR
@@ -179,6 +203,108 @@ cmd_vf_init() {
 ## Setup Feature
 
 The setup command manages software installation across different platforms.
+
+### Architecture
+
+The setup install system is composed of four layers:
+
+```
+commands/setup/install.sh        Entry point (cmd_setup_install)
+        |
+libs/setup/registry.sh           Package metadata (name, desc, category, check-cmd)
+libs/setup/registry.yaml          + user ~/.config/homelabctl/setup/registry.yaml
+        |
+libs/setup/installer.sh          Loader & runner (_setup_run_installer)
+        |
+libs/setup/installers/<name>.sh  Per-package install logic (_setup_install_<name>)
+libs/setup/_common.sh            Shared helpers (arch/os detection, vfox PATH refresh)
+```
+
+**Key source files:**
+
+| File | Role |
+|------|------|
+| `commands/setup/install.sh` | CLI entry: parse args, check registry, call `_setup_run_installer` |
+| `libs/setup/registry.sh` | Load & query `registry.yaml` (builtin + user merge) |
+| `libs/setup/installer.sh` | `_setup_load_installer` (source `.sh`), `_setup_run_installer` (call function), `_setup_install_binary` (copy binary to `/usr/local/bin`) |
+| `libs/setup/_common.sh` | `_setup_is_installed`, `_setup_get_arch`, `_setup_get_os`, `_setup_vfox_refresh_path` |
+| `libs/setup/installers/*.sh` | Each file exports `_setup_install_<name>(version)` |
+
+### Install Flow
+
+```mermaid
+flowchart TD
+    A["homelabctl setup install &lt;name&gt; [-v version]"] --> B[_setup_registry_init]
+    B --> B1[Load builtin registry.yaml]
+    B1 --> B2[Merge user registry.yaml]
+    B2 --> C{Package in registry?}
+    C -- No --> C1[ERROR: Unknown package]
+    C -- Yes --> D{Already installed<br/>& version=latest?}
+    D -- Yes --> D1[INFO: already installed<br/>return 0]
+    D -- No --> E[_setup_run_installer name version]
+
+    E --> F[_setup_load_installer name]
+    F --> F1{User installer<br/>~/.config/.../installers/name.sh?}
+    F1 -- Yes --> F3[source user installer]
+    F1 -- No --> F2{Builtin installer<br/>libs/setup/installers/name.sh?}
+    F2 -- Yes --> F3B[source builtin installer]
+    F2 -- No --> F4[ERROR: No installer found]
+
+    F3 --> G[Call _setup_install_name version]
+    F3B --> G
+
+    G --> H{Detect platform<br/>radp_os_get_distro_pm}
+    H -- brew --> I1[brew install]
+    H -- dnf/yum --> I2[dnf install<br/>or binary release fallback]
+    H -- apt --> I3[apt install<br/>or binary release fallback]
+    H -- vfox available --> I4["vfox install sdk@ver<br/>vfox use --global<br/>_setup_vfox_refresh_path"]
+    H -- other --> I5[Binary from GitHub release<br/>or official install script]
+
+    I1 --> J{Success?}
+    I2 --> J
+    I3 --> J
+    I4 --> J
+    I5 --> J
+    J -- Yes --> K[INFO: installed successfully]
+    J -- No --> L[ERROR: Failed to install]
+```
+
+### Installer Design Patterns
+
+Each installer (`libs/setup/installers/<name>.sh`) follows a consistent pattern:
+
+```bash
+_setup_install_<name>() {
+  local version="${1:-latest}"
+
+  # 1. Early return if already installed
+  if _setup_is_installed <cmd> && [[ "$version" == "latest" ]]; then
+    radp_log_info "<name> is already installed"
+    return 0
+  fi
+
+  # 2. Detect platform
+  local pm
+  pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
+
+  # 3. Platform-specific install strategy
+  case "$pm" in
+  brew)     ... ;;           # macOS: Homebrew
+  dnf|yum)  ... ;;           # RHEL/CentOS: native PM, fallback to binary
+  apt)      ... ;;           # Debian/Ubuntu: native PM, fallback to binary
+  *)        ... ;;           # Fallback: GitHub release binary or official script
+  esac
+}
+```
+
+**Install strategy priority:**
+
+1. **Version manager** (vfox) -- for language runtimes (nodejs, jdk, ruby, go, python). After vfox install, calls `_setup_vfox_refresh_path` to inject `~/.version-fox/sdks/*/bin` into current shell PATH via `eval "$(vfox env -s bash)"`, ensuring subsequent installers can find the tools (e.g., markdownlint-cli needs npm from nodejs).
+2. **Native package manager** -- brew on macOS, dnf/apt on Linux
+3. **Binary release fallback** -- download from GitHub Releases / official CDN
+4. **Source build** -- last resort for tools without pre-built binaries (tig, tmux, pass, git, zsh)
+
+**User extension:** Users can override any builtin installer by placing `<name>.sh` in `~/.config/homelabctl/setup/installers/`. User installers are loaded with higher priority than builtin ones.
 
 ### Usage Examples
 ```bash
