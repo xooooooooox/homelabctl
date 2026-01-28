@@ -42,8 +42,8 @@ radp_app_banner() {
  / / / / /_/ / / / / / /  __/ / /_/ / /_/ / /__/ /_/ /
 /_/ /_/\____/_/ /_/ /_/\___/_/\__,_/_.___/\___/\__/_/
 EOF
-  printf ' :: homelabctl ::                          (%s)\n' "$gr_homelabctl_version"
-  printf ' :: radp-bash-framework ::                 (%s)\n' "$gr_fw_version"
+  printf ' :: homelabctl ::                          (%s)\n' "$(radp_get_install_version "$gr_homelabctl_version")"
+  printf ' :: radp-bash-framework ::                 (%s)\n' "$(radp_get_fw_install_version)"
   [[ -n "$vf_version" ]] && printf ' :: radp-vagrant-framework ::              (%s)\n' "$vf_version"
 }
 

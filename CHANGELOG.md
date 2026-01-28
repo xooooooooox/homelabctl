@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## Unreleased
+
+### feat
+- Display accurate version info when installed via `--ref <branch>` or `--ref <sha>`
+- Generate `.install-version` file during manual installation
+- Use framework's `radp_get_install_version()` helper in banner
+
+This allows installations via `--ref main` to show version like `v0.1.4+main`
+instead of the hardcoded source version.
+
 ## v0.1.4 - 2026-01-28
 
 ### feat
