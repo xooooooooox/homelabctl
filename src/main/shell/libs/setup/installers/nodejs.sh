@@ -70,6 +70,9 @@ _setup_nodejs_via_vfox() {
 
   vfox install "nodejs@$version" || return 1
   vfox use --global "nodejs@$version" 2>/dev/null || true
+
+  # Add nodejs to PATH directly (vfox use --global may not work without activation)
+  _setup_vfox_add_sdk_to_path "nodejs" "node"
   _setup_vfox_refresh_path
 }
 
