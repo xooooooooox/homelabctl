@@ -103,10 +103,12 @@ _setup_get_installed_version() {
     fi
 
     # Try common version flags
+    # Note: avoid -v (lowercase) as it means "verbose" for many tools (tmux, ssh, etc.)
+    # and would start an interactive session instead of printing version
     local version=""
-    version=$("$check_cmd" --version 2>/dev/null | head -1) ||
-    version=$("$check_cmd" -v 2>/dev/null | head -1) ||
-    version=$("$check_cmd" version 2>/dev/null | head -1) ||
+    version=$(timeout 5 "$check_cmd" --version 2>/dev/null | head -1) ||
+    version=$(timeout 5 "$check_cmd" -V 2>/dev/null | head -1) ||
+    version=$(timeout 5 "$check_cmd" version 2>/dev/null | head -1) ||
     version=""
 
     # Clean up version output
