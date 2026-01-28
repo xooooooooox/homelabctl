@@ -189,7 +189,7 @@ src/main/shell/libs/setup/
 packages:
   my-tool:
     desc: "My tool description"
-    category: cli-tools        # Category for grouping
+    category: utilities        # Category for grouping
     homepage: https://...      # Optional
     check-cmd: my-tool         # Command to check if installed
     # Or use check-path for non-command packages:
@@ -268,7 +268,7 @@ User files take precedence over builtin files when names conflict.
 ```bash
 # List packages
 ./bin/homelabctl setup list
-./bin/homelabctl setup list -c cli-tools
+./bin/homelabctl setup list -c search
 
 # Show package info
 ./bin/homelabctl setup info fzf

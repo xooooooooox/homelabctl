@@ -158,12 +158,16 @@ homelabctl setup profile apply recommend --continue
 
 **可用分类：**
 
-- **system** - 系统前置工具和包管理器 (homebrew, gnu-getopt)
-- **cli-tools** - 命令行工具 (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch)
-- **editors** - 文本编辑器 (neovim)
-- **languages** - 编程语言 (nodejs, jdk, python, go, rust, vfox, ruby)
+- **system** - 系统前置工具 (homebrew, gnu-getopt)
+- **shell** - Shell 和终端 (zsh, tmux, ohmyzsh, starship, zoxide)
+- **editors** - 文本编辑器 (vim, neovim)
+- **languages** - 编程语言 (nodejs, jdk, python, go, rust, ruby, vfox, mvn)
 - **devops** - DevOps 工具 (kubectl, helm, kubecm, vagrant, docker, terraform, ansible)
-- **shell** - Shell 工具 (zsh, tmux, starship)
+- **vcs** - 版本控制 (git, lazygit, tig, git-credential-manager, yadm)
+- **security** - 安全工具 (gpg, pinentry, pass)
+- **search** - 搜索工具 (fzf, fd, ripgrep, bat, eza)
+- **dev-tools** - 开发工具 (jq, shellcheck, markdownlint-cli)
+- **utilities** - 系统工具 (mc, fastfetch)
 
 **内置配置文件：**
 
@@ -179,8 +183,61 @@ homelabctl setup profile apply recommend --continue
 ~/.config/homelabctl/setup/
 ├── registry.yaml      # 自定义软件包定义
 ├── profiles/          # 自定义配置文件
+│   └── my-profile.yaml
 └── installers/        # 自定义安装器
+    └── my-tool.sh
 ```
+
+用户文件优先级高于内置文件。
+
+**添加自定义软件包：**
+
+1. 在 `~/.config/homelabctl/setup/registry.yaml` 中定义：
+
+```yaml
+packages:
+  my-tool:
+    desc: "我的自定义工具"
+    category: utilities
+    check-cmd: my-tool         # 用于验证安装的命令
+    homepage: https://example.com
+```
+
+2. 在 `~/.config/homelabctl/setup/installers/my-tool.sh` 创建安装器：
+
+```bash
+#!/usr/bin/env bash
+_setup_install_my_tool() {
+    local version="${1:-latest}"
+    local pm
+    pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
+
+    case "$pm" in
+    brew)   brew install my-tool ;;
+    dnf)    sudo dnf install -y my-tool ;;
+    apt)    sudo apt-get install -y my-tool ;;
+    *)      radp_log_error "不支持的平台"; return 1 ;;
+    esac
+}
+```
+
+**添加自定义配置文件：**
+
+创建 `~/.config/homelabctl/setup/profiles/my-profile.yaml`：
+
+```yaml
+name: my-profile
+desc: "我的自定义配置"
+platform: any              # any, darwin, linux
+
+packages:
+  - name: fzf
+  - name: bat
+  - name: my-tool
+    version: "1.0.0"       # 可选：指定版本
+```
+
+然后应用：`homelabctl setup profile apply my-profile`
 
 ## 全局选项
 

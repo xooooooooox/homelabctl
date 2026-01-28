@@ -309,7 +309,7 @@ _setup_install_<name>() {
 ```bash
 # List available packages
 homelabctl setup list
-homelabctl setup list -c cli-tools
+homelabctl setup list -c search
 homelabctl setup list --installed
 
 # Show package info
@@ -349,7 +349,7 @@ User files take precedence over builtin files.
 packages:
   my-tool:
     desc: My custom tool
-    category: cli-tools
+    category: utilities
     check-cmd: my-tool
 ```
 

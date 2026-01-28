@@ -177,12 +177,16 @@ For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com
 
 **Available Categories:**
 
-- **system** - System prerequisites and package managers (homebrew, gnu-getopt)
-- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch, lazygit, tig, gpg, pinentry, pass, shellcheck, git, git-credential-manager, markdownlint-cli, yadm)
-- **editors** - Text editors (neovim, vim)
+- **system** - System prerequisites (homebrew, gnu-getopt)
+- **shell** - Shell and terminal (zsh, tmux, ohmyzsh, starship, zoxide)
+- **editors** - Text editors (vim, neovim)
 - **languages** - Programming languages (nodejs, jdk, python, go, rust, ruby, vfox, mvn)
 - **devops** - DevOps tools (kubectl, helm, kubecm, vagrant, docker, terraform, ansible)
-- **shell** - Shell utilities (zsh, ohmyzsh, tmux, starship, zoxide)
+- **vcs** - Version control (git, lazygit, tig, git-credential-manager, yadm)
+- **security** - Security tools (gpg, pinentry, pass)
+- **search** - Search utilities (fzf, fd, ripgrep, bat, eza)
+- **dev-tools** - Development tools (jq, shellcheck, markdownlint-cli)
+- **utilities** - System utilities (mc, fastfetch)
 
 **Built-in Profiles:**
 
@@ -198,8 +202,61 @@ Add custom packages and profiles in `~/.config/homelabctl/setup/`:
 ~/.config/homelabctl/setup/
 ├── registry.yaml      # Custom package definitions
 ├── profiles/          # Custom profiles
+│   └── my-profile.yaml
 └── installers/        # Custom installers
+    └── my-tool.sh
 ```
+
+User files take precedence over builtin files when names conflict.
+
+**Adding a Custom Package:**
+
+1. Define in `~/.config/homelabctl/setup/registry.yaml`:
+
+```yaml
+packages:
+  my-tool:
+    desc: "My custom tool"
+    category: utilities
+    check-cmd: my-tool         # Command to verify installation
+    homepage: https://example.com
+```
+
+2. Create installer at `~/.config/homelabctl/setup/installers/my-tool.sh`:
+
+```bash
+#!/usr/bin/env bash
+_setup_install_my_tool() {
+    local version="${1:-latest}"
+    local pm
+    pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
+
+    case "$pm" in
+    brew)   brew install my-tool ;;
+    dnf)    sudo dnf install -y my-tool ;;
+    apt)    sudo apt-get install -y my-tool ;;
+    *)      radp_log_error "Unsupported platform"; return 1 ;;
+    esac
+}
+```
+
+**Adding a Custom Profile:**
+
+Create `~/.config/homelabctl/setup/profiles/my-profile.yaml`:
+
+```yaml
+name: my-profile
+desc: "My custom profile"
+platform: any              # any, darwin, linux
+
+packages:
+  - name: fzf
+  - name: bat
+  - name: my-tool
+    version: "1.0.0"       # Optional: specific version
+```
+
+Then apply: `homelabctl setup profile apply my-profile`
 
 ## Global Options
 
