@@ -63,7 +63,6 @@ _setup_ruby_via_vfox() {
   fi
 
   vfox install "ruby@$version" || return 1
-  if ! vfox use --global "ruby@$version" 2>/dev/null; then
-      radp_log_info "Set ruby@$version as global default. Run 'vfox activate' in your shell to use it."
-  fi
+  vfox use --global "ruby@$version" 2>/dev/null || true
+  _setup_vfox_refresh_path
 }

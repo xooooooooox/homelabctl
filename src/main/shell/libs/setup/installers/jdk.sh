@@ -79,9 +79,8 @@ _setup_jdk_via_vfox() {
     fi
 
     vfox install "java@$version" || return 1
-    if ! vfox use --global "java@$version" 2>/dev/null; then
-        radp_log_info "Set java@$version as global default. Run 'vfox activate' in your shell to use it."
-    fi
+    vfox use --global "java@$version" 2>/dev/null || true
+    _setup_vfox_refresh_path
 }
 
 _setup_jdk_via_sdkman() {

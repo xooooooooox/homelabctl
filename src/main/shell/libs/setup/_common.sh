@@ -89,3 +89,21 @@ _setup_get_os() {
     os=$(radp_os_get_distro_os 2>/dev/null || uname -s)
     echo "${os,,}"
 }
+
+#######################################
+# Refresh PATH from vfox after install
+# Makes vfox-managed tools (node, java, ruby, etc.)
+# immediately available in the current shell session.
+# This is needed because vfox requires shell hooks
+# (vfox activate) to manage PATH, which are not
+# available in non-interactive scripts.
+#######################################
+_setup_vfox_refresh_path() {
+    if ! _setup_is_installed vfox; then
+        return 0
+    fi
+    local shell_name
+    shell_name=$(basename "${SHELL:-bash}")
+    [[ "$shell_name" != "bash" && "$shell_name" != "zsh" ]] && shell_name="bash"
+    eval "$(vfox env -s "$shell_name" 2>/dev/null)" || true
+}
