@@ -75,7 +75,7 @@ radp_cli_help_command "setup profile apply"
       if _setup_is_installed "$check_cmd"; then
         if [[ -n "$skip_installed" ]]; then
           radp_log_info "Skipping $pkg_name (already installed)"
-          ((skipped++))
+          ((++skipped))
           continue
         fi
       fi
@@ -94,10 +94,10 @@ radp_cli_help_command "setup profile apply"
     radp_log_info "[$((installed + failed + skipped + 1))/$total] Installing $pkg_name ${pkg_version}..."
 
     if _setup_run_installer "$pkg_name" "$pkg_version"; then
-      ((installed++))
+      ((++installed))
       radp_log_info "$pkg_name installed successfully"
     else
-      ((failed++))
+      ((++failed))
       if [[ -z "$continue_on_error" ]]; then
         radp_log_error "Failed to install $pkg_name, stopping"
         echo ""
