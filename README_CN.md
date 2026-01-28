@@ -30,33 +30,26 @@
 
 ## 安装
 
-### 前置要求
-
-homelabctl 需要安装 radp-bash-framework：
+### 快速安装
 
 ```shell
-brew tap xooooooooox/radp
-brew install radp-bash-framework
+curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash
 ```
 
-### Homebrew（推荐）
+安装脚本会自动安装依赖、homelabctl，并配置 shell 补全。
+
+### Homebrew (macOS/Linux)
 
 ```shell
 brew tap xooooooooox/radp
 brew install homelabctl
 ```
 
-### 脚本安装 (curl)
-
-```shell
-curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash
-```
-
 ### RPM (Fedora/RHEL/CentOS)
 
 ```shell
 sudo dnf copr enable -y xooooooooox/radp
-sudo dnf install -y homelabctl
+sudo dnf install -y radp-bash-framework homelabctl
 ```
 
 更多安装选项请参阅[安装指南](docs/installation.md)。
@@ -252,12 +245,17 @@ packages:
 
 ## Shell 补全
 
+Shell 补全会在安装时自动配置。如需手动重新生成：
+
 ```shell
 # Bash
-homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
+mkdir -p ~/.local/share/bash-completion/completions
+homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
 
 # Zsh
-homelabctl completion zsh >~/.zfunc/_homelabctl
+mkdir -p ~/.zfunc
+homelabctl completion zsh > ~/.zfunc/_homelabctl
+# 添加到 ~/.zshrc: fpath=(~/.zfunc $fpath)
 ```
 
 补全功能包含软件包名称、配置文件名称和分类的动态建议。

@@ -31,33 +31,26 @@ on [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework).
 
 ## Installation
 
-### Prerequisites
-
-homelabctl requires radp-bash-framework:
+### Quick Install
 
 ```shell
-brew tap xooooooooox/radp
-brew install radp-bash-framework
+curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash
 ```
 
-### Homebrew (Recommended)
+The install script automatically installs dependencies, homelabctl, and configures shell completion.
+
+### Homebrew (macOS)
 
 ```shell
 brew tap xooooooooox/radp
 brew install homelabctl
 ```
 
-### Script (curl)
-
-```shell
-curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install.sh | bash
-```
-
 ### RPM (Fedora/RHEL/CentOS)
 
 ```shell
 sudo dnf copr enable -y xooooooooox/radp
-sudo dnf install -y homelabctl
+sudo dnf install -y radp-bash-framework homelabctl
 ```
 
 See [Installation Guide](docs/installation.md) for more options.
@@ -271,12 +264,17 @@ By default, homelabctl runs in quiet mode (no banner, only error logs).
 
 ## Shell Completion
 
+Shell completion is automatically configured during installation. To regenerate manually:
+
 ```shell
 # Bash
-homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
+mkdir -p ~/.local/share/bash-completion/completions
+homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
 
 # Zsh
-homelabctl completion zsh >~/.zfunc/_homelabctl
+mkdir -p ~/.zfunc
+homelabctl completion zsh > ~/.zfunc/_homelabctl
+# Add to ~/.zshrc: fpath=(~/.zfunc $fpath)
 ```
 
 Completions include dynamic suggestions for package names, profile names, and categories.
