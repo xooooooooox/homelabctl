@@ -41,6 +41,10 @@ _setup_install_markdownlint_cli() {
     # Check if npm is from vfox (user-space, no sudo needed)
     if [[ "$npm_cmd" == *".version-fox"* ]] || [[ "$npm_cmd" == *".vfox"* ]]; then
       # vfox-managed npm: install globally to npm prefix (no sudo needed)
+      # Add npm's directory to PATH so /usr/bin/env node can find node
+      local npm_bin_dir
+      npm_bin_dir="$(dirname "$npm_cmd")"
+      export PATH="$npm_bin_dir:$PATH"
       "$npm_cmd" install -g markdownlint-cli || return 1
     else
       # System npm: may need sudo
