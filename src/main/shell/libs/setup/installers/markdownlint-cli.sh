@@ -24,7 +24,16 @@ _setup_install_markdownlint_cli() {
       return 1
     fi
     radp_log_info "Installing markdownlint-cli via npm..."
-    $gr_sudo npm install -g markdownlint-cli || return 1
+    # Use npm from vfox without sudo (user-space installation)
+    local npm_cmd
+    npm_cmd=$(command -v npm)
+    if [[ "$npm_cmd" == *".version-fox"* ]]; then
+      # vfox-managed npm: install globally to npm prefix (no sudo needed)
+      npm install -g markdownlint-cli || return 1
+    else
+      # System npm: may need sudo
+      $gr_sudo npm install -g markdownlint-cli || return 1
+    fi
     ;;
   esac
 }

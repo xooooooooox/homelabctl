@@ -102,6 +102,28 @@ _setup_vfox_refresh_path() {
   if ! _setup_is_installed vfox; then
     return 0
   fi
+
+  local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
+
+  # Method 1: Add vfox shims to PATH (standard vfox approach)
+  local shims_dir="$vfox_home/shims"
+  if [[ -d "$shims_dir" && ":$PATH:" != *":$shims_dir:"* ]]; then
+    export PATH="$shims_dir:$PATH"
+  fi
+
+  # Method 2: Add SDK bin directories to PATH
+  # vfox sdks are symlinks: ~/.version-fox/sdks/nodejs -> ~/.version-fox/cache/nodejs/v-xxx/nodejs-xxx
+  local sdk_dir
+  for sdk_dir in "$vfox_home"/sdks/*; do
+    if [[ -L "$sdk_dir" || -d "$sdk_dir" ]]; then
+      local bin_dir="$sdk_dir/bin"
+      if [[ -d "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]]; then
+        export PATH="$bin_dir:$PATH"
+      fi
+    fi
+  done
+
+  # Method 3: Try vfox env as fallback
   local shell_name
   shell_name=$(basename "${SHELL:-bash}")
   [[ "$shell_name" != "bash" && "$shell_name" != "zsh" ]] && shell_name="bash"
