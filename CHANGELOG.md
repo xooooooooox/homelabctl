@@ -1,5 +1,44 @@
 # CHANGELOG
 
+## v0.1.4 - 2026-01-28
+
+### feat
+- cebb7f6 optimize package categories
+- 5cb3aeb optimize builtin profiles
+- bd7bb70 Add installer pinentry
+- 9e1095b Add installer ansible, docker, eza, go, python, ripgrep, rust, starship, terraform
+- e51ad40 Add installer git, git-credential-manager, gpg, lazygit, markdownlit-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux, vim, yadm, zoxide
+- 3e52721 Add installer git, git-credential-manager, gpg, lazygit, markdownlit-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux, vim, yadm, zoxide
+
+### fix
+- 3ede3c2 fix apply.sh interrupt after package installed
+- 6f57e55 fix apply.sh interrupt after package installed
+- 2ecf4c8 fix installer.sh
+- 8609394 fix installer jdk, nodejs, ruby
+- 24511bc fix installer jdk, nodejs, ruby
+- 8cfcadb fix installer bat, fastfetch, fd, fzf, helm, jdk, jq, kubecm, kubectl, mc, neovim, nodejs, vagrant, vfox
+- 217c794 fix installer bat, fastfetch, fd, fzf, helm, jdk, jq, kubecm, kubectl, mc, neovim, nodejs, vagrant, vfox
+- fe926d0 fix trap error
+- c231ee1 fix install fzf on centos-stream-9
+- c33b9ef fix install fzf on centos-stream-9
+
+### chore
+- 2c17273 optimize install.sh
+- 59b192f fix installer
+- f1b7064 add post-install message
+- c6b5498 optimize install and uninstall script
+
+### docs
+- eb2d5ad introduce how to add user installer
+- 6b0206f update README.md and CLAUDE.md
+- 264b230 update installation
+- e33d354 update installation
+- 102d7ea update installation
+
+### other
+- df0f5d9 format code
+- 8036c0f format code
+
 ## v0.1.3 - 2026-01-27
 
 ### feat
