@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v0.1.5 - 2026-01-28
+
+### fix
+- eb577da fix banner version
+- f1bb257 fix banner version
+- 0bd253c fix banner version
+- 4df27f4 fix install lsp via vfox
+- de10e6c fix install lsp via vfox
+- 9a0336c fix install lsp via vfox
+- 21347ac fix install lsp via vfox
+- 9ddb94f fix install lsp via vfox
+- 2600360 fix install lsp via vfox
+- 9944ffd fix install lsp via vfox
+
+### docs
+- 1462a26 update install doc
+
 ## Unreleased
 
 ### feat
