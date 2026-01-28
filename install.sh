@@ -695,7 +695,28 @@ install_manual() {
   chmod 0755 "${install_dir}/bin/homelabctl"
   find "${install_dir}/src" -type f -name "*.sh" -exec chmod 0755 {} \;
 
-  # Write install method marker for uninstall.sh
+  # Write version info for runtime display
+  local commit_short=""
+  if [[ -d "${src_root}/.git" ]]; then
+    commit_short=$(git -C "${src_root}" rev-parse --short HEAD 2>/dev/null || true)
+  fi
+  # For tarball downloads, try to get commit from GitHub API
+  if [[ -z "${commit_short}" && "${ref}" != v* ]]; then
+    local commit_json
+    commit_json=$(fetch_text "${FETCH_TOOL}" "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits/${ref}" 2>/dev/null || true)
+    if [[ -n "${commit_json}" ]]; then
+      commit_short=$(echo "${commit_json}" | sed -n 's/.*"sha"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1 | cut -c1-7)
+    fi
+  fi
+
+  cat >"${install_dir}/.version" <<EOF
+install_method=manual
+ref=${ref}
+commit=${commit_short}
+date=$(date +%Y-%m-%d)
+EOF
+
+  # Keep legacy markers for uninstall.sh compatibility
   echo "manual" >"${install_dir}/.install-method"
   echo "${ref}" >"${install_dir}/.install-ref"
 
