@@ -91,6 +91,78 @@ _setup_get_os() {
 }
 
 #######################################
+# Find vfox SDK bin directory
+# Arguments:
+#   1 - SDK name (nodejs, java, python, ruby, go)
+#   2 - binary name to check (node, java, python3, ruby, go)
+# Returns:
+#   Path to bin directory (stdout), or empty if not found
+#######################################
+_setup_vfox_find_sdk_bin() {
+  local sdk_name="$1"
+  local check_binary="$2"
+
+  local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
+  [[ ! -d "$vfox_home" ]] && vfox_home="$HOME/.vfox"
+
+  local bin_dir=""
+
+  # Method 1: Check sdks directory (symlink created by vfox use)
+  if [[ -d "$vfox_home/sdks/$sdk_name/bin" ]]; then
+    if [[ -z "$check_binary" ]] || [[ -x "$vfox_home/sdks/$sdk_name/bin/$check_binary" ]]; then
+      echo "$vfox_home/sdks/$sdk_name/bin"
+      return 0
+    fi
+  fi
+
+  # Method 2: Search in cache directory
+  for dir in "$vfox_home"/cache/"$sdk_name"/*/bin; do
+    if [[ -d "$dir" ]]; then
+      if [[ -z "$check_binary" ]] || [[ -x "$dir/$check_binary" ]]; then
+        echo "$dir"
+        return 0
+      fi
+    fi
+  done
+
+  # Method 3: Search without /bin suffix (some SDKs have different structure)
+  for dir in "$vfox_home"/cache/"$sdk_name"/*; do
+    if [[ -d "$dir/bin" ]]; then
+      if [[ -z "$check_binary" ]] || [[ -x "$dir/bin/$check_binary" ]]; then
+        echo "$dir/bin"
+        return 0
+      fi
+    fi
+  done
+
+  return 1
+}
+
+#######################################
+# Add vfox SDK to PATH
+# Arguments:
+#   1 - SDK name (nodejs, java, python, ruby, go)
+#   2 - binary name to check (node, java, python3, ruby, go)
+# Returns:
+#   0 if added, 1 if not found
+#######################################
+_setup_vfox_add_sdk_to_path() {
+  local sdk_name="$1"
+  local check_binary="$2"
+
+  local bin_dir
+  bin_dir=$(_setup_vfox_find_sdk_bin "$sdk_name" "$check_binary")
+
+  if [[ -n "$bin_dir" && ":$PATH:" != *":$bin_dir:"* ]]; then
+    export PATH="$bin_dir:$PATH"
+    radp_log_info "Added $bin_dir to PATH"
+    return 0
+  fi
+
+  return 1
+}
+
+#######################################
 # Refresh PATH from vfox after install
 # Makes vfox-managed tools (node, java, ruby, etc.)
 # immediately available in the current shell session.
@@ -104,6 +176,7 @@ _setup_vfox_refresh_path() {
   fi
 
   local vfox_home="${VFOX_HOME:-$HOME/.version-fox}"
+  [[ ! -d "$vfox_home" ]] && vfox_home="$HOME/.vfox"
 
   # Method 1: Add vfox shims to PATH (standard vfox approach)
   local shims_dir="$vfox_home/shims"
@@ -111,8 +184,7 @@ _setup_vfox_refresh_path() {
     export PATH="$shims_dir:$PATH"
   fi
 
-  # Method 2: Add SDK bin directories to PATH
-  # vfox sdks are symlinks: ~/.version-fox/sdks/nodejs -> ~/.version-fox/cache/nodejs/v-xxx/nodejs-xxx
+  # Method 2: Add SDK bin directories from sdks symlinks
   local sdk_dir
   for sdk_dir in "$vfox_home"/sdks/*; do
     if [[ -L "$sdk_dir" || -d "$sdk_dir" ]]; then
@@ -123,7 +195,16 @@ _setup_vfox_refresh_path() {
     fi
   done
 
-  # Method 3: Try vfox env as fallback
+  # Method 3: Add SDK bin directories from cache
+  for sdk_dir in "$vfox_home"/cache/*/; do
+    for version_dir in "$sdk_dir"*/bin; do
+      if [[ -d "$version_dir" && ":$PATH:" != *":$version_dir:"* ]]; then
+        export PATH="$version_dir:$PATH"
+      fi
+    done
+  done
+
+  # Method 4: Try vfox env as fallback
   local shell_name
   shell_name=$(basename "${SHELL:-bash}")
   [[ "$shell_name" != "bash" && "$shell_name" != "zsh" ]] && shell_name="bash"
