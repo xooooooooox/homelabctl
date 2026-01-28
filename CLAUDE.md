@@ -89,7 +89,7 @@ homelabctl/
 │           │   ├── osx-dev.yaml
 │           │   ├── linux-dev.yaml
 │           │   └── devops.yaml
-│           └── installers/     # Package installers (41 files)
+│           └── installers/     # Package installers (42 files)
 │               ├── ansible.sh
 │               ├── bat.sh
 │               ├── docker.sh
@@ -116,6 +116,7 @@ homelabctl/
 │               ├── nodejs.sh
 │               ├── ohmyzsh.sh
 │               ├── pass.sh
+│               ├── pinentry.sh
 │               ├── python.sh
 │               ├── ripgrep.sh
 │               ├── ruby.sh

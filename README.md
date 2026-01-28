@@ -178,7 +178,7 @@ For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com
 **Available Categories:**
 
 - **system** - System prerequisites and package managers (homebrew, gnu-getopt)
-- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch, lazygit, tig, gpg, pass, shellcheck, git, git-credential-manager, markdownlint-cli, yadm)
+- **cli-tools** - Command line utilities (fzf, bat, fd, jq, ripgrep, eza, zoxide, mc, fastfetch, lazygit, tig, gpg, pinentry, pass, shellcheck, git, git-credential-manager, markdownlint-cli, yadm)
 - **editors** - Text editors (neovim, vim)
 - **languages** - Programming languages (nodejs, jdk, python, go, rust, ruby, vfox, mvn)
 - **devops** - DevOps tools (kubectl, helm, kubecm, vagrant, docker, terraform, ansible)

@@ -124,6 +124,12 @@ packages:
     check-cmd: git
     homepage: https://git-scm.com/
 
+  pinentry:
+    desc: GPG passphrase entry dialog
+    category: cli-tools
+    check-cmd: pinentry
+    homepage: https://gnupg.org/related_software/pinentry/
+
   # Editors
   vim:
     desc: Vi improved text editor
