@@ -54,7 +54,28 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         'setup')
-            COMPREPLY=($(compgen -W "info install list profile  --help" -- "$cur"))
+            COMPREPLY=($(compgen -W "configure info install list profile  --help" -- "$cur"))
+            ;;
+        'setup configure')
+            COMPREPLY=($(compgen -W "chrony expand-lvm gpg-import gpg-preset list yadm  --help" -- "$cur"))
+            ;;
+        'setup configure chrony')
+            COMPREPLY=($(compgen -W "--help -s --servers -p --pool -t --timezone" -- "$cur"))
+            ;;
+        'setup configure expand-lvm')
+            COMPREPLY=($(compgen -W "--help -p --partition -v --vg -l --lv" -- "$cur"))
+            ;;
+        'setup configure gpg-import')
+            COMPREPLY=($(compgen -W "--help -p --public-key -p --public-key-file -s --secret-key-file -p --passphrase -p --passphrase-file -k --key-id -k --keyserver -t --trust-level -o --ownertrust-file -u --user" -- "$cur"))
+            ;;
+        'setup configure gpg-preset')
+            COMPREPLY=($(compgen -W "--help -k --key-uid -p --passphrase -p --passphrase-file -u --user" -- "$cur"))
+            ;;
+        'setup configure list')
+            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+            ;;
+        'setup configure yadm')
+            COMPREPLY=($(compgen -W "--help -r --repo-url -c --class -h --https-user -h --https-token -h --https-token-file -s --ssh-key-file -s --ssh-host -s --ssh-port -u --user" -- "$cur"))
             ;;
         'setup info')
             # 计算参数位置（减去命令路径深度）
