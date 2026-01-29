@@ -73,13 +73,16 @@ homelabctl/
 
 ## Version Management
 
-Version is stored in `src/main/shell/vars/constants.sh`:
+Version is stored in `src/main/shell/config/config.yaml`:
 
-```bash
-declare -gr gr_homelabctl_version=v0.1.0
+```yaml
+radp:
+  extend:
+    homelabctl:
+      version: v0.1.0
 ```
 
-This is the single source of truth for release management.
+Available as `$gr_radp_extend_homelabctl_version` in shell. This is the single source of truth for release management.
 
 ## Release Process
 

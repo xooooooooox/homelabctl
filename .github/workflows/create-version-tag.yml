@@ -57,10 +57,10 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          constants_file="src/main/shell/vars/constants.sh"
-          version=$(sed -n 's/^declare -gr gr_homelabctl_version=//p' "$constants_file" | head -n 1)
-          if [[ -z "$version" ]]; then
-            echo "Failed to read gr_homelabctl_version from $constants_file" >&2
+          config_file="src/main/shell/config/config.yaml"
+          version=$(yq '.radp.extend.homelabctl.version' "$config_file")
+          if [[ -z "$version" || "$version" == "null" ]]; then
+            echo "Failed to read radp.extend.homelabctl.version from $config_file" >&2
             exit 1
           fi
           if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

@@ -43,10 +43,14 @@ cmd_vf_info() {
         radp_vf_version=$(radp-vf version 2>/dev/null || echo "unknown")
     fi
 
+    # Get accurate version (reads .install-version for manual installs)
+    local homelabctl_version
+    homelabctl_version=$(radp_get_install_version "${gr_radp_extend_homelabctl_version:-v0.1.0}")
+
     if [[ "$json" == "true" ]]; then
         cat << JSON
 {
-  "homelabctl_version": "${gr_homelabctl_version:-unknown}",
+  "homelabctl_version": "${homelabctl_version}",
   "radp_vf_home": "${RADP_VF_HOME:-}",
   "radp_vf_version": "${radp_vf_version:-}",
   "config_dir": "$config_dir",
@@ -58,7 +62,7 @@ JSON
         echo "homelabctl Environment Info"
         echo "============================"
         echo ""
-        printf "%-20s %s\n" "homelabctl:" "${gr_homelabctl_version:-unknown}"
+        printf "%-20s %s\n" "homelabctl:" "${homelabctl_version}"
         printf "%-20s %s\n" "RADP_VF_HOME:" "${RADP_VF_HOME:-<not set>}"
         printf "%-20s %s\n" "radp-vf:" "${radp_vf_version:-<not found>}"
         printf "%-20s %s\n" "Config directory:" "${config_dir:-<not found>}"

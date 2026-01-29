@@ -136,19 +136,14 @@ jobs:
             except subprocess.CalledProcessError:
               return ""
 
-          constants_path = Path("src/main/shell/vars/constants.sh")
-          if not constants_path.exists():
-            raise SystemExit(f"Missing constants file: {constants_path}")
-          constants_text = constants_path.read_text()
-          constants_text, count = re.subn(
-            r"^declare -gr gr_homelabctl_version=.*$",
-            f"declare -gr gr_homelabctl_version={version}",
-            constants_text,
-            flags=re.M,
+          config_path = Path("src/main/shell/config/config.yaml")
+          if not config_path.exists():
+            raise SystemExit(f"Missing config file: {config_path}")
+          # Use yq to update version in YAML
+          subprocess.run(
+            ["yq", "-i", f".radp.extend.homelabctl.version = \"{version}\"", str(config_path)],
+            check=True,
           )
-          if count == 0:
-            raise SystemExit("Failed to update gr_homelabctl_version in constants.sh")
-          constants_path.write_text(constants_text)
 
           for spec_path in [
             Path("packaging/copr/homelabctl.spec"),
@@ -292,7 +287,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add \
-            src/main/shell/vars/constants.sh \
+            src/main/shell/config/config.yaml \
             packaging/copr/homelabctl.spec \
             packaging/obs/homelabctl.spec \
             completions/homelabctl.bash \
@@ -318,7 +313,7 @@ jobs:
           cat > "${body_file}" <<EOF
           Release prep for ${version}.
 
-          - Update gr_homelabctl_version
+          - Update radp.extend.homelabctl.version in config.yaml
           - Sync spec versions
           - Add changelog entry (please review and edit)
 

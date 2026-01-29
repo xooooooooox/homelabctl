@@ -24,9 +24,6 @@ if ! command -v radp-bf &>/dev/null; then
   exit 1
 fi
 
-# shellcheck source=/dev/null
-source "$RADP_APP_ROOT/src/main/shell/vars/constants.sh"
-
 # 自定义 banner（在 framework 之前定义，framework 会在 context 完成时调用）
 # shellcheck disable=SC2154
 radp_app_banner() {
@@ -42,7 +39,7 @@ radp_app_banner() {
  / / / / /_/ / / / / / /  __/ / /_/ / /_/ / /__/ /_/ /
 /_/ /_/\____/_/ /_/ /_/\___/_/\__,_/_.___/\___/\__/_/
 EOF
-  printf ' :: homelabctl ::                          (%s)\n' "$(radp_get_install_version "$gr_homelabctl_version")"
+  printf ' :: homelabctl ::                          (%s)\n' "$(radp_get_install_version "$gr_radp_extend_homelabctl_version")"
   printf ' :: radp-bash-framework ::                 (%s)\n' "$(radp_get_fw_install_version)"
   [[ -n "$vf_version" ]] && printf ' :: radp-vagrant-framework ::              (%s)\n' "$vf_version"
 }

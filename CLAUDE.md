@@ -89,9 +89,8 @@ homelabctl/
 │   │   ├── version.sh
 │   │   └── completion.sh
 │   ├── config/
+│   │   ├── _ide.sh             # IDE code completion support
 │   │   └── config.yaml         # YAML configuration
-│   ├── vars/
-│   │   └── constants.sh        # Version constants (gr_homelabctl_version)
 │   └── libs/                   # Project-specific libraries
 │       └── setup/              # Setup feature libraries
 │           ├── _common.sh      # Shared helper functions
@@ -158,12 +157,15 @@ homelabctl/
 
 ### Version Management
 
-Version is stored in `src/main/shell/vars/constants.sh`:
-```bash
-declare -gr gr_homelabctl_version=v0.1.0
+Version is stored in `src/main/shell/config/config.yaml`:
+```yaml
+radp:
+  extend:
+    homelabctl:
+      version: v0.1.0
 ```
 
-This is the single source of truth for release management.
+Available as `$gr_radp_extend_homelabctl_version` in shell. This is the single source of truth for release management.
 
 ### Command Definition Pattern
 Commands are defined using comment-based metadata:

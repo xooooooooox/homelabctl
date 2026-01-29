@@ -3,6 +3,6 @@
 # @desc Show homelabctl version information
 
 cmd_version() {
-    # Version is loaded from src/main/shell/vars/constants.sh
-    echo "homelabctl ${gr_homelabctl_version:-v0.0.1}"
+  # Version is loaded from config/config.yaml (radp.extend.homelabctl.version)
+  echo "homelabctl $(radp_get_install_version "${gr_radp_extend_homelabctl_version:-v0.1.0}")"
 }

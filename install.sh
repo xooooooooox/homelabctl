@@ -707,9 +707,9 @@ install_manual() {
   else
     # ref is branch/SHA, append to base version from source
     local base_version
-    base_version=$(grep -oE 'gr_homelabctl_version=v[0-9]+\.[0-9]+\.[0-9]+' \
-      "${install_dir}/src/main/shell/vars/constants.sh" 2>/dev/null \
-      | cut -d= -f2 || echo "v0.0.0")
+    base_version=$(grep -oE 'version:[[:space:]]*v[0-9]+\.[0-9]+\.[0-9]+' \
+      "${install_dir}/src/main/shell/config/config.yaml" 2>/dev/null \
+      | head -1 | sed 's/.*version:[[:space:]]*//' || echo "v0.0.0")
     installed_version="${base_version}+${ref}"
   fi
   echo "${installed_version}" >"${install_dir}/.install-version"

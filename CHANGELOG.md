@@ -8,7 +8,13 @@
 
 ### fix
 
+- Fix `version` and `vf info` commands showing inconsistent version with banner
 - Fix tmux not working on CentOS Stream 9 due to missing perl dependency
+
+### refactor
+
+- Move version from `vars/constants.sh` to `config/config.yaml` (`radp.extend.homelabctl.version`)
+- Remove `vars` directory, add `config/_ide.sh` for IDE code completion support
 
 ## v0.1.6
 
