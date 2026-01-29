@@ -1,260 +1,137 @@
 # CHANGELOG
 
-## v0.1.5 - 2026-01-28
-
-### fix
-- eb577da fix banner version
-- f1bb257 fix banner version
-- 0bd253c fix banner version
-- 4df27f4 fix install lsp via vfox
-- de10e6c fix install lsp via vfox
-- 9a0336c fix install lsp via vfox
-- 21347ac fix install lsp via vfox
-- 9ddb94f fix install lsp via vfox
-- 2600360 fix install lsp via vfox
-- 9944ffd fix install lsp via vfox
-
-### docs
-- 1462a26 update install doc
-
-## Unreleased
+## v0.1.6
 
 ### feat
+
+- Add `setup configure` command group for system configuration tasks
+  - `setup configure list` - Dynamically list available configurations from directory
+  - `setup configure chrony` - Configure chrony for time synchronization
+  - `setup configure expand-lvm` - Expand LVM partition and filesystem
+  - `setup configure gpg-import` - Import GPG keys into user keyring
+  - `setup configure gpg-preset` - Preset GPG passphrase in gpg-agent
+  - `setup configure yadm` - Clone dotfiles repository using yadm
+- All configure commands use framework's `radp_exec()` for cleaner dry-run support
+- Configure commands use sudo for privileged operations (no need to run as root)
 - Display accurate version info when installed via `--ref <branch>` or `--ref <sha>`
 - Generate `.install-version` file during manual installation
 - Use framework's `radp_get_install_version()` helper in banner
 
-This allows installations via `--ref main` to show version like `v0.1.4+main`
-instead of the hardcoded source version.
-
-## v0.1.4 - 2026-01-28
+## v0.1.5
 
 ### feat
-- cebb7f6 optimize package categories
-- 5cb3aeb optimize builtin profiles
-- bd7bb70 Add installer pinentry
-- 9e1095b Add installer ansible, docker, eza, go, python, ripgrep, rust, starship, terraform
-- e51ad40 Add installer git, git-credential-manager, gpg, lazygit, markdownlit-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux, vim, yadm, zoxide
-- 3e52721 Add installer git, git-credential-manager, gpg, lazygit, markdownlit-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux, vim, yadm, zoxide
+
+- Optimize package categories
+- Optimize builtin profiles
+- Add installer: pinentry, ansible, docker, eza, go, python, ripgrep, rust, starship, terraform
+- Add installer: git, git-credential-manager, gpg, lazygit, markdownlint-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux, vim, yadm, zoxide
+- Update entrypoint to use the latest bash framework
+- Add 8 packages
+- Update completion help example
+- Add global cli args
 
 ### fix
-- 3ede3c2 fix apply.sh interrupt after package installed
-- 6f57e55 fix apply.sh interrupt after package installed
-- 2ecf4c8 fix installer.sh
-- 8609394 fix installer jdk, nodejs, ruby
-- 24511bc fix installer jdk, nodejs, ruby
-- 8cfcadb fix installer bat, fastfetch, fd, fzf, helm, jdk, jq, kubecm, kubectl, mc, neovim, nodejs, vagrant, vfox
-- 217c794 fix installer bat, fastfetch, fd, fzf, helm, jdk, jq, kubecm, kubectl, mc, neovim, nodejs, vagrant, vfox
-- fe926d0 fix trap error
-- c231ee1 fix install fzf on centos-stream-9
-- c33b9ef fix install fzf on centos-stream-9
+
+- Fix banner version
+- Fix install lsp via vfox
+- Fix apply.sh interrupt after package installed
+- Fix installer.sh
+- Fix installer jdk, nodejs, ruby
+- Fix installer bat, fastfetch, fd, fzf, helm, jdk, jq, kubecm, kubectl, mc, neovim, nodejs, vagrant, vfox
+- Fix trap error
+- Fix install fzf on centos-stream-9
+- Fix zsh completion
+- Optimize user config dir
 
 ### chore
-- 2c17273 optimize install.sh
-- 59b192f fix installer
-- f1b7064 add post-install message
-- c6b5498 optimize install and uninstall script
+
+- Optimize install.sh
+- Fix installer
+- Add post-install message
+- Optimize install and uninstall script
+- Customize banner
 
 ### docs
-- eb2d5ad introduce how to add user installer
-- 6b0206f update README.md and CLAUDE.md
-- 264b230 update installation
-- e33d354 update installation
-- 102d7ea update installation
 
-### other
-- df0f5d9 format code
-- 8036c0f format code
+- Update install doc
+- Introduce how to add user installer
+- Update README.md and CLAUDE.md
+- Update installation
+- Update CLAUDE
+- Update README
 
-## v0.1.3 - 2026-01-27
+## v0.0.17
 
 ### feat
-- 78b871e Add 8 packages
 
-### docs
-- 029388c Update CLAUDE
-- cb4ebdc Update README
-
-## v0.1.2 - 2026-01-27
-
-### feat
-- 550a121 update entrypoint to use the latest bash framework
-
-## v0.1.1 - 2026-01-27
+- Enhance setup commands with dynamic shell completions
+- Add shell completion helper functions for setup commands
+- Enhance shell completions with dynamic suggestions
+- Add setup commands for profile and package management
+- Regenerate completion scripts before create PR
+- Add rebuild zsh completion cache instructions
+- Optimize brew formula to support install completion
+- Add shell completion file for bash and zsh
+- Split `vf template` command into dedicated `list` and `show` subcommands
+- Add template support to `vf init` and new `vf template` command for managing project templates
+- Add auto-detection of RADP_VF_HOME and improve Vagrantfile path resolution
+- Improve CLI argument handling for vf list and homelabctl commands
+- Add support for package manager detection and installation options in install script
+- Enhance vf list command with verbose mode, filtering, and additional display options
+- Add vf list and vf validate commands with environment override support
+- Add format and output options to vf dump-config command for enhanced flexibility
+- Enhance vf shell commands with improved CLI argument handling, version display, and environment overrides
+- Add global option parsing for homelabctl with verbose and debug modes
+- Add Homebrew formula reference in CLAUDE.md and update default version
+- Add Homebrew formula for homelabctl to streamline installation
+- Add vg and vf subcmd for radp-vagrant-framework
+- Add GitHub workflows for release and package builds
+- Init project
 
 ### fix
-- 87fc7b3 fix zsh completion
-- fe8ef0c optimize user config dir
 
-## v0.1.0 - 2026-01-27
-
-### feat
-- 416472d Update completion help example
-- 80b6ea1 Add global cli args
-
-### docs
-- 2f4c03c Update README
-
-## v0.0.17 - 2026-01-27
+- Subshell problem
+- Default user config path
+- Setup cmd
+- Ensure #compdef is first line for zsh completion
+- Vg cmd
+- Handle empty args in homelabctl by adding safeguards and help output
+- Handle initial release in release-prep workflow
+- Update version constant to v0.0.1
 
 ### chore
-- 286eee3 customize banner
 
-## v0.0.16 - 2026-01-27
-
-### fix
-- 27b85a4 subshell problem
-
-### chore
-- 44eca29 Optimize install.sh
-- a1891be Optimize install.sh
+- Optimize install.sh
+- Use latest release of radp-bash-framework
+- Debug workflow
+- Ensure all shell scripts use consistent shebang (`#!/usr/bin/env bash`)
+- Simplify formula update logic in Homebrew tap workflow
+- Default disable banner-mode
+- Format doc
 
 ### docs
-- 826cee9 Add badges
 
-## v0.0.15 - 2026-01-27
-
-### fix
-- 023cb47 default user config path
-
-## v0.0.14 - 2026-01-27
-
-### fix
-- 1d3afb4 setup cmd
-- 5b4f704 setup cmd
-- 918cebb setup cmd
-
-## v0.0.13 - 2026-01-27
-
-### fix
-- 85aecbe setup cmd
-
-## v0.0.12 - 2026-01-26
-
-- TODO: no commits found; add summary manually.
-
-## v0.0.11 - 2026-01-26
-
-### fix
-- f3de509 ensure #compdef is first line for zsh completion
-
-## v0.0.10 - 2026-01-26
-
-### fix
-- f0c4e98 ensure #compdef is first line for zsh completion
-
-## v0.0.9 - 2026-01-26
-
-### fix
-- 2f0f772 vg cmd
-
-### chore
-- a2159b4 use latest release of radp-bash-framework
-
-## v0.0.8 - 2026-01-26
-
-### feat
-- c64adb0 enhance setup commands with dynamic shell completions
-- e5f85b2 add shell completion helper functions for setup commands
-- 9c3a2e7 enhance shell completions with dynamic suggestions
-- 116d590 add setup commands for profile and package management
-
-### chore
-- 140402c debug workflow
-- 1f36b0f debug workflow
-
-### docs
-- f356135 expand CONTRIBUTING.md with setup feature details
-- 05f5453 update CLAUDE.md with detailed setup feature documentation
-- bdf01da update README and README_CN with revamped structure and feature details
-- dc89581 add IDE code completion reference for shell scripts
+- Add badges
+- Expand CONTRIBUTING.md with setup feature details
+- Update CLAUDE.md with detailed setup feature documentation
+- Update README and README_CN with revamped structure and feature details
+- Add IDE code completion reference for shell scripts
+- Update README with enhanced structure and detailed feature list
+- Add detailed guides for configuration, installation, and contribution
+- Refine CLAUDE.md to detail `vf template list` and `vf template show` subcommands
+- Update CLAUDE.md to include `vf template` command and enhancements to `vf init`
+- Update CLAUDE.md with vf list and vf validate command details
+- Update README to document new CLI options and commands
+- Update CLAUDE.md with vf/vg enhancements and environment setup details
+- Expand README with environment variables, installation methods, and CI/CD workflows
 
 ### refactor
-- 6906d07 simplify and modernize shell completion scripts for dynamic completions
+
+- Simplify and modernize shell completion scripts for dynamic completions
+- Move installer script to project root and update references
 
 ### other
-- 5134856 install radp-bash-framework from main branch for latest fixes before release
-- 34aa5e3 format code
 
-## v0.0.7 - 2026-01-26
-
-### docs
-- a8104fc update README with enhanced structure and detailed feature list
-- 9a40423 add detailed guides for configuration, installation, and contribution
-
-## v0.0.6 - 2026-01-26
-
-### feat
-- fa1a1c6 regenerate completion scripts before create PR
-- 48b77d1 Add rebuild zsh completion cache instructions
-
-## v0.0.5 - 2026-01-26
-
-### feat
-- c04259b Optimize brew formula to support install completion
-- a359ece Add shell completion file for bash and zsh
-
-### other
-- 363da95 docs; Update CLAUDE.md
-
-## v0.0.4 - 2026-01-25
-
-### docs
-- aeb5110 refine CLAUDE.md to detail `vf template list` and `vf template show` subcommands
-
-### refactor
-- 3f2632c split `vf template` command into dedicated `list` and `show` subcommands
-
-## v0.0.3 - 2026-01-25
-
-### feat
-- f4a0dc7 add template support to `vf init` and new `vf template` command for managing project templates
-
-### docs
-- 955d4d3 update CLAUDE.md to include `vf template` command and enhancements to `vf init`
-
-## v0.0.2 - 2026-01-25
-
-### feat
-- e06791b add auto-detection of RADP_VF_HOME and improve Vagrantfile path resolution
-
-## v0.0.1 - 2026-01-25
-
-### feat
-- 559fb37 improve CLI argument handling for vf list and homelabctl commands
-- 4d8c5d1 add support for package manager detection and installation options in install script
-- 9081bcc enhance vf list command with verbose mode, filtering, and additional display options
-- a607ace add vf list and vf validate commands with environment override support
-- 32934cd add format and output options to vf dump-config command for enhanced flexibility
-- 8a5d2c1 enhance vf shell commands with improved CLI argument handling, version display, and environment overrides
-- a4364df add global option parsing for homelabctl with verbose and debug modes
-- d830a78 add Homebrew formula reference in CLAUDE.md and update default version
-- f9606f4 add Homebrew formula for homelabctl to streamline installation
-- e9e73ed Add vg and vf subcmd for radp-vagrant-framework
-- d9cde44 add GitHub workflows for release and package builds
-- 87484de init project
-- dd9b286 init project
-
-### fix
-- 4c117bb handle empty args in homelabctl by adding safeguards and help output
-- aec9c81 handle initial release in release-prep workflow
-- 2ff9904 update version constant to v0.0.1
-
-### chore
-- 61647a3 ensure all shell scripts use consistent shebang (`#!/usr/bin/env bash`)
-- 6d67e55 simplify formula update logic in Homebrew tap workflow
-- 15078b4 default disable banner-mode
-- d53794b format doc
-
-### docs
-- 5385cf5 update CLAUDE.md to reflect new vf list options (verbose, provisions, synced-folders, triggers)
-- 93023a6 update CLAUDE.md with vf list and vf validate command details
-- e368dd9 update README and README_CN with verbose and debug mode details
-- 2d77c94 expand README with environment variables, installation methods, and CI/CD workflows
-- 062f48e update CLAUDE.md with vf/vg enhancements and environment setup details
-
-### refactor
-- 267699f move installer script to project root and update references
-
-### other
-- 4999d84 Initial commit
+- Install radp-bash-framework from main branch for latest fixes before release
+- Format code
+- Initial commit
