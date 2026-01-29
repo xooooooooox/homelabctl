@@ -100,7 +100,7 @@ homelabctl/
 │           ├── registry.yaml   # Package registry
 │           ├── profiles/       # Profile definitions
 │           │   └── recommend.yaml
-│           └── installers/     # Package installers (42 files)
+│           └── installers/     # Package installers (43 files)
 │               ├── ansible.sh
 │               ├── bat.sh
 │               ├── docker.sh
@@ -110,6 +110,7 @@ homelabctl/
 │               ├── fzf.sh
 │               ├── git-credential-manager.sh
 │               ├── git.sh
+│               ├── gitlab-runner.sh
 │               ├── gnu-getopt.sh
 │               ├── go.sh
 │               ├── gpg.sh

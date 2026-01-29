@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.1.7
+
+### feat
+
+- Add installer: gitlab-runner
+
 ## v0.1.6
 
 ### feat
