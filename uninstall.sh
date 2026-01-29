@@ -171,6 +171,18 @@ uninstall_pkm() {
     return 1
     ;;
   esac
+
+  # Remove shell completion files (user-local, not managed by package manager)
+  local bash_comp="$HOME/.local/share/bash-completion/completions/homelabctl"
+  local zsh_comp="$HOME/.zfunc/_homelabctl"
+  if [[ -f "${bash_comp}" ]]; then
+    rm -f "${bash_comp}"
+    log "Removed bash completion ${bash_comp}"
+  fi
+  if [[ -f "${zsh_comp}" ]]; then
+    rm -f "${zsh_comp}"
+    log "Removed zsh completion ${zsh_comp}"
+  fi
 }
 
 uninstall_manual() {
@@ -184,6 +196,18 @@ uninstall_manual() {
   if [[ -L "${link_path}" ]]; then
     rm -f "${link_path}"
     log "Removed symlink ${link_path}"
+  fi
+
+  # Remove shell completion files
+  local bash_comp="$HOME/.local/share/bash-completion/completions/homelabctl"
+  local zsh_comp="$HOME/.zfunc/_homelabctl"
+  if [[ -f "${bash_comp}" ]]; then
+    rm -f "${bash_comp}"
+    log "Removed bash completion ${bash_comp}"
+  fi
+  if [[ -f "${zsh_comp}" ]]; then
+    rm -f "${zsh_comp}"
+    log "Removed zsh completion ${zsh_comp}"
   fi
 
   # Remove install directory
@@ -216,6 +240,40 @@ uninstall_deps_pkm() {
     sudo zypper remove -y radp-bash-framework 2>/dev/null || true
     ;;
   esac
+}
+
+# Detect manual radp-bash-framework installation
+# Returns: install directory path, or empty string
+detect_radp_bf_manual_installed() {
+  local default_dir="$HOME/.local/lib/radp-bash-framework"
+
+  if [[ -d "${default_dir}" && -f "${default_dir}/.install-method" ]]; then
+    echo "${default_dir}"
+    return 0
+  fi
+
+  echo ""
+}
+
+uninstall_deps_manual() {
+  local install_dir="$1"
+
+  log "Uninstalling radp-bash-framework manual installation..."
+
+  # Remove symlinks
+  local bin_dir="$HOME/.local/bin"
+  local link_name
+  for link_name in radp-bf radp-bash-framework; do
+    local link_path="${bin_dir}/${link_name}"
+    if [[ -L "${link_path}" ]]; then
+      rm -f "${link_path}"
+      log "Removed symlink ${link_path}"
+    fi
+  done
+
+  # Remove install directory
+  rm -rf "${install_dir}"
+  log "Removed ${install_dir}"
 }
 
 confirm() {
@@ -283,23 +341,35 @@ main() {
 
   # Remove dependency if requested
   if [[ "${OPT_DEPS}" == true ]]; then
-    local dep_pkm="${pkm_installed}"
-    if [[ -z "${dep_pkm}" ]]; then
-      # Try to detect how radp-bash-framework was installed
-      if have brew && brew list --formula radp-bash-framework &>/dev/null; then
-        dep_pkm="homebrew"
-      elif have rpm && rpm -q radp-bash-framework &>/dev/null; then
+    local dep_pkm=""
+    local dep_manual_dir=""
+
+    # Try to detect how radp-bash-framework was installed
+    if have brew && brew list --formula radp-bash-framework &>/dev/null; then
+      dep_pkm="homebrew"
+    elif have rpm && rpm -q radp-bash-framework &>/dev/null; then
+      if have dnf; then
         dep_pkm="dnf"
-        have yum && ! have dnf && dep_pkm="yum"
-      elif have dpkg && dpkg -s radp-bash-framework &>/dev/null; then
-        dep_pkm="apt"
+      elif have yum; then
+        dep_pkm="yum"
+      else
+        dep_pkm="rpm"
       fi
+    elif have dpkg && dpkg -s radp-bash-framework &>/dev/null; then
+      dep_pkm="apt"
+    elif have zypper && zypper se -i radp-bash-framework &>/dev/null; then
+      dep_pkm="zypper"
+    else
+      # Check for manual installation
+      dep_manual_dir="$(detect_radp_bf_manual_installed)"
     fi
 
     if [[ -n "${dep_pkm}" ]]; then
       uninstall_deps_pkm "${dep_pkm}"
+    elif [[ -n "${dep_manual_dir}" ]]; then
+      uninstall_deps_manual "${dep_manual_dir}"
     else
-      log "radp-bash-framework: could not detect install method, skipping"
+      log "radp-bash-framework: not installed, skipping"
     fi
   else
     if [[ -n "${pkm_installed}" || -n "${manual_dir}" ]]; then
@@ -311,6 +381,10 @@ main() {
 
   log ""
   log "${REPO_NAME} has been uninstalled"
+  log ""
+  log "Note: User configuration files may remain at:"
+  log "  ~/.config/homelabctl/"
+  log "Remove manually if no longer needed."
 }
 
 main "$@"
