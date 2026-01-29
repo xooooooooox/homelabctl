@@ -185,40 +185,40 @@ _configure_yadm_install() {
   pm=$(radp_os_get_distro_pm)
 
   case "$pm" in
-    apt|apt-get)
-      radp_exec_sudo "Update apt cache" apt-get update -qq
-      radp_exec_sudo "Install yadm" apt-get install -y -qq yadm 2>/dev/null || {
-        radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
-        ${gr_sudo:-} chmod +x /usr/local/bin/yadm
-      }
-      ;;
-    dnf)
-      radp_exec_sudo "Install yadm" dnf install -y -q yadm 2>/dev/null || {
-        radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
-        ${gr_sudo:-} chmod +x /usr/local/bin/yadm
-      }
-      ;;
-    yum)
+  apt | apt-get)
+    radp_exec_sudo "Update apt cache" apt-get update -qq
+    radp_exec_sudo "Install yadm" apt-get install -y -qq yadm 2>/dev/null || {
       radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
       ${gr_sudo:-} chmod +x /usr/local/bin/yadm
-      ;;
-    pacman)
-      radp_exec_sudo "Install yadm" pacman -S --noconfirm yadm
-      ;;
-    apk)
-      radp_exec_sudo "Install yadm" apk add --quiet yadm 2>/dev/null || {
-        radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
-        ${gr_sudo:-} chmod +x /usr/local/bin/yadm
-      }
-      ;;
-    brew)
-      radp_exec "Install yadm" brew install yadm
-      ;;
-    *)
-      radp_log_info "Installing yadm from GitHub..."
+    }
+    ;;
+  dnf)
+    radp_exec_sudo "Install yadm" dnf install -y -q yadm 2>/dev/null || {
       radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
       ${gr_sudo:-} chmod +x /usr/local/bin/yadm
-      ;;
+    }
+    ;;
+  yum)
+    radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
+    ${gr_sudo:-} chmod +x /usr/local/bin/yadm
+    ;;
+  pacman)
+    radp_exec_sudo "Install yadm" pacman -S --noconfirm yadm
+    ;;
+  apk)
+    radp_exec_sudo "Install yadm" apk add --quiet yadm 2>/dev/null || {
+      radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
+      ${gr_sudo:-} chmod +x /usr/local/bin/yadm
+    }
+    ;;
+  brew)
+    radp_exec "Install yadm" brew install yadm
+    ;;
+  *)
+    radp_log_info "Installing yadm from GitHub..."
+    radp_exec_sudo "Download yadm from GitHub" curl -fLo /usr/local/bin/yadm "$yadm_url"
+    ${gr_sudo:-} chmod +x /usr/local/bin/yadm
+    ;;
   esac
 
   if ! command -v yadm &>/dev/null; then
