@@ -120,14 +120,20 @@ homelabctl vf dump-config -f yaml
 
 跨平台安装和管理软件包。支持单独安装和通过配置文件批量安装。
 
-| 命令                           | 描述       |
-|------------------------------|----------|
-| `setup list`                 | 列出可用软件包  |
-| `setup info <name>`          | 显示软件包详情  |
-| `setup install <name>`       | 安装软件包    |
-| `setup profile list`         | 列出可用配置文件 |
-| `setup profile show <name>`  | 显示配置文件详情 |
-| `setup profile apply <name>` | 应用配置文件   |
+| 命令                             | 描述                    |
+|--------------------------------|-----------------------|
+| `setup list`                   | 列出可用软件包               |
+| `setup info <name>`            | 显示软件包详情               |
+| `setup install <name>`         | 安装软件包                 |
+| `setup profile list`           | 列出可用配置文件              |
+| `setup profile show <name>`    | 显示配置文件详情              |
+| `setup profile apply <name>`   | 应用配置文件                |
+| `setup configure list`         | 列出可用系统配置              |
+| `setup configure chrony`       | 配置 chrony 时间同步        |
+| `setup configure expand-lvm`   | 扩展 LVM 分区和文件系统        |
+| `setup configure gpg-import`   | 导入 GPG 密钥到用户密钥环       |
+| `setup configure gpg-preset`   | 在 gpg-agent 中预设 GPG 密码 |
+| `setup configure yadm`         | 使用 yadm 克隆 dotfiles 仓库 |
 
 **示例：**
 
@@ -147,6 +153,14 @@ homelabctl setup profile list
 homelabctl setup profile show recommend
 homelabctl setup profile apply recommend --dry-run
 homelabctl setup profile apply recommend --continue
+
+# 系统配置
+homelabctl setup configure list
+homelabctl setup configure chrony --servers "ntp.aliyun.com" --timezone "Asia/Shanghai"
+homelabctl setup configure expand-lvm
+homelabctl setup configure gpg-import --secret-key-file ~/.secrets/key.asc --passphrase-file ~/.secrets/pass.txt
+homelabctl setup configure gpg-preset --key-uid "user@example.com" --passphrase-file ~/.secrets/pass.txt
+homelabctl setup configure yadm --repo-url "git@github.com:user/dotfiles.git" --ssh-key-file ~/.ssh/id_rsa --bootstrap
 ```
 
 **可用分类：**
@@ -167,6 +181,20 @@ homelabctl setup profile apply recommend --continue
 | 配置文件        | 描述                 |
 |-------------|--------------------|
 | `recommend` | 推荐的开发环境基础工具集 |
+
+**系统配置：**
+
+`setup configure` 命令提供即用型的系统配置任务：
+
+| 命令            | 描述                               |
+|---------------|----------------------------------|
+| `chrony`      | 配置 NTP 时间同步，支持自定义服务器             |
+| `expand-lvm`  | 扩展 LVM 分区和文件系统以使用所有可用磁盘空间        |
+| `gpg-import`  | 从文件、内容或密钥服务器导入 GPG 密钥            |
+| `gpg-preset`  | 在 gpg-agent 中缓存 GPG 密码，用于非交互式操作  |
+| `yadm`        | 克隆 dotfiles 仓库，支持 SSH/HTTPS、bootstrap、解密 |
+
+所有 configure 命令支持 `--dry-run` 预览更改。运行 `homelabctl setup configure <name> --help` 查看详细选项。
 
 **用户扩展：**
 

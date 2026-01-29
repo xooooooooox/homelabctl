@@ -123,14 +123,20 @@ see [radp-vagrant-framework Configuration Reference](https://github.com/xooooooo
 Install and manage software packages across different platforms. Supports individual package installation and batch
 installation via profiles.
 
-| Command                      | Description             |
-|------------------------------|-------------------------|
-| `setup list`                 | List available packages |
-| `setup info <name>`          | Show package details    |
-| `setup install <name>`       | Install a package       |
-| `setup profile list`         | List available profiles |
-| `setup profile show <name>`  | Show profile details    |
-| `setup profile apply <name>` | Apply a profile         |
+| Command                            | Description                           |
+|------------------------------------|---------------------------------------|
+| `setup list`                       | List available packages               |
+| `setup info <name>`                | Show package details                  |
+| `setup install <name>`             | Install a package                     |
+| `setup profile list`               | List available profiles               |
+| `setup profile show <name>`        | Show profile details                  |
+| `setup profile apply <name>`       | Apply a profile                       |
+| `setup configure list`             | List available system configurations  |
+| `setup configure chrony`           | Configure chrony time synchronization |
+| `setup configure expand-lvm`       | Expand LVM partition and filesystem   |
+| `setup configure gpg-import`       | Import GPG keys into user keyring     |
+| `setup configure gpg-preset`       | Preset GPG passphrase in gpg-agent    |
+| `setup configure yadm`             | Clone dotfiles repository using yadm  |
 
 **Examples:**
 
@@ -150,6 +156,14 @@ homelabctl setup profile list
 homelabctl setup profile show recommend
 homelabctl setup profile apply recommend --dry-run
 homelabctl setup profile apply recommend --continue
+
+# System configuration
+homelabctl setup configure list
+homelabctl setup configure chrony --servers "ntp.aliyun.com" --timezone "Asia/Shanghai"
+homelabctl setup configure expand-lvm
+homelabctl setup configure gpg-import --secret-key-file ~/.secrets/key.asc --passphrase-file ~/.secrets/pass.txt
+homelabctl setup configure gpg-preset --key-uid "user@example.com" --passphrase-file ~/.secrets/pass.txt
+homelabctl setup configure yadm --repo-url "git@github.com:user/dotfiles.git" --ssh-key-file ~/.ssh/id_rsa --bootstrap
 ```
 
 **How It Works:**
@@ -186,6 +200,20 @@ For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com
 | Profile     | Description                                        |
 |-------------|----------------------------------------------------|
 | `recommend` | Recommended development environment with essentials |
+
+**System Configuration:**
+
+The `setup configure` commands provide ready-to-use system configuration tasks:
+
+| Command       | Description                                                   |
+|---------------|---------------------------------------------------------------|
+| `chrony`      | Configure NTP time synchronization with custom servers        |
+| `expand-lvm`  | Expand LVM partition/filesystem to use all available disk space |
+| `gpg-import`  | Import GPG keys from file, content, or keyserver              |
+| `gpg-preset`  | Cache GPG passphrase in gpg-agent for non-interactive operations |
+| `yadm`        | Clone dotfiles repository with SSH/HTTPS, bootstrap, decrypt  |
+
+All configure commands support `--dry-run` to preview changes. Run `homelabctl setup configure <name> --help` for detailed options.
 
 **User Extensions:**
 

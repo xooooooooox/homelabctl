@@ -38,6 +38,12 @@ export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 - `setup profile list` - List available setup profiles
 - `setup profile show <name>` - Show profile details
 - `setup profile apply <name>` - Apply a profile (--dry-run, --continue, --skip-installed)
+- `setup configure list` - List available system configurations
+- `setup configure chrony` - Configure chrony time synchronization
+- `setup configure expand-lvm` - Expand LVM partition and filesystem
+- `setup configure gpg-import` - Import GPG keys into user keyring
+- `setup configure gpg-preset` - Preset GPG passphrase in gpg-agent
+- `setup configure yadm` - Clone dotfiles repository using yadm
 - `version` - Show homelabctl version
 - `completion <bash|zsh>` - Generate shell completion
 
@@ -69,10 +75,17 @@ homelabctl/
 │   │   │   ├── install.sh
 │   │   │   ├── list.sh
 │   │   │   ├── info.sh
-│   │   │   └── profile/        # homelabctl setup profile <subcommand>
-│   │   │       ├── list.sh
-│   │   │       ├── show.sh
-│   │   │       └── apply.sh
+│   │   │   ├── profile/        # homelabctl setup profile <subcommand>
+│   │   │   │   ├── list.sh
+│   │   │   │   ├── show.sh
+│   │   │   │   └── apply.sh
+│   │   │   └── configure/      # homelabctl setup configure <subcommand>
+│   │   │       ├── list.sh     # Dynamic list from @desc annotations
+│   │   │       ├── chrony.sh
+│   │   │       ├── expand-lvm.sh
+│   │   │       ├── gpg-import.sh
+│   │   │       ├── gpg-preset.sh
+│   │   │       └── yadm.sh
 │   │   ├── version.sh
 │   │   └── completion.sh
 │   ├── config/
@@ -376,3 +389,82 @@ packages:
   - name: my-tool
     version: "1.0.0"
 ```
+
+## Configure Feature
+
+The `setup configure` command group provides ready-to-use system configuration tasks.
+
+### Available Configurations
+
+| Command | Description |
+|---------|-------------|
+| `chrony` | Configure chrony for NTP time synchronization |
+| `expand-lvm` | Expand LVM partition and filesystem to use all disk space |
+| `gpg-import` | Import GPG keys from file, content, or keyserver |
+| `gpg-preset` | Preset GPG passphrase in gpg-agent for non-interactive operations |
+| `yadm` | Clone dotfiles repository using yadm |
+
+### Architecture
+
+Configure commands are auto-discovered from `commands/setup/configure/`:
+
+```
+commands/setup/configure/
+├── list.sh          # Dynamic list (scans @desc from other files)
+├── chrony.sh        # homelabctl setup configure chrony
+├── expand-lvm.sh    # homelabctl setup configure expand-lvm
+├── gpg-import.sh    # homelabctl setup configure gpg-import
+├── gpg-preset.sh    # homelabctl setup configure gpg-preset
+└── yadm.sh          # homelabctl setup configure yadm
+```
+
+### Command Pattern
+
+All configure commands follow a consistent pattern using framework's dry-run support:
+
+```bash
+cmd_setup_configure_example() {
+  # Set dry-run mode from flag
+  radp_set_dry_run "${opt_dry_run:-}"
+
+  # Use radp_exec for commands that need sudo
+  radp_exec_sudo "Install package" apt-get install -y package
+
+  # Use radp_dry_run_skip for complex operations
+  if radp_dry_run_skip "Configure complex settings"; then
+    return 0
+  fi
+  # ... actual implementation ...
+}
+```
+
+### Usage Examples
+
+```bash
+# List available configurations
+homelabctl setup configure list
+
+# Configure time synchronization
+homelabctl setup configure chrony --servers "ntp.aliyun.com" --timezone "Asia/Shanghai"
+homelabctl setup configure chrony --dry-run
+
+# Expand LVM (auto-detects configuration)
+homelabctl setup configure expand-lvm
+homelabctl setup configure expand-lvm --partition /dev/sda3 --vg ubuntu-vg --lv ubuntu-lv
+
+# Import GPG keys
+homelabctl setup configure gpg-import --secret-key-file ~/.secrets/key.asc --passphrase-file ~/.secrets/pass.txt
+homelabctl setup configure gpg-import --key-id 0x1234567890ABCDEF --keyserver keys.openpgp.org
+
+# Preset GPG passphrase for automation
+homelabctl setup configure gpg-preset --key-uid "user@example.com" --passphrase-file ~/.secrets/pass.txt
+
+# Clone dotfiles with yadm
+homelabctl setup configure yadm --repo-url "git@github.com:user/dotfiles.git" --ssh-key-file ~/.ssh/id_rsa --bootstrap
+```
+
+### Notes
+
+- All commands support `--dry-run` to preview changes
+- Commands use `sudo` for privileged operations (no need to run as root)
+- `--user` option allows configuring for another user (requires sudo)
