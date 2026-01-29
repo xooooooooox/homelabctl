@@ -10,7 +10,7 @@ cmd_setup_info() {
   local name="${1:-}"
 
   if [[ -z "$name" ]]; then
-radp_cli_help_command "setup info"
+    radp_cli_help_command "setup info"
     return 1
   fi
 
