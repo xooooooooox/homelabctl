@@ -19,7 +19,9 @@ _setup_install_tmux() {
     ;;
   dnf | yum)
     radp_log_info "Installing tmux via dnf..."
-    radp_os_install_pkgs tmux || return 1
+    # Install perl first - CentOS Stream 9 has perl-interpreter by default,
+    # but tmux requires the full perl package
+    radp_os_install_pkgs perl tmux || return 1
     ;;
   apt | apt-get)
     radp_log_info "Installing tmux via apt..."

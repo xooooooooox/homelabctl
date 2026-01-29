@@ -6,6 +6,10 @@
 
 - Add installer: gitlab-runner
 
+### fix
+
+- Fix tmux not working on CentOS Stream 9 due to missing perl dependency
+
 ## v0.1.6
 
 ### feat
