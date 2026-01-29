@@ -2,30 +2,17 @@
 # @cmd
 # @desc Run vagrant commands (passthrough to vagrant)
 # @meta passthrough
+# @example vg status
 # @example vg up
 # @example vg ssh node-1
-# @example vg status
 # @example vg provision myvm --provision-with shell
+# @example vg --help
 # @example RADP_VAGRANT_ENV=prod vg up
 
+# All arguments are passed through to vagrant
 cmd_vg() {
-  # All arguments are passed through to vagrant
-  # Use environment variables for homelabctl-specific options:
-  #   RADP_VAGRANT_ENV - environment name
-  #   RADP_VAGRANT_CONFIG_DIR - config directory path
-
   if [[ $# -eq 0 ]]; then
-    radp_log_error "Vagrant command required"
-    echo "Usage: homelabctl vg <command> [args...]"
-    echo ""
-    echo "Examples:"
-    echo "  homelabctl vg up"
-    echo "  homelabctl vg ssh node-1"
-    echo "  homelabctl vg provision myvm --provision-with shell"
-    echo ""
-    echo "Environment variables:"
-    echo "  RADP_VAGRANT_ENV         - Environment name"
-    echo "  RADP_VAGRANT_CONFIG_DIR  - Config directory path"
+    radp_cli_help_command "vg"
     return 1
   fi
 
