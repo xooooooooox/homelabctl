@@ -76,12 +76,111 @@ _homelabctl() {
                     ;;
                 setup)
                     local subcommands=(
+                        'configure:Manage configure'
                         'info:Show package details'
                         'install:Install a software package'
                         'list:List available packages'
                         'profile:Manage profile'
                     )
                     case "${words[2]}" in
+                    configure)
+                        local subcommands=(
+                            'chrony:Configure chrony for time synchronization'
+                            'expand-lvm:Expand LVM partition and filesystem to use all available disk space'
+                            'gpg-import:Import GPG keys into user keyring'
+                            'gpg-preset:Preset GPG passphrase in gpg-agent cache for non-interactive operations'
+                            'list:List available system configurations'
+                            'yadm:Clone dotfiles repository using yadm'
+                        )
+                        case "${words[3]}" in
+                        chrony)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
+
+                            _arguments \
+                                '(-h --help)'{-h,--help}'[Show help]' \
+                                (-s --servers)'{-s,--servers}[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
+                                (-p --pool)'{-p,--pool}[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
+                                (-t --timezone)'{-t,--timezone}[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
+                                '*:file:_files'
+                            ;;
+                        expand-lvm)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
+
+                            _arguments \
+                                '(-h --help)'{-h,--help}'[Show help]' \
+                                (-p --partition)'{-p,--partition}[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
+                                (-v --vg)'{-v,--vg}[Volume group name. Auto-detected if not specified.]:name:' \
+                                (-l --lv)'{-l,--lv}[Logical volume to expand. Auto-detected if not specified.]:name:' \
+                                '*:file:_files'
+                            ;;
+                        gpg-import)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
+
+                            _arguments \
+                                '(-h --help)'{-h,--help}'[Show help]' \
+                                (-p --public-key)'{-p,--public-key}[GPG public key content (ASCII-armored)]:content:' \
+                                (-p --public-key-file)'{-p,--public-key-file}[Path to GPG public key file]:file:' \
+                                (-s --secret-key-file)'{-s,--secret-key-file}[Path to GPG secret key file]:file:' \
+                                (-p --passphrase)'{-p,--passphrase}[Passphrase for secret key]:pass:' \
+                                (-p --passphrase-file)'{-p,--passphrase-file}[Path to file containing passphrase]:file:' \
+                                (-k --key-id)'{-k,--key-id}[GPG key ID to fetch from keyserver]:id:' \
+                                (-k --keyserver)'{-k,--keyserver}[Keyserver URL (default: keys.openpgp.org)]:url:' \
+                                (-t --trust-level)'{-t,--trust-level}[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
+                                (-o --ownertrust-file)'{-o,--ownertrust-file}[Path to ownertrust file]:file:' \
+                                (-u --user)'{-u,--user}[Target user (default: current user, requires sudo for other users)]:name:' \
+                                '*:file:_files'
+                            ;;
+                        gpg-preset)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
+
+                            _arguments \
+                                '(-h --help)'{-h,--help}'[Show help]' \
+                                (-k --key-uid)'{-k,--key-uid}[Key UID (email) to identify the key (e.g., user@example.com)]:uid:' \
+                                (-p --passphrase)'{-p,--passphrase}[Passphrase content]:pass:' \
+                                (-p --passphrase-file)'{-p,--passphrase-file}[Path to file containing passphrase]:file:' \
+                                (-u --user)'{-u,--user}[Target user (default: current user, requires sudo for other users)]:name:' \
+                                '*:file:_files'
+                            ;;
+                        list)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
+
+                            _arguments \
+                                '(-h --help)'{-h,--help}'[Show help]' \
+                                '*:file:_files'
+                            ;;
+                        yadm)
+                            # Shift words array for nested subcommand (depth=3)
+                            words=("${words[1]}" "${words[@]:4}")
+                            (( CURRENT -= 2 ))
+
+                            _arguments \
+                                '(-h --help)'{-h,--help}'[Show help]' \
+                                (-r --repo-url)'{-r,--repo-url}[Dotfiles repository URL (HTTPS or SSH format)]:url:' \
+                                (-c --class)'{-c,--class}[Set yadm class before clone]:class:' \
+                                (-h --https-user)'{-h,--https-user}[Username for HTTPS authentication]:user:' \
+                                (-h --https-token)'{-h,--https-token}[Personal access token for HTTPS authentication]:token:' \
+                                (-h --https-token-file)'{-h,--https-token-file}[Path to file containing access token]:file:' \
+                                (-s --ssh-key-file)'{-s,--ssh-key-file}[Path to SSH private key file]:file:' \
+                                (-s --ssh-host)'{-s,--ssh-host}[Override SSH hostname/IP (for private servers)]:host:' \
+                                (-s --ssh-port)'{-s,--ssh-port}[Override SSH port (default 22)]:port:' \
+                                (-u --user)'{-u,--user}[Target user (default: current user, requires sudo for other users)]:name:' \
+                                '*:file:_files'
+                            ;;
+                            *)
+                                _describe 'subcommand' subcommands
+                                ;;
+                        esac
+                        ;;
                     info)
                         # Shift words array for nested subcommand (depth=2)
                         words=("${words[1]}" "${words[@]:3}")
