@@ -116,7 +116,18 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          python - <<'PY'
+          version="${VERSION}"
+          version_no_prefix="${version#v}"
+
+          # Update version.sh
+          sed -i "s/^declare -gr gr_app_version=.*/declare -gr gr_app_version=\"${version}\"/" src/main/shell/commands/version.sh
+
+          # Update spec files
+          sed -i "s/^Version:.*/Version:        ${version_no_prefix}/" packaging/copr/homelabctl.spec
+          sed -i "s/^Version:.*/Version:        ${version_no_prefix}/" packaging/obs/homelabctl.spec
+
+          # Update CHANGELOG.md
+          python3 - <<'PY'
           import os
           import re
           import subprocess
@@ -135,32 +146,6 @@ jobs:
               return git(*args)
             except subprocess.CalledProcessError:
               return ""
-
-          config_path = Path("src/main/shell/config/config.yaml")
-          if not config_path.exists():
-            raise SystemExit(f"Missing config file: {config_path}")
-          # Use yq to update version in YAML
-          subprocess.run(
-            ["yq", "-i", f".radp.extend.homelabctl.version = \"{version}\"", str(config_path)],
-            check=True,
-          )
-
-          for spec_path in [
-            Path("packaging/copr/homelabctl.spec"),
-            Path("packaging/obs/homelabctl.spec"),
-          ]:
-            if not spec_path.exists():
-              raise SystemExit(f"Missing spec file: {spec_path}")
-            spec_text = spec_path.read_text()
-            spec_text, count = re.subn(
-              r"^Version:\s*.*$",
-              f"Version:        {version_no_prefix}",
-              spec_text,
-              flags=re.M,
-            )
-            if count == 0:
-              raise SystemExit(f"Failed to update Version in {spec_path}")
-            spec_path.write_text(spec_text)
 
           changelog_path = Path("CHANGELOG.md")
           if not changelog_path.exists():
@@ -259,7 +244,6 @@ jobs:
       - name: Install radp-bash-framework
         run: |
           set -euo pipefail
-          # Install latest release of radp-bash-framework
           curl -fsSL https://raw.githubusercontent.com/xooooooooox/radp-bash-framework/main/install.sh | \
             RADP_BF_INSTALL_MODE=manual bash
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -287,7 +271,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add \
-            src/main/shell/config/config.yaml \
+            src/main/shell/commands/version.sh \
             packaging/copr/homelabctl.spec \
             packaging/obs/homelabctl.spec \
             completions/homelabctl.bash \
@@ -313,7 +297,7 @@ jobs:
           cat > "${body_file}" <<EOF
           Release prep for ${version}.
 
-          - Update radp.extend.homelabctl.version in config.yaml
+          - Update gr_app_version in version.sh
           - Sync spec versions
           - Add changelog entry (please review and edit)
 
@@ -332,4 +316,4 @@ jobs:
           fi
           echo "PR creation not permitted for GitHub Actions token." >&2
           echo "Enable 'Allow GitHub Actions to create and approve pull requests' or create the PR manually:" >&2
-          echo "  gh pr create --base main --head \"${branch}\" --title \"${title}\" --body \"${body}\"" >&2
+          echo "  gh pr create --base main --head \"${branch}\" --title \"${title}\" --body-file \"${body_file}\"" >&2

@@ -52,11 +52,11 @@ jobs:
             tag_name="${GITHUB_REF_NAME}"
           fi
 
-          config_file="src/main/shell/config/config.yaml"
+          version_file="src/main/shell/commands/version.sh"
           if [[ -z "${tag_name}" && "${GITHUB_EVENT_NAME}" == "workflow_run" ]]; then
-            version_from_commit="$(git show "${head_sha}:${config_file}" | yq '.radp.extend.homelabctl.version')"
-            if [[ -z "${version_from_commit}" || "${version_from_commit}" == "null" ]]; then
-              echo "Failed to read radp.extend.homelabctl.version from ${config_file} at ${head_sha}" >&2
+            version_from_commit="$(git show "${head_sha}:${version_file}" | grep -oP 'declare -gr gr_app_version="\K[^"]+')"
+            if [[ -z "${version_from_commit}" ]]; then
+              echo "Failed to read gr_app_version from ${version_file} at ${head_sha}" >&2
               exit 1
             fi
             tag_name="${version_from_commit}"

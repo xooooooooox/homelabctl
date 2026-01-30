@@ -65,14 +65,14 @@ jobs:
             echo "Resolved tag ${tag_name} does not exist in repository." >&2
             exit 1
           fi
-          config_file="src/main/shell/config/config.yaml"
-          version_from_tag="$(git show "${tag_name}:${config_file}" | yq '.radp.extend.homelabctl.version')"
-          if [[ -z "${version_from_tag}" || "${version_from_tag}" == "null" ]]; then
-            echo "Failed to read radp.extend.homelabctl.version from ${config_file} at ${tag_name}" >&2
+          version_file="src/main/shell/commands/version.sh"
+          version_from_tag="$(git show "${tag_name}:${version_file}" | grep -oP 'declare -gr gr_app_version="\K[^"]+')"
+          if [[ -z "${version_from_tag}" ]]; then
+            echo "Failed to read gr_app_version from ${version_file} at ${tag_name}" >&2
             exit 1
           fi
           if [[ "${version_from_tag}" != "${tag_name}" ]]; then
-            echo "Tag ${tag_name} does not match radp.extend.homelabctl.version (${version_from_tag})" >&2
+            echo "Tag ${tag_name} does not match gr_app_version (${version_from_tag})" >&2
             exit 1
           fi
           version="${tag_name#v}"
