@@ -10,6 +10,7 @@
 
 - Fix `version` and `vf info` commands showing inconsistent version with banner
 - Fix tmux not working on CentOS Stream 9 due to missing perl dependency
+- Fix zsh completion not showing package names for `setup install <tab>` (banner/log output was breaking completion)
 
 ### refactor
 

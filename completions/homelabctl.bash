@@ -1,15 +1,15 @@
 # homelabctl completion helper functions
 
 _homelabctl_complete_packages() {
-    homelabctl setup list --names-only 2>/dev/null
+  homelabctl -q setup list --names-only 2>/dev/null
 }
 
 _homelabctl_complete_categories() {
-    homelabctl setup list --category-names 2>/dev/null
+  homelabctl -q setup list --category-names 2>/dev/null
 }
 
 _homelabctl_complete_profiles() {
-    homelabctl setup profile list --names-only 2>/dev/null
+  homelabctl -q setup profile list --names-only 2>/dev/null
 }
 
 # Bash completion script for homelabctl
