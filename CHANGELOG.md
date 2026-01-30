@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.1.7
+## v0.1.8
 
 ### feat
 
@@ -22,7 +22,6 @@
 - Add installer: pinentry, ansible, docker, eza, go, python, ripgrep, rust, starship, terraform
 - Add installer: git, git-credential-manager, gpg, lazygit, markdownlint-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux, vim, yadm, zoxide
 - Update entrypoint to use the latest bash framework
-- Add 8 packages
 - Update completion help example
 - Add global cli args
 
@@ -32,16 +31,8 @@
 - Fix `version` and `vf info` commands showing inconsistent version with banner
 - Fix tmux not working on CentOS Stream 9 due to missing perl dependency
 - Fix zsh completion not showing package names for `setup install <tab>` (banner/log output was breaking completion)
-- Fix banner version
-- Fix install lsp via vfox
 - Fix apply.sh interrupt after package installed
 - Fix installer.sh
-- Fix installer jdk, nodejs, ruby
-- Fix installer bat, fastfetch, fd, fzf, helm, jdk, jq, kubecm, kubectl, mc, neovim, nodejs, vagrant, vfox
-- Fix trap error
-- Fix install fzf on centos-stream-9
-- Fix zsh completion
-- Optimize user config dir
 
 ### refactor
 
