@@ -1,56 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 解析脚本真实路径（支持 symlink，如 Homebrew 安装）
-__resolve_project_root() {
-  local src="${BASH_SOURCE[0]}"
-  local dir
-  while [[ -L "$src" ]]; do
-    dir="$(cd -P "$(dirname "$src")" && pwd)"
-    src="$(readlink "$src")"
-    [[ "$src" != /* ]] && src="$dir/$src"
-  done
-  local bin_dir
-  bin_dir="$(cd -P "$(dirname "$src")" && pwd)"
-  dirname "$bin_dir"
-}
-
-export RADP_APP_ROOT="$(__resolve_project_root)"
-
-# 加载 radp-bash-framework
+# 检查框架是否已安装
 if ! command -v radp-bf &>/dev/null; then
   echo "Error: radp-bash-framework not found. Please install it first." >&2
   echo "  See: https://github.com/xooooooooox/radp-bash-framework" >&2
   exit 1
 fi
 
-# 自定义 banner（在 framework 之前定义，framework 会在 context 完成时调用）
-# shellcheck disable=SC2154
-radp_app_banner() {
-  local vf_version=""
-  if command -v radp-vf &>/dev/null; then
-    vf_version=$(radp-vf version 2>/dev/null || echo "")
-  fi
-
-  cat <<'EOF'
-    __                         __      __         __  __
-   / /_  ____  ____ ___  ___  / /___ _/ /_  _____/ /_/ /
-  / __ \/ __ \/ __ `__ \/ _ \/ / __ `/ __ \/ ___/ __/ /
- / / / / /_/ / / / / / /  __/ / /_/ / /_/ / /__/ /_/ /
-/_/ /_/\____/_/ /_/ /_/\___/_/\__,_/_.___/\___/\__/_/
-EOF
-  printf ' :: homelabctl ::                          (%s)\n' "$(radp_get_install_version "$gr_radp_extend_homelabctl_version")"
-  printf ' :: radp-bash-framework ::                 (%s)\n' "$(radp_get_fw_install_version)"
-  [[ -n "$vf_version" ]] && printf ' :: radp-vagrant-framework ::              (%s)\n' "$vf_version"
-}
-
-# 应用声明式配置
-export RADP_APP_NAME="homelabctl"
-export RADP_APP_GLOBAL_OPTIONS="-v --verbose --debug"
-
-# 项目特有导出
-export HOMELABCTL_ROOT="$RADP_APP_ROOT"
-
-# 启动：框架负责全部初始化和 dispatch
-# shellcheck source=/dev/null
+# 解析项目根目录并加载框架
+export RADP_APP_ROOT="$(radp-bf resolve-root "${BASH_SOURCE[0]}")"
 source "$(radp-bf path launcher)" "$@"

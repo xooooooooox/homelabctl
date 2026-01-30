@@ -1,5 +1,6 @@
+.radp-cli/checksums/
+src/main/shell/config/_idecomp.sh
 src/main/shell/config/config.sh
-src/main/shell/config/completion.sh
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
