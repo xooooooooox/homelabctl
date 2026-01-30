@@ -157,15 +157,12 @@ homelabctl/
 
 ### Version Management
 
-Version is stored in `src/main/shell/config/config.yaml`:
-```yaml
-radp:
-  extend:
-    homelabctl:
-      version: v0.1.0
+Version is stored in `src/main/shell/commands/version.sh`:
+```bash
+declare -gr gr_app_version="v0.1.0"
 ```
 
-Available as `$gr_radp_extend_homelabctl_version` in shell. This is the single source of truth for release management.
+Available as `$gr_app_version` in shell. This is the single source of truth for release management.
 
 ### Command Definition Pattern
 Commands are defined using comment-based metadata:
@@ -199,6 +196,12 @@ cmd_vf_init() {
 5. `build-copr-package` and `build-obs-package` build the packages
 6. `update-homebrew-tap` updates the Homebrew formula
 7. `attach-release-packages` uploads built packages to GitHub Release
+
+### Branch Cleanup
+- `cleanup-branches` workflow automatically deletes stale `workflow/v*` branches
+- Runs weekly (Sunday 00:00 UTC) or can be triggered manually
+- Default: deletes branches older than 14 days
+- Supports dry-run mode to preview deletions
 
 ### Required Secrets
 - `COPR_LOGIN`, `COPR_TOKEN`, `COPR_USERNAME`, `COPR_PROJECT` - COPR access
