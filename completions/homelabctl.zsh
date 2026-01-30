@@ -43,6 +43,356 @@ _homelabctl_arg_setup_profile_show_name() {
     _describe 'name' completions
 }
 
+_homelabctl_completion() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:shell:_files'
+}
+
+_homelabctl_setup() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'configure:Manage configure'
+                'info:Show package details'
+                'install:Install a software package'
+                'list:List available packages'
+                'profile:Manage profile'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_setup_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_setup_configure() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'chrony:Configure chrony for time synchronization'
+                'expand-lvm:Expand LVM partition and filesystem to use all available disk space'
+                'gpg-import:Import GPG keys into user keyring'
+                'gpg-preset:Preset GPG passphrase in gpg-agent cache for non-interactive operations'
+                'list:List available system configurations'
+                'yadm:Clone dotfiles repository using yadm'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_setup_configure_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_setup_configure_chrony() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-s --servers)'{-s,--servers}'[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
+        '(-p --pool)'{-p,--pool}'[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
+        '(-t --timezone)'{-t,--timezone}'[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_configure_expand_lvm() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-p --partition)'{-p,--partition}'[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
+        '(-v --vg)'{-v,--vg}'[Volume group name. Auto-detected if not specified.]:name:' \
+        '(-l --lv)'{-l,--lv}'[Logical volume to expand. Auto-detected if not specified.]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_configure_gpg_import() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-p --public-key)'{-p,--public-key}'[GPG public key content (ASCII-armored)]:content:' \
+        '(-p --public-key-file)'{-p,--public-key-file}'[Path to GPG public key file]:file:' \
+        '(-s --secret-key-file)'{-s,--secret-key-file}'[Path to GPG secret key file]:file:' \
+        '(-p --passphrase)'{-p,--passphrase}'[Passphrase for secret key]:pass:' \
+        '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
+        '(-k --key-id)'{-k,--key-id}'[GPG key ID to fetch from keyserver]:id:' \
+        '(-k --keyserver)'{-k,--keyserver}'[Keyserver URL (default: keys.openpgp.org)]:url:' \
+        '(-t --trust-level)'{-t,--trust-level}'[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
+        '(-o --ownertrust-file)'{-o,--ownertrust-file}'[Path to ownertrust file]:file:' \
+        '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_configure_gpg_preset() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-k --key-uid)'{-k,--key-uid}'[Key UID (email) to identify the key (e.g., user@example.com)]:uid:' \
+        '(-p --passphrase)'{-p,--passphrase}'[Passphrase content]:pass:' \
+        '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
+        '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_configure_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_configure_yadm() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-r --repo-url)'{-r,--repo-url}'[Dotfiles repository URL (HTTPS or SSH format)]:url:' \
+        '(-c --class)'{-c,--class}'[Set yadm class before clone]:class:' \
+        '(-h --https-user)'{-h,--https-user}'[Username for HTTPS authentication]:user:' \
+        '(-h --https-token)'{-h,--https-token}'[Personal access token for HTTPS authentication]:token:' \
+        '(-h --https-token-file)'{-h,--https-token-file}'[Path to file containing access token]:file:' \
+        '(-s --ssh-key-file)'{-s,--ssh-key-file}'[Path to SSH private key file]:file:' \
+        '(-s --ssh-host)'{-s,--ssh-host}'[Override SSH hostname/IP (for private servers)]:host:' \
+        '(-s --ssh-port)'{-s,--ssh-port}'[Override SSH port (default 22)]:port:' \
+        '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_info() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:name:_homelabctl_arg_setup_info_name'
+}
+
+_homelabctl_setup_install() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-v --version)'{-v,--version}'[Specific version (default: latest)]:ver:' \
+        '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed without installing]' \
+        '1:name:_homelabctl_arg_setup_install_name'
+}
+
+_homelabctl_setup_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-c --category)'{-c,--category}'[Filter by category]:name:_homelabctl_opt_setup_list_category' \
+        '(-i --installed)'{-i,--installed}'[Show only installed packages]' \
+        '(-c --categories)'{-c,--categories}'[List available categories]' \
+        '(-n --names-only)'{-n,--names-only}'[Output package names only (for completion)]' \
+        '(-c --category-names)'{-c,--category-names}'[Output category names only (for completion)]' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_profile() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'apply:Apply a setup profile (install multiple packages)'
+                'list:List available setup profiles'
+                'show:Show profile details'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_setup_profile_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_setup_profile_apply() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed]' \
+        '(-c --continue)'{-c,--continue}'[Continue on error]' \
+        '(-s --skip-installed)'{-s,--skip-installed}'[Skip already installed packages]' \
+        '1:name:_homelabctl_arg_setup_profile_apply_name'
+}
+
+_homelabctl_setup_profile_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-n --names-only)'{-n,--names-only}'[Output profile names only (for completion)]' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_profile_show() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:name:_homelabctl_arg_setup_profile_show_name'
+}
+
+_homelabctl_version() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_vf() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'dump-config:Export merged configuration'
+                'generate:Generate standalone Vagrantfile'
+                'info:Show current environment information'
+                'init:Initialize a new radp-vagrant-framework project'
+                'list:List clusters and guests from configuration'
+                'template:Manage template'
+                'validate:Validate YAML configuration files'
+                'version:Show radp-vagrant-framework version'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_vf_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_vf_dump_config() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
+        '(-f --format)'{-f,--format}'[Output format (json or yaml, default: json)]:format:' \
+        '(-o --output)'{-o,--output}'[Output file path]:file:' \
+        '1:filter:_files'
+}
+
+_homelabctl_vf_generate() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
+        '1:output:_files'
+}
+
+_homelabctl_vf_info() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-e --env)'{-e,--env}'[Environment name]:name:' \
+        '(-j --json)'{-j,--json}'[Output as JSON]' \
+        '*:file:_files'
+}
+
+_homelabctl_vf_init() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-t --template)'{-t,--template}'[Use a template (default: base)]:name:' \
+        '(-s --set)'{-s,--set}'[]:var:' \
+        '1:dir:_files'
+}
+
+_homelabctl_vf_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
+        '(-v --verbose)'{-v,--verbose}'[Show detailed info (box, network, provisions, etc.)]' \
+        '(-p --provisions)'{-p,--provisions}'[Show provisions only]' \
+        '(-s --synced-folders)'{-s,--synced-folders}'[Show synced folders only]' \
+        '(-t --triggers)'{-t,--triggers}'[Show triggers only]' \
+        '1:filter:_files'
+}
+
+_homelabctl_vf_template() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'list:List available project templates'
+                'show:Show template details and variables'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_vf_template_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_vf_template_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_vf_template_show() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:name:_files'
+}
+
+_homelabctl_vf_validate() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_vf_version() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_vg() {
+    _arguments '(-h --help)'{-h,--help}'[Show help]' '*:args:'
+}
+
 _homelabctl() {
     local context state state_descr line
     typeset -A opt_args
@@ -70,350 +420,12 @@ _homelabctl() {
             _describe 'command' commands
             ;;
         args)
-            case "${words[1]}" in
-                completion)
-                    # Shift words to remove subcommand path (depth=1)
-                    words=( "${words[@]:1}" )
-                    (( CURRENT -= 1 ))
-
-                    _arguments -s \
-                        '(-h --help)'{-h,--help}'[Show help]' \
-                        '1:shell:_files'
-                    ;;
-                setup)
-                    local subcommands=(
-                        'configure:Manage configure'
-                        'info:Show package details'
-                        'install:Install a software package'
-                        'list:List available packages'
-                        'profile:Manage profile'
-                    )
-                    case "${words[2]}" in
-                    configure)
-                        local subcommands=(
-                            'chrony:Configure chrony for time synchronization'
-                            'expand-lvm:Expand LVM partition and filesystem to use all available disk space'
-                            'gpg-import:Import GPG keys into user keyring'
-                            'gpg-preset:Preset GPG passphrase in gpg-agent cache for non-interactive operations'
-                            'list:List available system configurations'
-                            'yadm:Clone dotfiles repository using yadm'
-                        )
-                        case "${words[3]}" in
-                        chrony)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '(-s --servers)'{-s,--servers}'[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
-                                '(-p --pool)'{-p,--pool}'[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
-                                '(-t --timezone)'{-t,--timezone}'[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
-                                '*:file:_files'
-                            ;;
-                        expand-lvm)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '(-p --partition)'{-p,--partition}'[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
-                                '(-v --vg)'{-v,--vg}'[Volume group name. Auto-detected if not specified.]:name:' \
-                                '(-l --lv)'{-l,--lv}'[Logical volume to expand. Auto-detected if not specified.]:name:' \
-                                '*:file:_files'
-                            ;;
-                        gpg-import)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '(-p --public-key)'{-p,--public-key}'[GPG public key content (ASCII-armored)]:content:' \
-                                '(-p --public-key-file)'{-p,--public-key-file}'[Path to GPG public key file]:file:' \
-                                '(-s --secret-key-file)'{-s,--secret-key-file}'[Path to GPG secret key file]:file:' \
-                                '(-p --passphrase)'{-p,--passphrase}'[Passphrase for secret key]:pass:' \
-                                '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
-                                '(-k --key-id)'{-k,--key-id}'[GPG key ID to fetch from keyserver]:id:' \
-                                '(-k --keyserver)'{-k,--keyserver}'[Keyserver URL (default: keys.openpgp.org)]:url:' \
-                                '(-t --trust-level)'{-t,--trust-level}'[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
-                                '(-o --ownertrust-file)'{-o,--ownertrust-file}'[Path to ownertrust file]:file:' \
-                                '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
-                                '*:file:_files'
-                            ;;
-                        gpg-preset)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '(-k --key-uid)'{-k,--key-uid}'[Key UID (email) to identify the key (e.g., user@example.com)]:uid:' \
-                                '(-p --passphrase)'{-p,--passphrase}'[Passphrase content]:pass:' \
-                                '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
-                                '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
-                                '*:file:_files'
-                            ;;
-                        list)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '*:file:_files'
-                            ;;
-                        yadm)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '(-r --repo-url)'{-r,--repo-url}'[Dotfiles repository URL (HTTPS or SSH format)]:url:' \
-                                '(-c --class)'{-c,--class}'[Set yadm class before clone]:class:' \
-                                '(-h --https-user)'{-h,--https-user}'[Username for HTTPS authentication]:user:' \
-                                '(-h --https-token)'{-h,--https-token}'[Personal access token for HTTPS authentication]:token:' \
-                                '(-h --https-token-file)'{-h,--https-token-file}'[Path to file containing access token]:file:' \
-                                '(-s --ssh-key-file)'{-s,--ssh-key-file}'[Path to SSH private key file]:file:' \
-                                '(-s --ssh-host)'{-s,--ssh-host}'[Override SSH hostname/IP (for private servers)]:host:' \
-                                '(-s --ssh-port)'{-s,--ssh-port}'[Override SSH port (default 22)]:port:' \
-                                '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
-                                '*:file:_files'
-                            ;;
-                            *)
-                                _describe 'subcommand' subcommands
-                                ;;
-                        esac
-                        ;;
-                    info)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '1:name:_homelabctl_arg_setup_info_name'
-                        ;;
-                    install)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-v --version)'{-v,--version}'[Specific version (default: latest)]:ver:' \
-                            '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed without installing]' \
-                            '1:name:_homelabctl_arg_setup_install_name'
-                        ;;
-                    list)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-c --category)'{-c,--category}'[Filter by category]:name:_homelabctl_opt_setup_list_category' \
-                            '(-i --installed)'{-i,--installed}'[Show only installed packages]' \
-                            '(-c --categories)'{-c,--categories}'[List available categories]' \
-                            '(-n --names-only)'{-n,--names-only}'[Output package names only (for completion)]' \
-                            '(-c --category-names)'{-c,--category-names}'[Output category names only (for completion)]' \
-                            '*:file:_files'
-                        ;;
-                    profile)
-                        local subcommands=(
-                            'apply:Apply a setup profile (install multiple packages)'
-                            'list:List available setup profiles'
-                            'show:Show profile details'
-                        )
-                        case "${words[3]}" in
-                        apply)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed]' \
-                                '(-c --continue)'{-c,--continue}'[Continue on error]' \
-                                '(-s --skip-installed)'{-s,--skip-installed}'[Skip already installed packages]' \
-                                '1:name:_homelabctl_arg_setup_profile_apply_name'
-                            ;;
-                        list)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '(-n --names-only)'{-n,--names-only}'[Output profile names only (for completion)]' \
-                                '*:file:_files'
-                            ;;
-                        show)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '1:name:_homelabctl_arg_setup_profile_show_name'
-                            ;;
-                            *)
-                                _describe 'subcommand' subcommands
-                                ;;
-                        esac
-                        ;;
-                        *)
-                            _describe 'subcommand' subcommands
-                            ;;
-                    esac
-                    ;;
-                version)
-                    # Shift words to remove subcommand path (depth=1)
-                    words=( "${words[@]:1}" )
-                    (( CURRENT -= 1 ))
-
-                    _arguments -s \
-                        '(-h --help)'{-h,--help}'[Show help]' \
-                        '*:file:_files'
-                    ;;
-                vf)
-                    local subcommands=(
-                        'dump-config:Export merged configuration'
-                        'generate:Generate standalone Vagrantfile'
-                        'info:Show current environment information'
-                        'init:Initialize a new radp-vagrant-framework project'
-                        'list:List clusters and guests from configuration'
-                        'template:Manage template'
-                        'validate:Validate YAML configuration files'
-                        'version:Show radp-vagrant-framework version'
-                    )
-                    case "${words[2]}" in
-                    dump-config)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-                            '(-f --format)'{-f,--format}'[Output format (json or yaml, default: json)]:format:' \
-                            '(-o --output)'{-o,--output}'[Output file path]:file:' \
-                            '1:filter:_files'
-                        ;;
-                    generate)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-                            '1:output:_files'
-                        ;;
-                    info)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-e --env)'{-e,--env}'[Environment name]:name:' \
-                            '(-j --json)'{-j,--json}'[Output as JSON]' \
-                            '*:file:_files'
-                        ;;
-                    init)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-t --template)'{-t,--template}'[Use a template (default: base)]:name:' \
-                            '(-s --set)'{-s,--set}'[]:var:' \
-                            '1:dir:_files'
-                        ;;
-                    list)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-                            '(-v --verbose)'{-v,--verbose}'[Show detailed info (box, network, provisions, etc.)]' \
-                            '(-p --provisions)'{-p,--provisions}'[Show provisions only]' \
-                            '(-s --synced-folders)'{-s,--synced-folders}'[Show synced folders only]' \
-                            '(-t --triggers)'{-t,--triggers}'[Show triggers only]' \
-                            '1:filter:_files'
-                        ;;
-                    template)
-                        local subcommands=(
-                            'list:List available project templates'
-                            'show:Show template details and variables'
-                        )
-                        case "${words[3]}" in
-                        list)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '*:file:_files'
-                            ;;
-                        show)
-                            # Shift words to remove subcommand path (depth=3)
-                            words=( "${words[@]:3}" )
-                            (( CURRENT -= 3 ))
-
-                            _arguments -s \
-                                '(-h --help)'{-h,--help}'[Show help]' \
-                                '1:name:_files'
-                            ;;
-                            *)
-                                _describe 'subcommand' subcommands
-                                ;;
-                        esac
-                        ;;
-                    validate)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-                            '*:file:_files'
-                        ;;
-                    version)
-                        # Shift words to remove subcommand path (depth=2)
-                        words=( "${words[@]:2}" )
-                        (( CURRENT -= 2 ))
-
-                        _arguments -s \
-                            '(-h --help)'{-h,--help}'[Show help]' \
-                            '*:file:_files'
-                        ;;
-                        *)
-                            _describe 'subcommand' subcommands
-                            ;;
-                    esac
-                    ;;
-                vg)
-                    # Shift words to remove subcommand path (depth=1)
-                    words=( "${words[@]:1}" )
-                    (( CURRENT -= 1 ))
-
-                    _arguments -s \
-                        '(-h --help)'{-h,--help}'[Show help]' \
-                        '*:args:'
-                    ;;
-                *)
-                    _files
-                    ;;
-            esac
+            local cmd_func="_homelabctl_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
             ;;
     esac
 }
