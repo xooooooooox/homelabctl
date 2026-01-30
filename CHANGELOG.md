@@ -5,22 +5,6 @@
 ### feat
 
 - Add installer: gitlab-runner
-
-### fix
-
-- Fix `version` and `vf info` commands showing inconsistent version with banner
-- Fix tmux not working on CentOS Stream 9 due to missing perl dependency
-- Fix zsh completion not showing package names for `setup install <tab>` (banner/log output was breaking completion)
-
-### refactor
-
-- Move version from `vars/constants.sh` to `config/config.yaml` (`radp.extend.homelabctl.version`)
-- Remove `vars` directory, add `config/_ide.sh` for IDE code completion support
-
-## v0.1.6
-
-### feat
-
 - Add `setup configure` command group for system configuration tasks
   - `setup configure list` - Dynamically list available configurations from directory
   - `setup configure chrony` - Configure chrony for time synchronization
@@ -33,11 +17,6 @@
 - Display accurate version info when installed via `--ref <branch>` or `--ref <sha>`
 - Generate `.install-version` file during manual installation
 - Use framework's `radp_get_install_version()` helper in banner
-
-## v0.1.5
-
-### feat
-
 - Optimize package categories
 - Optimize builtin profiles
 - Add installer: pinentry, ansible, docker, eza, go, python, ripgrep, rust, starship, terraform
@@ -49,6 +28,10 @@
 
 ### fix
 
+- Fix `setup list` showing no packages due to undefined `HOMELABCTL_ROOT` (should use `RADP_APP_ROOT`)
+- Fix `version` and `vf info` commands showing inconsistent version with banner
+- Fix tmux not working on CentOS Stream 9 due to missing perl dependency
+- Fix zsh completion not showing package names for `setup install <tab>` (banner/log output was breaking completion)
 - Fix banner version
 - Fix install lsp via vfox
 - Fix apply.sh interrupt after package installed
@@ -60,13 +43,14 @@
 - Fix zsh completion
 - Optimize user config dir
 
+### refactor
+
+- Move version from `vars/constants.sh` to `config/config.yaml` (`radp.extend.homelabctl.version`)
+- Remove `vars` directory, add `config/_ide.sh` for IDE code completion support
+
 ### chore
 
-- Optimize install.sh
-- Fix installer
-- Add post-install message
 - Optimize install and uninstall script
-- Customize banner
 
 ### docs
 
