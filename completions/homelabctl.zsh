@@ -50,8 +50,11 @@ _homelabctl() {
     _arguments -C \
         '(-h --help)'{-h,--help}'[Show help]' \
         '--version[Show version]' \
+        '-q' \
+        '--quiet' \
         '(-v --verbose)'{-v,--verbose}'[Enable verbose output]' \
         '--debug[Enable debug output]' \
+        '--config' \
         '1: :->command' \
         '*:: :->args'
 
@@ -60,7 +63,7 @@ _homelabctl() {
             local commands=(
                 'completion:Generate shell completion script'
                 'setup:Manage setup'
-                'version:Show homelabctl version information'
+                'version:Show version information'
                 'vf:Manage vf'
                 'vg:Run vagrant commands (passthrough to vagrant)'
             )
@@ -69,8 +72,11 @@ _homelabctl() {
         args)
             case "${words[1]}" in
                 completion)
+                    # Shift words to remove subcommand path (depth=1)
+                    words=( "${words[@]:1}" )
+                    (( CURRENT -= 1 ))
 
-                    _arguments \
+                    _arguments -s \
                         '(-h --help)'{-h,--help}'[Show help]' \
                         '1:shell:_files'
                     ;;
@@ -94,86 +100,86 @@ _homelabctl() {
                         )
                         case "${words[3]}" in
                         chrony)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                (-s --servers)'{-s,--servers}[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
-                                (-p --pool)'{-p,--pool}[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
-                                (-t --timezone)'{-t,--timezone}[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
+                                '(-s --servers)'{-s,--servers}'[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
+                                '(-p --pool)'{-p,--pool}'[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
+                                '(-t --timezone)'{-t,--timezone}'[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
                                 '*:file:_files'
                             ;;
                         expand-lvm)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                (-p --partition)'{-p,--partition}[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
-                                (-v --vg)'{-v,--vg}[Volume group name. Auto-detected if not specified.]:name:' \
-                                (-l --lv)'{-l,--lv}[Logical volume to expand. Auto-detected if not specified.]:name:' \
+                                '(-p --partition)'{-p,--partition}'[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
+                                '(-v --vg)'{-v,--vg}'[Volume group name. Auto-detected if not specified.]:name:' \
+                                '(-l --lv)'{-l,--lv}'[Logical volume to expand. Auto-detected if not specified.]:name:' \
                                 '*:file:_files'
                             ;;
                         gpg-import)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                (-p --public-key)'{-p,--public-key}[GPG public key content (ASCII-armored)]:content:' \
-                                (-p --public-key-file)'{-p,--public-key-file}[Path to GPG public key file]:file:' \
-                                (-s --secret-key-file)'{-s,--secret-key-file}[Path to GPG secret key file]:file:' \
-                                (-p --passphrase)'{-p,--passphrase}[Passphrase for secret key]:pass:' \
-                                (-p --passphrase-file)'{-p,--passphrase-file}[Path to file containing passphrase]:file:' \
-                                (-k --key-id)'{-k,--key-id}[GPG key ID to fetch from keyserver]:id:' \
-                                (-k --keyserver)'{-k,--keyserver}[Keyserver URL (default: keys.openpgp.org)]:url:' \
-                                (-t --trust-level)'{-t,--trust-level}[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
-                                (-o --ownertrust-file)'{-o,--ownertrust-file}[Path to ownertrust file]:file:' \
-                                (-u --user)'{-u,--user}[Target user (default: current user, requires sudo for other users)]:name:' \
+                                '(-p --public-key)'{-p,--public-key}'[GPG public key content (ASCII-armored)]:content:' \
+                                '(-p --public-key-file)'{-p,--public-key-file}'[Path to GPG public key file]:file:' \
+                                '(-s --secret-key-file)'{-s,--secret-key-file}'[Path to GPG secret key file]:file:' \
+                                '(-p --passphrase)'{-p,--passphrase}'[Passphrase for secret key]:pass:' \
+                                '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
+                                '(-k --key-id)'{-k,--key-id}'[GPG key ID to fetch from keyserver]:id:' \
+                                '(-k --keyserver)'{-k,--keyserver}'[Keyserver URL (default: keys.openpgp.org)]:url:' \
+                                '(-t --trust-level)'{-t,--trust-level}'[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
+                                '(-o --ownertrust-file)'{-o,--ownertrust-file}'[Path to ownertrust file]:file:' \
+                                '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
                                 '*:file:_files'
                             ;;
                         gpg-preset)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                (-k --key-uid)'{-k,--key-uid}[Key UID (email) to identify the key (e.g., user@example.com)]:uid:' \
-                                (-p --passphrase)'{-p,--passphrase}[Passphrase content]:pass:' \
-                                (-p --passphrase-file)'{-p,--passphrase-file}[Path to file containing passphrase]:file:' \
-                                (-u --user)'{-u,--user}[Target user (default: current user, requires sudo for other users)]:name:' \
+                                '(-k --key-uid)'{-k,--key-uid}'[Key UID (email) to identify the key (e.g., user@example.com)]:uid:' \
+                                '(-p --passphrase)'{-p,--passphrase}'[Passphrase content]:pass:' \
+                                '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
+                                '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
                                 '*:file:_files'
                             ;;
                         list)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 '*:file:_files'
                             ;;
                         yadm)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                (-r --repo-url)'{-r,--repo-url}[Dotfiles repository URL (HTTPS or SSH format)]:url:' \
-                                (-c --class)'{-c,--class}[Set yadm class before clone]:class:' \
-                                (-h --https-user)'{-h,--https-user}[Username for HTTPS authentication]:user:' \
-                                (-h --https-token)'{-h,--https-token}[Personal access token for HTTPS authentication]:token:' \
-                                (-h --https-token-file)'{-h,--https-token-file}[Path to file containing access token]:file:' \
-                                (-s --ssh-key-file)'{-s,--ssh-key-file}[Path to SSH private key file]:file:' \
-                                (-s --ssh-host)'{-s,--ssh-host}[Override SSH hostname/IP (for private servers)]:host:' \
-                                (-s --ssh-port)'{-s,--ssh-port}[Override SSH port (default 22)]:port:' \
-                                (-u --user)'{-u,--user}[Target user (default: current user, requires sudo for other users)]:name:' \
+                                '(-r --repo-url)'{-r,--repo-url}'[Dotfiles repository URL (HTTPS or SSH format)]:url:' \
+                                '(-c --class)'{-c,--class}'[Set yadm class before clone]:class:' \
+                                '(-h --https-user)'{-h,--https-user}'[Username for HTTPS authentication]:user:' \
+                                '(-h --https-token)'{-h,--https-token}'[Personal access token for HTTPS authentication]:token:' \
+                                '(-h --https-token-file)'{-h,--https-token-file}'[Path to file containing access token]:file:' \
+                                '(-s --ssh-key-file)'{-s,--ssh-key-file}'[Path to SSH private key file]:file:' \
+                                '(-s --ssh-host)'{-s,--ssh-host}'[Override SSH hostname/IP (for private servers)]:host:' \
+                                '(-s --ssh-port)'{-s,--ssh-port}'[Override SSH port (default 22)]:port:' \
+                                '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
                                 '*:file:_files'
                             ;;
                             *)
@@ -182,37 +188,37 @@ _homelabctl() {
                         esac
                         ;;
                     info)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             '1:name:_homelabctl_arg_setup_info_name'
                         ;;
                     install)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-v --version)'{-v,--version}[Specific version (default: latest)]:ver:' \
-                            (-d --dry-run)'{-d,--dry-run}[Show what would be installed without installing]' \
+                            '(-v --version)'{-v,--version}'[Specific version (default: latest)]:ver:' \
+                            '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed without installing]' \
                             '1:name:_homelabctl_arg_setup_install_name'
                         ;;
                     list)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-c --category)'{-c,--category}[Filter by category]:name:_homelabctl_opt_setup_list_category' \
-                            (-i --installed)'{-i,--installed}[Show only installed packages]' \
-                            (-c --categories)'{-c,--categories}[List available categories]' \
-                            (-n --names-only)'{-n,--names-only}[Output package names only (for completion)]' \
-                            (-c --category-names)'{-c,--category-names}[Output category names only (for completion)]' \
+                            '(-c --category)'{-c,--category}'[Filter by category]:name:_homelabctl_opt_setup_list_category' \
+                            '(-i --installed)'{-i,--installed}'[Show only installed packages]' \
+                            '(-c --categories)'{-c,--categories}'[List available categories]' \
+                            '(-n --names-only)'{-n,--names-only}'[Output package names only (for completion)]' \
+                            '(-c --category-names)'{-c,--category-names}'[Output category names only (for completion)]' \
                             '*:file:_files'
                         ;;
                     profile)
@@ -223,33 +229,33 @@ _homelabctl() {
                         )
                         case "${words[3]}" in
                         apply)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                (-d --dry-run)'{-d,--dry-run}[Show what would be installed]' \
-                                (-c --continue)'{-c,--continue}[Continue on error]' \
-                                (-s --skip-installed)'{-s,--skip-installed}[Skip already installed packages]' \
+                                '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed]' \
+                                '(-c --continue)'{-c,--continue}'[Continue on error]' \
+                                '(-s --skip-installed)'{-s,--skip-installed}'[Skip already installed packages]' \
                                 '1:name:_homelabctl_arg_setup_profile_apply_name'
                             ;;
                         list)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
-                                (-n --names-only)'{-n,--names-only}[Output profile names only (for completion)]' \
+                                '(-n --names-only)'{-n,--names-only}'[Output profile names only (for completion)]' \
                                 '*:file:_files'
                             ;;
                         show)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 '1:name:_homelabctl_arg_setup_profile_show_name'
                             ;;
@@ -264,8 +270,11 @@ _homelabctl() {
                     esac
                     ;;
                 version)
+                    # Shift words to remove subcommand path (depth=1)
+                    words=( "${words[@]:1}" )
+                    (( CURRENT -= 1 ))
 
-                    _arguments \
+                    _arguments -s \
                         '(-h --help)'{-h,--help}'[Show help]' \
                         '*:file:_files'
                     ;;
@@ -282,61 +291,61 @@ _homelabctl() {
                     )
                     case "${words[2]}" in
                     dump-config)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-e --env)'{-e,--env}[Override environment name]:name:' \
-                            (-f --format)'{-f,--format}[Output format (json or yaml, default: json)]:format:' \
-                            (-o --output)'{-o,--output}[Output file path]:file:' \
+                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
+                            '(-f --format)'{-f,--format}'[Output format (json or yaml, default: json)]:format:' \
+                            '(-o --output)'{-o,--output}'[Output file path]:file:' \
                             '1:filter:_files'
                         ;;
                     generate)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-e --env)'{-e,--env}[Override environment name]:name:' \
+                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
                             '1:output:_files'
                         ;;
                     info)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-e --env)'{-e,--env}[Environment name]:name:' \
-                            (-j --json)'{-j,--json}[Output as JSON]' \
+                            '(-e --env)'{-e,--env}'[Environment name]:name:' \
+                            '(-j --json)'{-j,--json}'[Output as JSON]' \
                             '*:file:_files'
                         ;;
                     init)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-t --template)'{-t,--template}[Use a template (default: base)]:name:' \
-                            (-s --set)'{-s,--set}[]:var:' \
+                            '(-t --template)'{-t,--template}'[Use a template (default: base)]:name:' \
+                            '(-s --set)'{-s,--set}'[]:var:' \
                             '1:dir:_files'
                         ;;
                     list)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-e --env)'{-e,--env}[Override environment name]:name:' \
-                            (-v --verbose)'{-v,--verbose}[Show detailed info (box, network, provisions, etc.)]' \
-                            (-p --provisions)'{-p,--provisions}[Show provisions only]' \
-                            (-s --synced-folders)'{-s,--synced-folders}[Show synced folders only]' \
-                            (-t --triggers)'{-t,--triggers}[Show triggers only]' \
+                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
+                            '(-v --verbose)'{-v,--verbose}'[Show detailed info (box, network, provisions, etc.)]' \
+                            '(-p --provisions)'{-p,--provisions}'[Show provisions only]' \
+                            '(-s --synced-folders)'{-s,--synced-folders}'[Show synced folders only]' \
+                            '(-t --triggers)'{-t,--triggers}'[Show triggers only]' \
                             '1:filter:_files'
                         ;;
                     template)
@@ -346,20 +355,20 @@ _homelabctl() {
                         )
                         case "${words[3]}" in
                         list)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 '*:file:_files'
                             ;;
                         show)
-                            # Shift words array for nested subcommand (depth=3)
-                            words=("${words[1]}" "${words[@]:4}")
-                            (( CURRENT -= 2 ))
+                            # Shift words to remove subcommand path (depth=3)
+                            words=( "${words[@]:3}" )
+                            (( CURRENT -= 3 ))
 
-                            _arguments \
+                            _arguments -s \
                                 '(-h --help)'{-h,--help}'[Show help]' \
                                 '1:name:_files'
                             ;;
@@ -369,21 +378,21 @@ _homelabctl() {
                         esac
                         ;;
                     validate)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
-                            (-e --env)'{-e,--env}[Override environment name]:name:' \
+                            '(-e --env)'{-e,--env}'[Override environment name]:name:' \
                             '*:file:_files'
                         ;;
                     version)
-                        # Shift words array for nested subcommand (depth=2)
-                        words=("${words[1]}" "${words[@]:3}")
-                        (( CURRENT -= 1 ))
+                        # Shift words to remove subcommand path (depth=2)
+                        words=( "${words[@]:2}" )
+                        (( CURRENT -= 2 ))
 
-                        _arguments \
+                        _arguments -s \
                             '(-h --help)'{-h,--help}'[Show help]' \
                             '*:file:_files'
                         ;;
@@ -393,8 +402,11 @@ _homelabctl() {
                     esac
                     ;;
                 vg)
+                    # Shift words to remove subcommand path (depth=1)
+                    words=( "${words[@]:1}" )
+                    (( CURRENT -= 1 ))
 
-                    _arguments \
+                    _arguments -s \
                         '(-h --help)'{-h,--help}'[Show help]' \
                         '*:args:'
                     ;;

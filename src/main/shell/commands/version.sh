@@ -4,7 +4,7 @@
 
 # Application version
 # Update this value when releasing a new version
-declare -gr gr_app_version="v0.1.7"
+declare -gr gr_app_version="v0.1.8"
 
 cmd_version() {
     echo "homelabctl $(radp_get_install_version "${gr_app_version}")"
