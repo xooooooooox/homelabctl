@@ -28,12 +28,12 @@ _setup_get_user_dir() {
 #######################################
 # Get builtin setup directory
 # Globals:
-#   HOMELABCTL_ROOT
+#   RADP_APP_ROOT
 # Returns:
 #   Path to builtin setup directory
 #######################################
 _setup_get_builtin_dir() {
-  echo "${HOMELABCTL_ROOT:-}/src/main/shell/libs/setup"
+  echo "${RADP_APP_ROOT:-}/src/main/shell/libs/setup"
 }
 
 #######################################
