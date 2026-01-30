@@ -390,7 +390,36 @@ _homelabctl_vf_version() {
 }
 
 _homelabctl_vg() {
-    _arguments '(-h --help)'{-h,--help}'[Show help]' '*:args:'
+    # Delegate to vagrant's native completion for consistent experience
+    if (( $+functions[_vagrant] )); then
+        _vagrant "$@"
+    else
+        # Fallback if vagrant completion not loaded
+        local -a vagrant_cmds=(
+            'up:Start and provision VMs'
+            'halt:Stop VMs'
+            'destroy:Destroy VMs'
+            'status:Show VM status'
+            'ssh:SSH into VM'
+            'provision:Run provisioners'
+            'reload:Restart VMs'
+            'suspend:Suspend VMs'
+            'resume:Resume suspended VMs'
+            'snapshot:Manage snapshots'
+        )
+        _arguments -s \
+            '1: :->vagrant_cmd' \
+            '*:: :->vagrant_args'
+
+        case "$state" in
+            vagrant_cmd)
+                _describe -t commands 'vagrant command' vagrant_cmds
+                ;;
+            vagrant_args)
+                _files
+                ;;
+        esac
+    fi
 }
 
 _homelabctl() {
