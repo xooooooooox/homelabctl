@@ -4,7 +4,6 @@
 
 radp:
   env: default
-
   # Framework settings override (optional)
   fw:
     banner-mode: off
@@ -17,12 +16,11 @@ radp:
         enabled: false
     user:
       config:
-        automap: true  # Auto-generate config.sh from radp.extend.*
-
+        automap: true # Auto-generate config.sh from radp.extend.*
   # Application-specific extensions
   # Variables defined here will be available as gr_radp_extend_* in shell
   extend:
     homelabctl:
       # Version - single source of truth for release management
       # Available as $gr_radp_extend_homelabctl_version in shell
-      version: v0.1.6
+      version: v0.1.7
