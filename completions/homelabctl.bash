@@ -233,7 +233,7 @@ _homelabctl() {
                 _vagrant
             else
                 # Fallback if vagrant completion not loaded
-                local vagrant_cmds="up halt destroy status ssh provision reload suspend resume snapshot box snapshot plugin validate"
+                local vagrant_cmds="up halt destroy status ssh provision reload suspend resume snapshot box plugin validate"
                 COMPREPLY=($(compgen -W "$vagrant_cmds" -- "$cur"))
             fi
             ;;
