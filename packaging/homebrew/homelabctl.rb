@@ -21,8 +21,12 @@ class Homelabctl < Formula
   depends_on "xooooooooox/radp/radp-bash-framework"
 
   def install
-    # Install to libexec
-    libexec.install "bin", "src"
+    # Install to libexec, excluding IDE support files
+    libexec.install "bin"
+    libexec.install "src"
+
+    # Remove IDE support files (development only, not needed at runtime)
+    Dir.glob(libexec/"src/**/_ide*.sh").each { |f| rm f }
 
     # Create wrapper script that sets up paths
     (bin/"homelabctl").write <<~EOS

@@ -692,6 +692,9 @@ install_manual() {
   cp -R "${src_root}/bin" "${install_dir}/"
   cp -R "${src_root}/src" "${install_dir}/"
 
+  # Remove IDE support files (development only, not needed at runtime)
+  find "${install_dir}/src" -name "_ide*.sh" -delete 2>/dev/null || true
+
   chmod 0755 "${install_dir}/bin/homelabctl"
   find "${install_dir}/src" -type f -name "*.sh" -exec chmod 0755 {} \;
 
