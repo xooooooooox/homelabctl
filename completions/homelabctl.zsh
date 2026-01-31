@@ -54,6 +54,13 @@ _homelabctl_completion() {
         '1:shell:_files'
 }
 
+_homelabctl_info() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-j --json)'{-j,--json}'[Output as JSON]' \
+        '*:file:_files'
+}
+
 _homelabctl_setup() {
     local context state state_descr line
     typeset -A opt_args
@@ -275,45 +282,8 @@ _homelabctl_version() {
         '*:file:_files'
 }
 
-_homelabctl_info() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '(-j --json)'{-j,--json}'[Output as JSON]' \
-        '*:file:_files'
-}
-
 _homelabctl_vf() {
-    # Delegate to radp-vf's native completion for consistent experience
-    if (( $+functions[_radp_vf] )); then
-        _radp_vf "$@"
-    else
-        # Fallback if radp-vf completion not loaded
-        local -a radp_vf_cmds=(
-            'init:Initialize a new project with sample configuration'
-            'vg:Run vagrant command with framework'
-            'list:List clusters and guests from configuration'
-            'dump-config:Dump merged configuration'
-            'generate:Generate standalone Vagrantfile'
-            'validate:Validate YAML configuration files'
-            'info:Show environment and configuration info'
-            'template:Manage project templates'
-            'completion:Generate shell completion script'
-            'version:Show version'
-            'help:Show help'
-        )
-        _arguments -s \
-            '1: :->radp_vf_cmd' \
-            '*:: :->radp_vf_args'
-
-        case "$state" in
-            radp_vf_cmd)
-                _describe -t commands 'radp-vf command' radp_vf_cmds
-                ;;
-            radp_vf_args)
-                _files
-                ;;
-        esac
-    fi
+    _arguments '(-h --help)'{-h,--help}'[Show help]' '*:args:'
 }
 
 _homelabctl() {
@@ -354,3 +324,37 @@ _homelabctl() {
 }
 
 _homelabctl "$@"
+
+# Override _homelabctl_vg to delegate to vagrant's native completion
+_homelabctl_vg() {
+    # Delegate to vagrant's native completion for consistent experience
+    if (( $+functions[_vagrant] )); then
+        _vagrant "$@"
+    else
+        # Fallback if vagrant completion not loaded
+        local -a vagrant_cmds=(
+            'up:Start and provision VMs'
+            'halt:Stop VMs'
+            'destroy:Destroy VMs'
+            'status:Show VM status'
+            'ssh:SSH into VM'
+            'provision:Run provisioners'
+            'reload:Restart VMs'
+            'suspend:Suspend VMs'
+            'resume:Resume suspended VMs'
+            'snapshot:Manage snapshots'
+        )
+        _arguments -s \
+            '1: :->vagrant_cmd' \
+            '*:: :->vagrant_args'
+
+        case "$state" in
+            vagrant_cmd)
+                _describe -t commands 'vagrant command' vagrant_cmds
+                ;;
+            vagrant_args)
+                _files
+                ;;
+        esac
+    fi
+}
