@@ -415,7 +415,7 @@ _homelabctl() {
                 'setup:Manage setup'
                 'version:Show version information'
                 'vf:Manage vf'
-                'vg:Run vagrant commands (passthrough to vagrant)'
+                'vg:Run vagrant commands (passthrough to radp-vf vg)'
             )
             _describe 'command' commands
             ;;
