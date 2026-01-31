@@ -14,5 +14,7 @@ override_dh_auto_install:
 
 override_dh_fixperms:
 	dh_fixperms
+	# Remove IDE support files (development only, not needed at runtime)
+	find debian/homelabctl/usr/lib/homelabctl/src -name "_ide*.sh" -delete 2>/dev/null || true
 	chmod 0755 debian/homelabctl/usr/lib/homelabctl/bin/homelabctl
 	find debian/homelabctl/usr/lib/homelabctl/src -type f -name '*.sh' -exec chmod 0755 {} \;

@@ -63,13 +63,13 @@ class Homelabctl < Formula
           zinit snippet #{HOMEBREW_PREFIX}/share/zsh/site-functions/_homelabctl
 
         For Oh-My-Zsh users:
-          ln -sf #{HOMEBREW_PREFIX}/share/zsh/site-functions/_homelabctl \\
+          ln -sf #{HOMEBREW_PREFIX}/share/zsh/site-functions/_homelabctl \
             ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/homelabctl/_homelabctl
 
         For Bash:
           brew install bash-completion@2
           # Add to ~/.bash_profile or ~/.bashrc:
-          [[ -r "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]] && \\
+          [[ -r "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]] && \
             source "#{HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
 
         Alternative - Dynamic completion (always up-to-date):
@@ -78,8 +78,6 @@ class Homelabctl < Formula
 
       Quick start:
         homelabctl --help
-        homelabctl vf init myproject
-        homelabctl vg status
     EOS
   end
 

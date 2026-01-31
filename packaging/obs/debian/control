@@ -10,7 +10,7 @@ Rules-Requires-Root: no
 Package: homelabctl
 Architecture: all
 Depends: ${misc:Depends}, bash, coreutils, radp-bash-framework
-Description: CLI tool for managing homelab infrastructure.
+Description: CLI tool built with radp-bash-framework.
  homelabctl is a CLI tool for managing homelab infrastructure, built on top of
  radp-bash-framework. It provides a unified interface for orchestrating various
  homelab components including Vagrant-based virtual machines.
