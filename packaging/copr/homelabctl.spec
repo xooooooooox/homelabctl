@@ -41,6 +41,9 @@ mkdir -p %{buildroot}%{_libdir}/homelabctl
 cp -a bin %{buildroot}%{_libdir}/homelabctl/
 cp -a src %{buildroot}%{_libdir}/homelabctl/
 
+# Remove IDE support files (development only, not needed at runtime)
+find %{buildroot}%{_libdir}/homelabctl/src -name "_ide*.sh" -delete
+
 # Ensure executables
 chmod 0755 %{buildroot}%{_libdir}/homelabctl/bin/homelabctl
 find %{buildroot}%{_libdir}/homelabctl/src -type f -name "*.sh" -exec chmod 0755 {} \;
