@@ -105,7 +105,14 @@ cmd_setup_profile_apply() {
     local dep_pkg
     for dep_pkg in "${pkg_install_order[@]}"; do
       # Skip if already installed in this session
-      [[ -n "${already_installed_in_session[$dep_pkg]:-}" ]] && continue
+      if [[ -n "${already_installed_in_session[$dep_pkg]:-}" ]]; then
+        # If this is the target package (not a dependency), count it as installed
+        if [[ "$dep_pkg" == "$pkg_name" ]]; then
+          ((++installed))
+          radp_log_info "[$((installed + failed + skipped))/$total] $pkg_name already installed (as dependency)"
+        fi
+        continue
+      fi
 
       # Skip already installed deps (but not the target package unless --skip-installed)
       if [[ "$dep_pkg" != "$pkg_name" ]]; then
