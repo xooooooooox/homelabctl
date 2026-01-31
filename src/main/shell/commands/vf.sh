@@ -26,6 +26,12 @@ cmd_vf() {
   radp_vf="radp-vf"
 
   # Pass through to radp-vf
+  if [[ -n "$gr_radp_extend_homelabctl_vf_config_base_filename" ]]; then
+    export RADP_VAGRANT_CONFIG_BASE_FILENAME="$gr_radp_extend_homelabctl_vf_config_base_filename"
+  fi
+  if [[ -n "$gr_radp_extend_homelabctl_vf_env" ]]; then
+      export RADP_VAGRANT_ENV="$gr_radp_extend_homelabctl_vf_env"
+  fi
   if [[ -n "$gr_radp_extend_homelabctl_vf_config_dir" ]]; then
     exec "$radp_vf" -c "$gr_radp_extend_homelabctl_vf_config_dir" "$@"
   else
