@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.1.17
+
+### fix
+
+- fix setup install lsp
+
 ## v0.1.16
 
 ### feat
