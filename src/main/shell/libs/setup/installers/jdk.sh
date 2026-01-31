@@ -87,6 +87,12 @@ _setup_jdk_via_vfox() {
   java_bin=$(_setup_vfox_find_sdk_bin "java" "java")
   [[ -n "$java_bin" ]] && export JAVA_HOME="${java_bin%/bin}"
   _setup_vfox_refresh_path
+
+  # Verify java is available, if not, explicitly add to PATH
+  if ! command -v java &>/dev/null && [[ -n "$java_bin" ]]; then
+    export PATH="$java_bin:$PATH"
+    hash -r 2>/dev/null || true
+  fi
 }
 
 _setup_jdk_via_sdkman() {

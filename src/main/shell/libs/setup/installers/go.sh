@@ -47,6 +47,16 @@ _setup_go_via_vfox() {
   vfox use --global "golang@$version" 2>/dev/null || true
   _setup_vfox_add_sdk_to_path "golang" "go"
   _setup_vfox_refresh_path
+
+  # Verify go is available, if not, explicitly find and add to PATH
+  if ! command -v go &>/dev/null; then
+    local go_bin_dir
+    go_bin_dir=$(_setup_vfox_find_sdk_bin "golang" "go")
+    if [[ -n "$go_bin_dir" ]]; then
+      export PATH="$go_bin_dir:$PATH"
+      hash -r 2>/dev/null || true
+    fi
+  fi
 }
 
 _setup_go_from_official() {

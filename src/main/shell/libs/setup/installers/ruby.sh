@@ -66,4 +66,14 @@ _setup_ruby_via_vfox() {
   vfox use --global "ruby@$version" 2>/dev/null || true
   _setup_vfox_add_sdk_to_path "ruby" "ruby"
   _setup_vfox_refresh_path
+
+  # Verify ruby is available, if not, explicitly find and add to PATH
+  if ! command -v ruby &>/dev/null; then
+    local ruby_bin_dir
+    ruby_bin_dir=$(_setup_vfox_find_sdk_bin "ruby" "ruby")
+    if [[ -n "$ruby_bin_dir" ]]; then
+      export PATH="$ruby_bin_dir:$PATH"
+      hash -r 2>/dev/null || true
+    fi
+  fi
 }

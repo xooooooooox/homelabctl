@@ -72,6 +72,16 @@ _setup_nodejs_via_vfox() {
   vfox use --global "nodejs@$version" 2>/dev/null || true
   _setup_vfox_add_sdk_to_path "nodejs" "node"
   _setup_vfox_refresh_path
+
+  # Verify node is available, if not, explicitly find and add to PATH
+  if ! command -v node &>/dev/null; then
+    local nodejs_bin_dir
+    nodejs_bin_dir=$(_setup_vfox_find_sdk_bin "nodejs" "node")
+    if [[ -n "$nodejs_bin_dir" ]]; then
+      export PATH="$nodejs_bin_dir:$PATH"
+      hash -r 2>/dev/null || true
+    fi
+  fi
 }
 
 _setup_nodejs_via_nvm() {

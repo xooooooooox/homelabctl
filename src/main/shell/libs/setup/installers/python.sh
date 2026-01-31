@@ -64,4 +64,14 @@ _setup_python_via_vfox() {
   vfox use --global "python@$version" 2>/dev/null || true
   _setup_vfox_add_sdk_to_path "python" "python3"
   _setup_vfox_refresh_path
+
+  # Verify python3 is available, if not, explicitly find and add to PATH
+  if ! command -v python3 &>/dev/null; then
+    local python_bin_dir
+    python_bin_dir=$(_setup_vfox_find_sdk_bin "python" "python3")
+    if [[ -n "$python_bin_dir" ]]; then
+      export PATH="$python_bin_dir:$PATH"
+      hash -r 2>/dev/null || true
+    fi
+  fi
 }

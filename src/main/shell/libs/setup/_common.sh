@@ -140,7 +140,12 @@ _setup_vfox_find_sdk_bin() {
   if [[ -d "$vfox_home/cache/$sdk_name" ]]; then
     local found_bin
     if [[ -n "$check_binary" ]]; then
-      found_bin=$(find "$vfox_home/cache/$sdk_name" -type f -name "$check_binary" -perm -111 2>/dev/null | head -1)
+      # Use -executable for GNU find, fallback to -perm /111 for POSIX compatibility
+      found_bin=$(find "$vfox_home/cache/$sdk_name" -type f -name "$check_binary" -executable 2>/dev/null | head -1)
+      if [[ -z "$found_bin" ]]; then
+        # Fallback: use -perm /111 (any execute bit set) instead of -perm -111 (all execute bits)
+        found_bin=$(find "$vfox_home/cache/$sdk_name" -type f -name "$check_binary" -perm /111 2>/dev/null | head -1)
+      fi
       if [[ -n "$found_bin" ]]; then
         dirname "$found_bin"
         return 0
