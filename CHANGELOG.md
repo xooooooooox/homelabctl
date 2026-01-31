@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.1.20
+
+### fix
+
+- homelabctl completion
+
+### docs
+
+- update changelog
+
 ## v0.1.21
 
 ### feat
