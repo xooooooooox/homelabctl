@@ -53,6 +53,9 @@ _homelabctl() {
         'completion')
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
+        'info')
+            COMPREPLY=($(compgen -W "--help -j --json" -- "$cur"))
+            ;;
         'setup')
             COMPREPLY=($(compgen -W "configure deps info install list profile  --help" -- "$cur"))
             ;;
@@ -208,39 +211,8 @@ _homelabctl() {
         'version')
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
-        'info')
-            COMPREPLY=($(compgen -W "--help -j --json" -- "$cur"))
-            ;;
         'vf')
-            # Delegate to radp-vf's native completion for consistent experience
-            if type _radp_vf &>/dev/null; then
-                # Shift words to simulate radp-vf being called directly
-                local radp_vf_words=("radp-vf" "${words[@]:2}")
-                local radp_vf_cword=$((cword - 1))
-                COMP_WORDS=("${radp_vf_words[@]}")
-                COMP_CWORD=$radp_vf_cword
-                COMP_LINE="${radp_vf_words[*]}"
-                COMP_POINT=${#COMP_LINE}
-                _radp_vf
-            else
-                # Fallback if radp-vf completion not loaded
-                local radp_vf_cmds="init vg list dump-config generate validate info template completion version help"
-                COMPREPLY=($(compgen -W "$radp_vf_cmds" -- "$cur"))
-            fi
-            ;;
-        vf\ *)
-            # Delegate vf subcommands to radp-vf completion
-            if type _radp_vf &>/dev/null; then
-                local radp_vf_words=("radp-vf" "${words[@]:2}")
-                local radp_vf_cword=$((cword - 1))
-                COMP_WORDS=("${radp_vf_words[@]}")
-                COMP_CWORD=$radp_vf_cword
-                COMP_LINE="${radp_vf_words[*]}"
-                COMP_POINT=${#COMP_LINE}
-                _radp_vf
-            else
-                COMPREPLY=()
-            fi
+            COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         *)
             COMPREPLY=()
