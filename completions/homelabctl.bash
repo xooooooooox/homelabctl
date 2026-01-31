@@ -54,7 +54,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
         'setup')
-            COMPREPLY=($(compgen -W "configure info install list profile  --help" -- "$cur"))
+            COMPREPLY=($(compgen -W "configure deps info install list profile  --help" -- "$cur"))
             ;;
         'setup configure')
             COMPREPLY=($(compgen -W "chrony expand-lvm gpg-import gpg-preset list yadm  --help" -- "$cur"))
@@ -77,6 +77,27 @@ _homelabctl() {
         'setup configure yadm')
             COMPREPLY=($(compgen -W "--help -r --repo-url -c --class -h --https-user -h --https-token -h --https-token-file -s --ssh-key-file -s --ssh-host -s --ssh-port -u --user" -- "$cur"))
             ;;
+        'setup deps')
+            # 计算参数位置（减去命令路径深度）
+            local arg_idx=0
+            for ((i = 1; i < cword; i++)); do
+                case "${words[i]}" in
+                    -*) ;;
+                    *) ((arg_idx++)) ;;
+                esac
+            done
+            ((arg_idx -= 2)) || true
+            # 根据参数位置补全
+            case "$arg_idx" in
+                0)
+                    local completions
+                    completions=$(_homelabctl_complete_packages 2>/dev/null)
+                    COMPREPLY=($(compgen -W "$completions" -- "$cur"))
+                    return
+                    ;;
+            esac
+            COMPREPLY=($(compgen -W "--help -r --reverse" -- "$cur"))
+            ;;
         'setup info')
             # 计算参数位置（减去命令路径深度）
             local arg_idx=0
@@ -96,7 +117,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help -a --all-platforms" -- "$cur"))
             ;;
         'setup install')
             # 计算参数位置（减去命令路径深度）
@@ -117,7 +138,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help -v --version -d --dry-run" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help -v --version -d --dry-run -n --no-deps" -- "$cur"))
             ;;
         'setup list')
             case "$prev" in
@@ -158,7 +179,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help -d --dry-run -c --continue -s --skip-installed" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help -d --dry-run -c --continue -s --skip-installed -n --no-deps" -- "$cur"))
             ;;
         'setup profile list')
             COMPREPLY=($(compgen -W "--help -n --names-only" -- "$cur"))
