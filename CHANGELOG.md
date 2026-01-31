@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.1.16
+## v0.1.17
 
 ### feat
 
@@ -40,7 +40,11 @@
 - Fix tmux not working on CentOS Stream 9 due to missing perl dependency
 - Fix zsh completion not showing package names for `setup install <tab>` (banner/log output was breaking completion)
 - Fix apply.sh interrupt after package installed
-- Fix installer.sh
+- Fix vfox-installed SDKs not available in PATH for subsequent installers
+    - Problem: `vfox use --global` requires hook support and doesn't work in non-interactive scripts, causing nodejs/jdk/go/python/ruby binaries to be missing from PATH
+    - Solution: Add verification step after vfox operations to explicitly find and add SDK bin directory to PATH if the binary is not found
+    - Affected installers: nodejs.sh, jdk.sh, go.sh, python.sh, ruby.sh
+- Improve `_setup_vfox_find_sdk_bin` to use `-executable` flag with fallback to `-perm /111` for better compatibility
 
 ### refactor
 
