@@ -1,12 +1,12 @@
-# recommend Development Environment Profile
-name: recommend
-desc: Recommend development environment with essential packages
+# recommend-linux Development Environment Profile
+name: recommend-linux
+desc: Recommend development environment with essential packages (Linux)
 # platform: any | linux | darwin | freebsd | ...
 # - any: all platforms (default)
 # - linux: Linux only
 # - darwin: macOS only
 # - other values from `uname -s` (lowercased)
-platform: any
+platform: linux
 
 packages:
   # Version control
@@ -27,6 +27,7 @@ packages:
   # Shell enhancements
   - name: zoxide
   - name: fzf
+  - name: fzf-tab-completion
   - name: fd
   - name: jq
   - name: bat
