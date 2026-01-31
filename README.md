@@ -99,26 +99,27 @@ homelabctl setup profile apply recommend
 
 # Manage Vagrant VMs (requires radp-vagrant-framework)
 homelabctl vf init myproject --template k8s-cluster
-homelabctl vg up
+homelabctl vf vg up
 ```
 
 ## Commands
 
-### Vagrant Integration (vg, vf)
+### Vagrant Integration (vf)
 
-| Command                 | Description                     |
-|-------------------------|---------------------------------|
-| `vg <cmd>`              | Vagrant command passthrough     |
-| `vf init [dir]`         | Initialize a vagrant project    |
-| `vf list`               | List clusters and guests        |
-| `vf info`               | Show environment information    |
-| `vf validate`           | Validate YAML configuration     |
-| `vf dump-config`        | Export merged configuration     |
-| `vf generate`           | Generate standalone Vagrantfile |
-| `vf template list/show` | List or show templates          |
-| `vf version`            | Show framework version          |
+| Command                 | Description                      |
+|-------------------------|----------------------------------|
+| `vf vg <cmd>`           | Vagrant command passthrough      |
+| `vf init [dir]`         | Initialize a vagrant project     |
+| `vf list`               | List clusters and guests         |
+| `vf info`               | Show radp-vagrant-framework info |
+| `vf validate`           | Validate YAML configuration      |
+| `vf dump-config`        | Export merged configuration      |
+| `vf generate`           | Generate standalone Vagrantfile  |
+| `vf template list/show` | List or show templates           |
+| `vf version`            | Show framework version           |
 
-Requires [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework). See [Vagrant Guide](docs/vagrant-guide.md) for details.
+Requires [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework).
+See [Vagrant Guide](docs/vagrant-guide.md) for details.
 
 ### Software Setup (setup)
 

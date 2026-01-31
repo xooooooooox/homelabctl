@@ -17,21 +17,24 @@ export PATH="/path/to/radp-bash-framework/src/main/shell/bin:$PATH"
 export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 
 ./bin/homelabctl --help
-./bin/homelabctl vf info
-./bin/homelabctl vg up
+./bin/homelabctl info
+./bin/homelabctl vf list
+./bin/homelabctl vf vg up
 ```
 
 ### Available Commands
-- `vg <cmd>` - Vagrant command passthrough (sets VAGRANT_VAGRANTFILE automatically)
-- `vf init` - Initialize a vagrant project (supports -t/--template, --set options)
-- `vf info` - Show environment information (versions, paths, plugins)
-- `vf list` - List clusters and guests (supports -v, --provisions, --synced-folders, --triggers)
-- `vf validate` - Validate YAML configuration files
-- `vf dump-config` - Export merged configuration (JSON/YAML, supports -f and -o options)
-- `vf generate` - Generate standalone Vagrantfile
-- `vf template list` - List available project templates
-- `vf template show` - Show template details and variables
-- `vf version` - Show radp-vagrant-framework version
+- `info` - Show homelabctl environment information (versions, paths, plugins)
+- `vf <cmd>` - Passthrough to radp-vf (all radp-vagrant-framework commands)
+  - `vf init` - Initialize a vagrant project (supports -t/--template, --set options)
+  - `vf info` - Show radp-vagrant-framework info
+  - `vf list` - List clusters and guests (supports -v, --provisions, --synced-folders, --triggers)
+  - `vf validate` - Validate YAML configuration files
+  - `vf dump-config` - Export merged configuration (JSON/YAML, supports -f and -o options)
+  - `vf generate` - Generate standalone Vagrantfile
+  - `vf template list` - List available project templates
+  - `vf template show` - Show template details and variables
+  - `vf version` - Show radp-vagrant-framework version
+  - `vf vg <cmd>` - Run vagrant commands (e.g., `vf vg up`, `vf vg status`)
 - `setup install <name>` - Install a software package (-v version, --dry-run, --no-deps)
 - `setup list` - List available packages (-c category, --installed, --categories)
 - `setup info <name>` - Show package details (includes dependencies and conflicts)
@@ -60,18 +63,8 @@ homelabctl/
 │   └── homelabctl.zsh          # Zsh completion script
 ├── src/main/shell/
 │   ├── commands/               # Command implementations
-│   │   ├── vg.sh               # homelabctl vg <cmd>
-│   │   ├── vf/                 # homelabctl vf <subcommand>
-│   │   │   ├── init.sh
-│   │   │   ├── info.sh
-│   │   │   ├── list.sh
-│   │   │   ├── validate.sh
-│   │   │   ├── dump-config.sh
-│   │   │   ├── generate.sh
-│   │   │   ├── template/       # homelabctl vf template <subcommand>
-│   │   │   │   ├── list.sh
-│   │   │   │   └── show.sh
-│   │   │   └── version.sh
+│   │   ├── info.sh             # homelabctl info (environment info)
+│   │   ├── vf.sh               # homelabctl vf <cmd> (passthrough to radp-vf)
 │   │   ├── setup/              # homelabctl setup <subcommand>
 │   │   │   ├── install.sh
 │   │   │   ├── list.sh
@@ -213,8 +206,8 @@ cmd_vf_init() {
 
 ## Dependencies
 - radp-bash-framework (required) - CLI framework
-- radp-vagrant-framework (for vf commands) - set `RADP_VF_HOME` env var
-- vagrant (for vg commands) - Vagrant CLI
+- radp-vagrant-framework (for vf commands) - set `RADP_VF_HOME` env var or install in PATH
+- vagrant (for vf vg commands) - Vagrant CLI
 
 ## Environment Variables
 - `RADP_VF_HOME` - Path to radp-vagrant-framework (required for vf commands)

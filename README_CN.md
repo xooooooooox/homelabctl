@@ -97,24 +97,24 @@ homelabctl setup profile apply recommend
 
 # 管理 Vagrant 虚拟机（需要 radp-vagrant-framework）
 homelabctl vf init myproject --template k8s-cluster
-homelabctl vg up
+homelabctl vf vg up
 ```
 
 ## 命令
 
-### Vagrant 集成 (vg, vf)
+### Vagrant 集成 (vf)
 
-| 命令                      | 描述               |
-|-------------------------|------------------|
-| `vg <cmd>`              | Vagrant 命令透传     |
-| `vf init [dir]`         | 初始化 Vagrant 项目   |
-| `vf list`               | 列出集群和虚拟机         |
-| `vf info`               | 显示环境信息           |
-| `vf validate`           | 验证 YAML 配置       |
-| `vf dump-config`        | 导出合并后的配置         |
-| `vf generate`           | 生成独立 Vagrantfile |
-| `vf template list/show` | 列出或显示模板          |
-| `vf version`            | 显示框架版本           |
+| 命令                      | 描述                            |
+|-------------------------|-------------------------------|
+| `vf vg <cmd>`           | Vagrant 命令透传                  |
+| `vf init [dir]`         | 初始化 Vagrant 项目                |
+| `vf list`               | 列出集群和虚拟机                      |
+| `vf info`               | 显示 radp-vagrant-framework 信息  |
+| `vf validate`           | 验证 YAML 配置                    |
+| `vf dump-config`        | 导出合并后的配置                      |
+| `vf generate`           | 生成独立 Vagrantfile              |
+| `vf template list/show` | 列出或显示模板                       |
+| `vf version`            | 显示框架版本                        |
 
 需要安装 [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework)。详情请参阅 [Vagrant 指南](docs/vagrant-guide.md)。
 

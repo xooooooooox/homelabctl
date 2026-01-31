@@ -48,7 +48,7 @@ _homelabctl() {
     # Command completions
     case "$cmd_path" in
         '')
-            COMPREPLY=($(compgen -W "completion setup version vf vg  -q --quiet -v --verbose --debug --config --help --version" -- "$cur"))
+            COMPREPLY=($(compgen -W "completion info setup version vf  -q --quiet -v --verbose --debug --config --help --version" -- "$cur"))
             ;;
         'completion')
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
@@ -208,54 +208,38 @@ _homelabctl() {
         'version')
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
+        'info')
+            COMPREPLY=($(compgen -W "--help -j --json" -- "$cur"))
+            ;;
         'vf')
-            COMPREPLY=($(compgen -W "dump-config generate info init list template validate version  --help" -- "$cur"))
-            ;;
-        'vf dump-config')
-            COMPREPLY=($(compgen -W "--help -e --env -f --format -o --output" -- "$cur"))
-            ;;
-        'vf generate')
-            COMPREPLY=($(compgen -W "--help -e --env" -- "$cur"))
-            ;;
-        'vf info')
-            COMPREPLY=($(compgen -W "--help -e --env -j --json" -- "$cur"))
-            ;;
-        'vf init')
-            COMPREPLY=($(compgen -W "--help -t --template -s --set" -- "$cur"))
-            ;;
-        'vf list')
-            COMPREPLY=($(compgen -W "--help -e --env -v --verbose -p --provisions -s --synced-folders -t --triggers" -- "$cur"))
-            ;;
-        'vf template')
-            COMPREPLY=($(compgen -W "list show  --help" -- "$cur"))
-            ;;
-        'vf template list')
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
-            ;;
-        'vf template show')
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
-            ;;
-        'vf validate')
-            COMPREPLY=($(compgen -W "--help -e --env" -- "$cur"))
-            ;;
-        'vf version')
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
-            ;;
-        'vg')
-            # Delegate to vagrant's native completion for consistent experience
-            if type _vagrant &>/dev/null; then
-                # Shift words to simulate vagrant being called directly
-                local vagrant_words=("vagrant" "${words[@]:2}")
-                local vagrant_cword=$((cword - 1))
-                COMP_WORDS=("${vagrant_words[@]}")
-                COMP_CWORD=$vagrant_cword
-                COMP_LINE="${vagrant_words[*]}"
+            # Delegate to radp-vf's native completion for consistent experience
+            if type _radp_vf &>/dev/null; then
+                # Shift words to simulate radp-vf being called directly
+                local radp_vf_words=("radp-vf" "${words[@]:2}")
+                local radp_vf_cword=$((cword - 1))
+                COMP_WORDS=("${radp_vf_words[@]}")
+                COMP_CWORD=$radp_vf_cword
+                COMP_LINE="${radp_vf_words[*]}"
                 COMP_POINT=${#COMP_LINE}
-                _vagrant
+                _radp_vf
             else
-                # Fallback if vagrant completion not loaded
-                local vagrant_cmds="up halt destroy status ssh provision reload suspend resume snapshot box plugin validate"
-                COMPREPLY=($(compgen -W "$vagrant_cmds" -- "$cur"))
+                # Fallback if radp-vf completion not loaded
+                local radp_vf_cmds="init vg list dump-config generate validate info template completion version help"
+                COMPREPLY=($(compgen -W "$radp_vf_cmds" -- "$cur"))
+            fi
+            ;;
+        vf\ *)
+            # Delegate vf subcommands to radp-vf completion
+            if type _radp_vf &>/dev/null; then
+                local radp_vf_words=("radp-vf" "${words[@]:2}")
+                local radp_vf_cword=$((cword - 1))
+                COMP_WORDS=("${radp_vf_words[@]}")
+                COMP_CWORD=$radp_vf_cword
+                COMP_LINE="${radp_vf_words[*]}"
+                COMP_POINT=${#COMP_LINE}
+                _radp_vf
+            else
+                COMPREPLY=()
             fi
             ;;
         *)

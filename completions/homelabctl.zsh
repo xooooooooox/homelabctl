@@ -275,138 +275,45 @@ _homelabctl_version() {
         '*:file:_files'
 }
 
-_homelabctl_vf() {
-    local context state state_descr line
-    typeset -A opt_args
-
-    _arguments -C \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '1: :->command' \
-        '*:: :->args'
-
-    case "$state" in
-        command)
-            local commands=(
-                'dump-config:Export merged configuration'
-                'generate:Generate standalone Vagrantfile'
-                'info:Show current environment information'
-                'init:Initialize a new radp-vagrant-framework project'
-                'list:List clusters and guests from configuration'
-                'template:Manage template'
-                'validate:Validate YAML configuration files'
-                'version:Show radp-vagrant-framework version'
-            )
-            _describe 'subcommand' commands
-            ;;
-        args)
-            local cmd_func="_homelabctl_vf_${words[1]//-/_}"
-            if (( $+functions[$cmd_func] )); then
-                $cmd_func
-            else
-                _files
-            fi
-            ;;
-    esac
-}
-
-_homelabctl_vf_dump_config() {
+_homelabctl_info() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-        '(-f --format)'{-f,--format}'[Output format (json or yaml, default: json)]:format:' \
-        '(-o --output)'{-o,--output}'[Output file path]:file:' \
-        '1:filter:_files'
-}
-
-_homelabctl_vf_generate() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-        '1:output:_files'
-}
-
-_homelabctl_vf_info() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '(-e --env)'{-e,--env}'[Environment name]:name:' \
         '(-j --json)'{-j,--json}'[Output as JSON]' \
         '*:file:_files'
 }
 
-_homelabctl_vf_init() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '(-t --template)'{-t,--template}'[Use a template (default: base)]:name:' \
-        '(-s --set)'{-s,--set}'[]:var:' \
-        '1:dir:_files'
-}
+_homelabctl_vf() {
+    # Delegate to radp-vf's native completion for consistent experience
+    if (( $+functions[_radp_vf] )); then
+        _radp_vf "$@"
+    else
+        # Fallback if radp-vf completion not loaded
+        local -a radp_vf_cmds=(
+            'init:Initialize a new project with sample configuration'
+            'vg:Run vagrant command with framework'
+            'list:List clusters and guests from configuration'
+            'dump-config:Dump merged configuration'
+            'generate:Generate standalone Vagrantfile'
+            'validate:Validate YAML configuration files'
+            'info:Show environment and configuration info'
+            'template:Manage project templates'
+            'completion:Generate shell completion script'
+            'version:Show version'
+            'help:Show help'
+        )
+        _arguments -s \
+            '1: :->radp_vf_cmd' \
+            '*:: :->radp_vf_args'
 
-_homelabctl_vf_list() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-        '(-v --verbose)'{-v,--verbose}'[Show detailed info (box, network, provisions, etc.)]' \
-        '(-p --provisions)'{-p,--provisions}'[Show provisions only]' \
-        '(-s --synced-folders)'{-s,--synced-folders}'[Show synced folders only]' \
-        '(-t --triggers)'{-t,--triggers}'[Show triggers only]' \
-        '1:filter:_files'
-}
-
-_homelabctl_vf_template() {
-    local context state state_descr line
-    typeset -A opt_args
-
-    _arguments -C \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '1: :->command' \
-        '*:: :->args'
-
-    case "$state" in
-        command)
-            local commands=(
-                'list:List available project templates'
-                'show:Show template details and variables'
-            )
-            _describe 'subcommand' commands
-            ;;
-        args)
-            local cmd_func="_homelabctl_vf_template_${words[1]//-/_}"
-            if (( $+functions[$cmd_func] )); then
-                $cmd_func
-            else
+        case "$state" in
+            radp_vf_cmd)
+                _describe -t commands 'radp-vf command' radp_vf_cmds
+                ;;
+            radp_vf_args)
                 _files
-            fi
-            ;;
-    esac
-}
-
-_homelabctl_vf_template_list() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '*:file:_files'
-}
-
-_homelabctl_vf_template_show() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '1:name:_files'
-}
-
-_homelabctl_vf_validate() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '(-e --env)'{-e,--env}'[Override environment name]:name:' \
-        '*:file:_files'
-}
-
-_homelabctl_vf_version() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '*:file:_files'
-}
-
-_homelabctl_vg() {
-    _arguments '(-h --help)'{-h,--help}'[Show help]' '*:args:'
+                ;;
+        esac
+    fi
 }
 
 _homelabctl() {
@@ -428,10 +335,10 @@ _homelabctl() {
         command)
             local commands=(
                 'completion:Generate shell completion script'
+                'info:Show homelabctl environment information'
                 'setup:Manage setup'
                 'version:Show version information'
-                'vf:Manage vf'
-                'vg:Run vagrant commands (passthrough to radp-vf vg)'
+                'vf:Run radp-vagrant-framework commands (passthrough to radp-vf)'
             )
             _describe 'command' commands
             ;;
@@ -447,37 +354,3 @@ _homelabctl() {
 }
 
 _homelabctl "$@"
-
-# Override _homelabctl_vg to delegate to vagrant's native completion
-_homelabctl_vg() {
-    # Delegate to vagrant's native completion for consistent experience
-    if (( $+functions[_vagrant] )); then
-        _vagrant "$@"
-    else
-        # Fallback if vagrant completion not loaded
-        local -a vagrant_cmds=(
-            'up:Start and provision VMs'
-            'halt:Stop VMs'
-            'destroy:Destroy VMs'
-            'status:Show VM status'
-            'ssh:SSH into VM'
-            'provision:Run provisioners'
-            'reload:Restart VMs'
-            'suspend:Suspend VMs'
-            'resume:Resume suspended VMs'
-            'snapshot:Manage snapshots'
-        )
-        _arguments -s \
-            '1: :->vagrant_cmd' \
-            '*:: :->vagrant_args'
-
-        case "$state" in
-            vagrant_cmd)
-                _describe -t commands 'vagrant command' vagrant_cmds
-                ;;
-            vagrant_args)
-                _files
-                ;;
-        esac
-    fi
-}
