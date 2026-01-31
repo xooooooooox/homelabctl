@@ -416,103 +416,30 @@ refresh_cache() {
   esac
 }
 
-# Check if radp-bash-framework is installed
-check_radp_bf_installed() {
-  if have radp-bf; then
-    return 0
-  fi
-  return 1
-}
-
-# Install radp-bash-framework dependency
+# Install radp-bash-framework dependency by delegating to its install.sh
+# Arguments:
+#   $1 - mode: homebrew, dnf, yum, apt, zypper, or manual
 install_radp_bf() {
-  local pkm="$1"
+  local mode="$1"
 
-  if check_radp_bf_installed; then
+  if have radp-bf; then
     log "radp-bash-framework is already installed"
     return 0
   fi
 
   log "Installing radp-bash-framework dependency..."
 
-  case "${pkm}" in
-  homebrew)
-    brew install radp-bash-framework
-    ;;
-  dnf)
-    sudo dnf install -y radp-bash-framework
-    ;;
-  yum)
-    sudo yum install -y radp-bash-framework
-    ;;
-  apt)
-    sudo apt-get install -y radp-bash-framework
-    ;;
-  zypper)
-    sudo zypper install -y radp-bash-framework
-    ;;
-  manual)
-    install_radp_bf_manual
-    ;;
-  *)
-    err "Unknown package manager: ${pkm}"
-    return 1
-    ;;
-  esac
-}
+  local install_url="https://raw.githubusercontent.com/xooooooooox/radp-bash-framework/main/install.sh"
+  local bin_dir="${OPT_BIN_DIR:-$HOME/.local/bin}"
 
-# Install radp-bash-framework manually
-install_radp_bf_manual() {
-  local rbf_repo="xooooooooox/radp-bash-framework"
-  local rbf_install_dir="$HOME/.local/lib/radp-bash-framework"
-  local rbf_bin_dir="${OPT_BIN_DIR:-$HOME/.local/bin}"
-
-  if check_radp_bf_installed; then
-    return 0
+  # Delegate to radp-bash-framework's install.sh with the same mode
+  if have curl; then
+    curl -fsSL "${install_url}" | bash -s -- --mode "${mode}" --bin-dir "${bin_dir}"
+  elif have wget; then
+    wget -qO- "${install_url}" | bash -s -- --mode "${mode}" --bin-dir "${bin_dir}"
+  else
+    die "curl or wget required to install radp-bash-framework"
   fi
-
-  log "Installing radp-bash-framework manually..."
-
-  # Create temp dir if not exists
-  if [[ -z "${tmp_dir:-}" ]]; then
-    tmp_dir="$(mktemp -d 2>/dev/null || mktemp -d -t "radp-bf")"
-    trap cleanup EXIT
-  fi
-
-  # Get latest release tag
-  local api_url="https://api.github.com/repos/${rbf_repo}/releases/latest"
-  local json tag
-  json="$(fetch_text "${FETCH_TOOL}" "${api_url}" || true)"
-  if [[ -z "${json}" ]]; then
-    die "Failed to fetch radp-bash-framework latest release"
-  fi
-  tag="$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' <<<"${json}")"
-  tag="${tag%%$'\n'*}"
-
-  local tar_url="https://github.com/${rbf_repo}/archive/${tag}.tar.gz"
-  local tarball="${tmp_dir}/radp-bash-framework.tar.gz"
-
-  log "Downloading radp-bash-framework ${tag}..."
-  fetch_url "${FETCH_TOOL}" "${tar_url}" "${tarball}" || die "Failed to download radp-bash-framework"
-
-  local tar_listing root_dir
-  tar_listing="$(tar -tzf "${tarball}")"
-  root_dir="${tar_listing%%/*}"
-
-  tar -xzf "${tarball}" -C "${tmp_dir}"
-  local src_root="${tmp_dir}/${root_dir}"
-
-  rm -rf "${rbf_install_dir}"
-  mkdir -p "${rbf_install_dir}"
-  cp -R "${src_root}/src" "${rbf_install_dir}/"
-
-  # Create radp-bf symlink
-  mkdir -p "${rbf_bin_dir}"
-  local launcher="${rbf_install_dir}/src/main/shell/bin/radp-bf"
-  chmod 0755 "${launcher}"
-  ln -sf "${launcher}" "${rbf_bin_dir}/radp-bf"
-
-  log "radp-bash-framework installed to ${rbf_install_dir}"
 }
 
 # Install using package manager
