@@ -46,6 +46,11 @@ packages:
     check-cmd: zoxide
     homepage: https://github.com/ajeetdsouza/zoxide
 
+  fzf-tab-completion:
+    desc: Tab completion using fzf for bash/zsh
+    category: shell
+    homepage: https://github.com/lincheney/fzf-tab-completion
+
   # Editors
   vim:
     desc: Vi improved text editor
