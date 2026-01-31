@@ -58,6 +58,7 @@ packages:
     desc: Terminal multiplexer
     category: shell
     check-cmd: tmux
+    recommends: fzf
     homepage: https://github.com/tmux/tmux
 
   ohmyzsh:
@@ -77,6 +78,7 @@ packages:
     desc: Smarter cd command
     category: shell
     check-cmd: zoxide
+    recommends: fzf
     homepage: https://github.com/ajeetdsouza/zoxide
 
   fzf-tab-completion:
@@ -97,7 +99,7 @@ packages:
     category: editors
     check-cmd: nvim
     homepage: https://neovim.io/
-    recommends: ripgrep
+    recommends: ripgrep fd fzf bat
 
   # Languages and Runtimes
   dotnet-sdk:
@@ -158,6 +160,7 @@ packages:
     desc: Apache Maven build tool
     category: languages
     check-cmd: mvn
+    requires: jdk
     homepage: https://maven.apache.org/
     recommends: vfox
 
@@ -172,12 +175,14 @@ packages:
     desc: Kubernetes package manager
     category: devops
     check-cmd: helm
+    recommends: kubectl
     homepage: https://helm.sh/
 
   kubecm:
     desc: Kubernetes context manager
     category: devops
     check-cmd: kubecm
+    requires: kubectl
     homepage: https://kubecm.cloud/
 
   vagrant:
@@ -202,12 +207,14 @@ packages:
     desc: IT automation platform
     category: devops
     check-cmd: ansible
+    recommends: python
     homepage: https://www.ansible.com/
 
   gitlab-runner:
     desc: GitLab CI/CD runner
     category: devops
     check-cmd: gitlab-runner
+    recommends: git docker
     homepage: https://docs.gitlab.com/runner/
 
   # Version Control and Git Tools
@@ -228,6 +235,7 @@ packages:
     desc: Text-mode interface for git
     category: vcs
     check-cmd: tig
+    requires: git
     homepage: https://jonas.github.io/tig/
 
   git-credential-manager:
@@ -251,6 +259,8 @@ packages:
     desc: Yet Another Dotfiles Manager
     category: vcs
     check-cmd: yadm
+    requires: git
+    recommends: gpg
     homepage: https://yadm.io/
 
   # Security and Cryptography
@@ -264,6 +274,7 @@ packages:
     desc: GPG passphrase entry dialog
     category: security
     check-cmd: pinentry
+    recommends: gpg
     homepage: https://gnupg.org/related_software/pinentry/
 
   pass:
