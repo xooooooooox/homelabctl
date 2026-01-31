@@ -48,7 +48,7 @@ _homelabctl() {
     # Command completions
     case "$cmd_path" in
         '')
-            COMPREPLY=($(compgen -W "completion setup version vf  -q --quiet -v --verbose --debug --config --all --json --help --version" -- "$cur"))
+            COMPREPLY=($(compgen -W "completion setup version vf  -q --quiet -v --verbose --debug --config --all --help --version" -- "$cur"))
             ;;
         'completion')
             COMPREPLY=($(compgen -W "--help" -- "$cur"))

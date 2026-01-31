@@ -292,7 +292,6 @@ _homelabctl() {
         '--debug[Enable debug output]' \
         '--config' \
         '--all' \
-        '--json' \
         '1: :->command' \
         '*:: :->args'
 
