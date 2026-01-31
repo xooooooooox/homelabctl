@@ -185,10 +185,17 @@ packages:
     requires: kubectl
     homepage: https://kubecm.cloud/
 
+  virtualbox:
+    desc: Cross-platform virtualization software
+    category: devops
+    check-cmd: VBoxManage
+    homepage: https://www.virtualbox.org/
+
   vagrant:
     desc: Virtual machine management
     category: devops
     check-cmd: vagrant
+    recommends: virtualbox
     homepage: https://www.vagrantup.com/
 
   docker:

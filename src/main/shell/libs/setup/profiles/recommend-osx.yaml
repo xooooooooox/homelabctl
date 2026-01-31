@@ -1,0 +1,55 @@
+# recommend-linux Development Environment Profile
+name: recommend-osx
+desc: Recommend development environment with essential packages (Linux)
+# platform: any | linux | darwin | freebsd | ...
+# - any: all platforms (default)
+# - linux: Linux only
+# - darwin: macOS only
+# - other values from `uname -s` (lowercased)
+platform: darwin
+
+packages:
+  # Version control
+  - name: git
+  - name: lazygit
+  - name: git-credential-manager
+
+  # Terminal multiplexer
+  - name: tmux
+
+  # Editors
+  - name: vim
+  - name: neovim
+
+  # Security
+  - name: pass
+  - name: gpg
+
+  # Shell enhancements
+  - name: zoxide
+  - name: fzf
+  - name: fzf-tab-completion
+  - name: fd
+  - name: jq
+  - name: bat
+
+  # Version manager
+  - name: vfox
+
+  # Language runtimes (with version)
+  - name: jdk
+    version: "17"
+  - name: nodejs
+    version: "20"
+
+  # Linters
+  - name: markdownlint-cli
+
+  # DevOPS
+  - name: vagrant
+  - name: virtualbox
+  - name: kubectl
+  - name: kubecm
+  - name: helm
+  - name: docker
+
