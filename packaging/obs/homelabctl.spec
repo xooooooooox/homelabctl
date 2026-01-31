@@ -9,7 +9,7 @@
 #----------------------------------------------------------------------------------------------------------------------#
 
 Name:           homelabctl
-Version:        0.1.19
+Version:        0.1.20
 Release:        1%{?dist}
 Summary:        CLI tool for managing homelab infrastructure
 
