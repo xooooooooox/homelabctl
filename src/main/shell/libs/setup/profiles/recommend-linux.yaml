@@ -44,3 +44,6 @@ packages:
 
   # Linters
   - name: markdownlint-cli
+
+  # utilities
+  - name: fastfetch

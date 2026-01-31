@@ -53,3 +53,6 @@ packages:
   - name: helm
   - name: docker
 
+  # utilities
+  - name: fastfetch
+
