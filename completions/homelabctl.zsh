@@ -54,13 +54,6 @@ _homelabctl_completion() {
         '1:shell:_files'
 }
 
-_homelabctl_info() {
-    _arguments -s \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '(-j --json)'{-j,--json}'[Output as JSON]' \
-        '*:file:_files'
-}
-
 _homelabctl_setup() {
     local context state state_descr line
     typeset -A opt_args
@@ -283,6 +276,50 @@ _homelabctl_version() {
 }
 
 _homelabctl_vf() {
+    _arguments '(-h --help)'{-h,--help}'[Show help]' '*:args:'
+}
+
+_homelabctl() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--version[Show version]' \
+        '-q' \
+        '--quiet' \
+        '(-v --verbose)'{-v,--verbose}'[Enable verbose output]' \
+        '--debug[Enable debug output]' \
+        '--config' \
+        '--all' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'completion:Generate shell completion script'
+                'setup:Manage setup'
+                'version:Show version information'
+                'vf:Run radp-vagrant-framework commands (passthrough to radp-vf)'
+            )
+            _describe 'command' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl "$@"
+
+# Override _homelabctl_vf to delegate to radp-vf's native completion
+_homelabctl_vf() {
     # Delegate to radp-vf's native completion for consistent experience
     if (( $+functions[_radp_vf] )); then
         # Shift context to simulate radp-vf being called directly
@@ -344,42 +381,3 @@ _homelabctl_vf() {
         esac
     fi
 }
-
-_homelabctl() {
-    local context state state_descr line
-    typeset -A opt_args
-
-    _arguments -C \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '--version[Show version]' \
-        '-q' \
-        '--quiet' \
-        '(-v --verbose)'{-v,--verbose}'[Enable verbose output]' \
-        '--debug[Enable debug output]' \
-        '--config' \
-        '1: :->command' \
-        '*:: :->args'
-
-    case "$state" in
-        command)
-            local commands=(
-                'completion:Generate shell completion script'
-                'info:Show homelabctl environment information'
-                'setup:Manage setup'
-                'version:Show version information'
-                'vf:Run radp-vagrant-framework commands (passthrough to radp-vf)'
-            )
-            _describe 'command' commands
-            ;;
-        args)
-            local cmd_func="_homelabctl_${words[1]//-/_}"
-            if (( $+functions[$cmd_func] )); then
-                $cmd_func
-            else
-                _files
-            fi
-            ;;
-    esac
-}
-
-_homelabctl "$@"

@@ -17,13 +17,12 @@ export PATH="/path/to/radp-bash-framework/src/main/shell/bin:$PATH"
 export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 
 ./bin/homelabctl --help
-./bin/homelabctl info
+./bin/homelabctl --config
 ./bin/homelabctl vf list
 ./bin/homelabctl vf vg up
 ```
 
 ### Available Commands
-- `info` - Show homelabctl environment information (versions, paths, plugins)
 - `vf <cmd>` - Passthrough to radp-vf (all radp-vagrant-framework commands)
   - `vf init` - Initialize a vagrant project (supports -t/--template, --set options)
   - `vf info` - Show radp-vagrant-framework info
@@ -50,6 +49,9 @@ export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 - `setup configure yadm` - Clone dotfiles repository using yadm
 - `version` - Show homelabctl version
 - `completion <bash|zsh>` - Generate shell completion
+- `--config` - Show homelabctl configuration (global option)
+- `--config --json` - Show configuration in JSON format
+- `--config --all` - Include extension configurations (vf settings, etc.)
 
 ## Architecture
 
@@ -63,7 +65,6 @@ homelabctl/
 │   └── homelabctl.zsh          # Zsh completion script
 ├── src/main/shell/
 │   ├── commands/               # Command implementations
-│   │   ├── info.sh             # homelabctl info (environment info)
 │   │   ├── vf.sh               # homelabctl vf <cmd> (passthrough to radp-vf)
 │   │   ├── setup/              # homelabctl setup <subcommand>
 │   │   │   ├── install.sh

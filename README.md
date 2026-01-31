@@ -147,6 +147,8 @@ See [Setup Guide](docs/setup-guide.md) for architecture details, full package li
 |-------------------|--------------------------------------------|
 | `-v`, `--verbose` | Enable verbose output (banner + info logs) |
 | `--debug`         | Enable debug output (banner + debug logs)  |
+| `--config`        | Show configuration (paths, settings, log)  |
+| `--config --all`  | Include extension configurations           |
 | `-h`, `--help`    | Show help                                  |
 | `--version`       | Show version                               |
 

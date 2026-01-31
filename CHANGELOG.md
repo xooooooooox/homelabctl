@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.1.20
+## v0.1.21
 
 ### feat
 
@@ -52,7 +52,10 @@
   - `homelabctl vf <cmd>` now passes all arguments directly to `radp-vf`
   - Vagrant commands via `homelabctl vf vg <cmd>` (e.g., `vf vg up`, `vf vg status`)
   - Remove duplicate subcommand definitions (init, list, validate, etc.)
-  - Add root-level `homelabctl info` for homelabctl-specific environment info
+- Remove `homelabctl info` command, replaced by `homelabctl --config`
+  - Use `--config` for core configuration (paths, settings, log)
+  - Use `--config --all` to include extension configurations (vf settings, etc.)
+  - Use `--config --json` or `--config --all --json` for JSON output
 - Move version from `vars/constants.sh` to `config/config.yaml` (`radp.extend.homelabctl.version`)
 - Remove `vars` directory, add `config/_ide.sh` for IDE code completion support
 
