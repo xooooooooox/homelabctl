@@ -1,5 +1,17 @@
 # Installation Guide
 
+## Requirements
+
+Before installing homelabctl, ensure you have:
+
+- **Bash 4.0+** - Required for associative arrays and other features
+    - macOS ships with Bash 3.x; install newer version: `brew install bash`
+    - Linux distributions typically have Bash 4.x or 5.x
+- **Git** - Required for manual installation
+- **curl or wget** - Required for script installation
+
+The install script will automatically install **radp-bash-framework** as a dependency.
+
 ## Quick Install
 
 The easiest way to install homelabctl:
@@ -9,6 +21,7 @@ curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install
 ```
 
 The install script automatically:
+
 - Detects your package manager (Homebrew, dnf, apt, etc.)
 - Installs radp-bash-framework dependency
 - Installs homelabctl
@@ -91,8 +104,10 @@ sudo zypper install radp-bash-framework homelabctl
 
 ```shell
 # Add OBS repository (replace with your Ubuntu/Debian version)
-echo "deb http://download.opensuse.org/repositories/home:/xooooooooox:/radp/xUbuntu_22.04/ /" | sudo tee /etc/apt/sources.list.d/home:xooooooooox:radp.list
-curl -fsSL https://download.opensuse.org/repositories/home:xooooooooox:radp/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/home_xooooooooox_radp.gpg > /dev/null
+echo "deb http://download.opensuse.org/repositories/home:/xooooooooox:/radp/xUbuntu_22.04/ /" |
+  sudo tee /etc/apt/sources.list.d/home:xooooooooox:radp.list
+curl -fsSL https://download.opensuse.org/repositories/home:xooooooooox:radp/xUbuntu_22.04/Release.key | gpg --dearmor |
+  sudo tee /etc/apt/trusted.gpg.d/home_xooooooooox_radp.gpg >/dev/null
 sudo apt update
 sudo apt install radp-bash-framework homelabctl
 ```
@@ -146,7 +161,7 @@ curl -fsSL https://raw.githubusercontent.com/xooooooooox/homelabctl/main/install
 
 ```shell
 bash uninstall.sh
-bash uninstall.sh --yes        # Skip confirmation
+bash uninstall.sh --yes # Skip confirmation
 bash uninstall.sh --deps --yes # Also remove radp-bash-framework
 ```
 
@@ -196,7 +211,7 @@ Shell completion is **automatically configured** during installation. If you nee
 
 # Create directory and generate completion
 mkdir -p ~/.local/share/bash-completion/completions
-homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
 ```
 
 ### Zsh
@@ -204,7 +219,7 @@ homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabc
 ```shell
 # Create directory and generate completion
 mkdir -p ~/.zfunc
-homelabctl completion zsh > ~/.zfunc/_homelabctl
+homelabctl completion zsh >~/.zfunc/_homelabctl
 
 # Add to ~/.zshrc if not already present:
 # fpath=(~/.zfunc $fpath)
@@ -212,3 +227,130 @@ homelabctl completion zsh > ~/.zfunc/_homelabctl
 ```
 
 Completions include dynamic suggestions for package names, profile names, and categories.
+
+## Troubleshooting
+
+### "bash: homelabctl: command not found"
+
+Ensure the installation directory is in your PATH:
+
+```shell
+# For manual installation
+export PATH="$HOME/.local/bin:$PATH"
+
+# Add to ~/.bashrc or ~/.zshrc
+echo 'export PATH="$HOME/.local/bin:$PATH"' >>~/.bashrc
+```
+
+### "homelabctl: line X: declare: -A: invalid option"
+
+This error indicates Bash 3.x is being used. homelabctl requires Bash 4.0+.
+
+**macOS fix:**
+
+```shell
+# Install newer Bash
+brew install bash
+
+# Verify version
+/opt/homebrew/bin/bash --version # Apple Silicon
+/usr/local/bin/bash --version # Intel
+
+# Option 1: Run homelabctl with Homebrew's bash
+/opt/homebrew/bin/bash -c 'homelabctl --help'
+
+# Option 2: Add Homebrew's bash to /etc/shells and change default shell
+sudo bash -c 'echo /opt/homebrew/bin/bash >> /etc/shells'
+chsh -s /opt/homebrew/bin/bash
+```
+
+### "radp: command not found" or framework errors
+
+The radp-bash-framework dependency is missing or not in PATH.
+
+**Reinstall with package manager:**
+
+```shell
+# Homebrew
+brew reinstall radp-bash-framework
+
+# DNF
+sudo dnf reinstall radp-bash-framework
+```
+
+**Manual installation check:**
+
+```shell
+# Check if framework is installed
+ls ~/.local/lib/radp-bash-framework
+
+# Add to PATH if missing
+export PATH="$HOME/.local/lib/radp-bash-framework/src/main/shell/bin:$PATH"
+```
+
+### Shell completion not working
+
+**Bash:**
+
+```shell
+# Ensure bash-completion is installed and loaded
+brew install bash-completion@2 # macOS
+source /opt/homebrew/etc/profile.d/bash_completion.sh
+
+# Regenerate completion
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
+```
+
+**Zsh:**
+
+```shell
+# Regenerate completion
+homelabctl completion zsh >~/.zfunc/_homelabctl
+
+# Rebuild completion cache
+rm -f ~/.zcompdump*
+compinit
+```
+
+### radp-vf not found (for vf/vg commands)
+
+The `vf` and `vg` commands require radp-vagrant-framework to be installed:
+
+```shell
+# Option 1: Install via Homebrew (recommended)
+brew tap xooooooooox/radp
+brew install radp-vagrant-framework
+
+# Option 2: Install via script
+curl -fsSL https://raw.githubusercontent.com/xooooooooox/radp-vagrant-framework/main/install.sh | bash
+
+# Option 3: Manual installation - add bin to PATH
+git clone https://github.com/xooooooooox/radp-vagrant-framework.git
+export PATH="$PWD/radp-vagrant-framework/bin:$PATH"
+echo 'export PATH="/path/to/radp-vagrant-framework/bin:$PATH"' >> ~/.bashrc
+```
+
+For `vf` commands, you can alternatively set `RADP_VF_HOME`:
+
+```shell
+export RADP_VF_HOME="/path/to/radp-vagrant-framework"
+```
+
+See [Vagrant Guide](vagrant-guide.md) for more details.
+
+### Package installation fails
+
+If `homelabctl setup install` fails:
+
+```shell
+# Check if command exists (for already installed packages)
+which <package-name>
+
+# Try with verbose output
+homelabctl setup install <package> --verbose
+
+# Try dry-run first
+homelabctl setup install <package> --dry-run
+```
+
+For platform-specific issues, check the [Setup Guide](setup-guide.md#platform-support).
