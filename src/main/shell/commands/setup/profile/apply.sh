@@ -17,7 +17,7 @@ cmd_setup_profile_apply() {
   local skip_installed="${opt_skip_installed:-}"
 
   if [[ -z "$profile_name" ]]; then
-radp_cli_help_command "setup profile apply"
+    radp_cli_help_command "setup profile apply"
     return 1
   fi
 
