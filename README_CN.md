@@ -120,20 +120,21 @@ homelabctl vf dump-config -f yaml
 
 跨平台安装和管理软件包。支持单独安装和通过配置文件批量安装。
 
-| 命令                             | 描述                    |
-|--------------------------------|-----------------------|
-| `setup list`                   | 列出可用软件包               |
-| `setup info <name>`            | 显示软件包详情               |
-| `setup install <name>`         | 安装软件包                 |
-| `setup profile list`           | 列出可用配置文件              |
-| `setup profile show <name>`    | 显示配置文件详情              |
-| `setup profile apply <name>`   | 应用配置文件                |
-| `setup configure list`         | 列出可用系统配置              |
-| `setup configure chrony`       | 配置 chrony 时间同步        |
-| `setup configure expand-lvm`   | 扩展 LVM 分区和文件系统        |
-| `setup configure gpg-import`   | 导入 GPG 密钥到用户密钥环       |
-| `setup configure gpg-preset`   | 在 gpg-agent 中预设 GPG 密码 |
-| `setup configure yadm`         | 使用 yadm 克隆 dotfiles 仓库 |
+| 命令                           | 描述                     |
+|------------------------------|------------------------|
+| `setup list`                 | 列出可用软件包                |
+| `setup info <name>`          | 显示软件包详情                |
+| `setup deps <name>`          | 显示软件包依赖树               |
+| `setup install <name>`       | 安装软件包                  |
+| `setup profile list`         | 列出可用配置文件               |
+| `setup profile show <name>`  | 显示配置文件详情               |
+| `setup profile apply <name>` | 应用配置文件                 |
+| `setup configure list`       | 列出可用系统配置               |
+| `setup configure chrony`     | 配置 chrony 时间同步         |
+| `setup configure expand-lvm` | 扩展 LVM 分区和文件系统         |
+| `setup configure gpg-import` | 导入 GPG 密钥到用户密钥环        |
+| `setup configure gpg-preset` | 在 gpg-agent 中预设 GPG 密码 |
+| `setup configure yadm`       | 使用 yadm 克隆 dotfiles 仓库 |
 
 **示例：**
 
@@ -142,6 +143,12 @@ homelabctl vf dump-config -f yaml
 homelabctl setup list
 homelabctl setup list -c cli-tools
 homelabctl setup list --installed
+
+# 显示软件包信息和依赖
+homelabctl setup info git-credential-manager
+homelabctl setup info git-credential-manager --all-platforms
+homelabctl setup deps markdownlint-cli
+homelabctl setup deps nodejs --reverse
 
 # 安装软件包
 homelabctl setup install fzf
@@ -178,21 +185,21 @@ homelabctl setup configure yadm --repo-url "git@github.com:user/dotfiles.git" --
 
 **内置配置文件：**
 
-| 配置文件        | 描述                 |
-|-------------|--------------------|
+| 配置文件        | 描述           |
+|-------------|--------------|
 | `recommend` | 推荐的开发环境基础工具集 |
 
 **系统配置：**
 
 `setup configure` 命令提供即用型的系统配置任务：
 
-| 命令            | 描述                               |
-|---------------|----------------------------------|
-| `chrony`      | 配置 NTP 时间同步，支持自定义服务器             |
-| `expand-lvm`  | 扩展 LVM 分区和文件系统以使用所有可用磁盘空间        |
-| `gpg-import`  | 从文件、内容或密钥服务器导入 GPG 密钥            |
-| `gpg-preset`  | 在 gpg-agent 中缓存 GPG 密码，用于非交互式操作  |
-| `yadm`        | 克隆 dotfiles 仓库，支持 SSH/HTTPS、bootstrap、解密 |
+| 命令           | 描述                                       |
+|--------------|------------------------------------------|
+| `chrony`     | 配置 NTP 时间同步，支持自定义服务器                     |
+| `expand-lvm` | 扩展 LVM 分区和文件系统以使用所有可用磁盘空间                |
+| `gpg-import` | 从文件、内容或密钥服务器导入 GPG 密钥                    |
+| `gpg-preset` | 在 gpg-agent 中缓存 GPG 密码，用于非交互式操作          |
+| `yadm`       | 克隆 dotfiles 仓库，支持 SSH/HTTPS、bootstrap、解密 |
 
 所有 configure 命令支持 `--dry-run` 预览更改。运行 `homelabctl setup configure <name> --help` 查看详细选项。
 
@@ -222,23 +229,36 @@ packages:
     category: utilities
     check-cmd: my-tool         # 用于验证安装的命令
     homepage: https://example.com
+    requires: git              # 依赖（自动安装）
+    recommends: fzf            # 可选推荐（显示为提示）
+    platform: # 平台特定依赖
+      linux:
+        recommends: pass gpg
+      linux-arm64: # OS-架构组合（优先级高于仅 OS）
+        requires: dotnet-sdk
+        recommends: pass gpg
 ```
+
+平台键支持仅 OS（`linux`、`darwin`）和 OS-架构组合（`linux-arm64`、`darwin-amd64`）。查找链为：`os-arch` → `os` → base。
 
 2. 在 `~/.config/homelabctl/setup/installers/my-tool.sh` 创建安装器：
 
 ```bash
 #!/usr/bin/env bash
 _setup_install_my_tool() {
-    local version="${1:-latest}"
-    local pm
-    pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
+  local version="${1:-latest}"
+  local pm
+  pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
 
-    case "$pm" in
-    brew)   brew install my-tool ;;
-    dnf)    sudo dnf install -y my-tool ;;
-    apt)    sudo apt-get install -y my-tool ;;
-    *)      radp_log_error "不支持的平台"; return 1 ;;
-    esac
+  case "$pm" in
+  brew) brew install my-tool ;;
+  dnf) sudo dnf install -y my-tool ;;
+  apt) sudo apt-get install -y my-tool ;;
+  *)
+    radp_log_error "不支持的平台";
+    return 1
+    ;;
+  esac
 }
 ```
 
@@ -278,11 +298,11 @@ Shell 补全会在安装时自动配置。如需手动重新生成：
 ```shell
 # Bash
 mkdir -p ~/.local/share/bash-completion/completions
-homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
 
 # Zsh
 mkdir -p ~/.zfunc
-homelabctl completion zsh > ~/.zfunc/_homelabctl
+homelabctl completion zsh >~/.zfunc/_homelabctl
 # 添加到 ~/.zshrc: fpath=(~/.zfunc $fpath)
 ```
 

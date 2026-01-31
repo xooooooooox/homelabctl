@@ -123,20 +123,21 @@ see [radp-vagrant-framework Configuration Reference](https://github.com/xooooooo
 Install and manage software packages across different platforms. Supports individual package installation and batch
 installation via profiles.
 
-| Command                            | Description                           |
-|------------------------------------|---------------------------------------|
-| `setup list`                       | List available packages               |
-| `setup info <name>`                | Show package details                  |
-| `setup install <name>`             | Install a package                     |
-| `setup profile list`               | List available profiles               |
-| `setup profile show <name>`        | Show profile details                  |
-| `setup profile apply <name>`       | Apply a profile                       |
-| `setup configure list`             | List available system configurations  |
-| `setup configure chrony`           | Configure chrony time synchronization |
-| `setup configure expand-lvm`       | Expand LVM partition and filesystem   |
-| `setup configure gpg-import`       | Import GPG keys into user keyring     |
-| `setup configure gpg-preset`       | Preset GPG passphrase in gpg-agent    |
-| `setup configure yadm`             | Clone dotfiles repository using yadm  |
+| Command                      | Description                           |
+|------------------------------|---------------------------------------|
+| `setup list`                 | List available packages               |
+| `setup info <name>`          | Show package details                  |
+| `setup deps <name>`          | Show package dependency tree          |
+| `setup install <name>`       | Install a package                     |
+| `setup profile list`         | List available profiles               |
+| `setup profile show <name>`  | Show profile details                  |
+| `setup profile apply <name>` | Apply a profile                       |
+| `setup configure list`       | List available system configurations  |
+| `setup configure chrony`     | Configure chrony time synchronization |
+| `setup configure expand-lvm` | Expand LVM partition and filesystem   |
+| `setup configure gpg-import` | Import GPG keys into user keyring     |
+| `setup configure gpg-preset` | Preset GPG passphrase in gpg-agent    |
+| `setup configure yadm`       | Clone dotfiles repository using yadm  |
 
 **Examples:**
 
@@ -145,6 +146,12 @@ installation via profiles.
 homelabctl setup list
 homelabctl setup list -c cli-tools
 homelabctl setup list --installed
+
+# Show package info and dependencies
+homelabctl setup info git-credential-manager
+homelabctl setup info git-credential-manager --all-platforms
+homelabctl setup deps markdownlint-cli
+homelabctl setup deps nodejs --reverse
 
 # Install packages
 homelabctl setup install fzf
@@ -178,9 +185,14 @@ flowchart TD
     D --> E3["Language runtimes:<br/>vfox + PATH refresh"]
 ```
 
-The install system uses a layered architecture: a **registry** (`registry.yaml`) defines available packages and metadata, an **installer loader** (`installer.sh`) dynamically sources per-package scripts, and each **installer** (`installers/<name>.sh`) implements platform-specific install strategies. Users can extend both the registry and installers via `~/.config/homelabctl/setup/`.
+The install system uses a layered architecture: a **registry** (`registry.yaml`) defines available packages and
+metadata, an **installer loader** (`installer.sh`) dynamically sources per-package scripts, and each **installer** (
+`installers/<name>.sh`) implements platform-specific install strategies. Users can extend both the registry and
+installers via `~/.config/homelabctl/setup/`.
 
-For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com/version-fox/vfox) is preferred when available. After a vfox-based install, the current shell PATH is refreshed via `vfox env` so that dependent tools (e.g., markdownlint-cli needs npm) can be installed in the same session.
+For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com/version-fox/vfox) is preferred when
+available. After a vfox-based install, the current shell PATH is refreshed via `vfox env` so that dependent tools (e.g.,
+markdownlint-cli needs npm) can be installed in the same session.
 
 **Available Categories:**
 
@@ -197,23 +209,24 @@ For language runtimes (nodejs, jdk, ruby, go, python), [vfox](https://github.com
 
 **Built-in Profiles:**
 
-| Profile     | Description                                        |
-|-------------|----------------------------------------------------|
+| Profile     | Description                                         |
+|-------------|-----------------------------------------------------|
 | `recommend` | Recommended development environment with essentials |
 
 **System Configuration:**
 
 The `setup configure` commands provide ready-to-use system configuration tasks:
 
-| Command       | Description                                                   |
-|---------------|---------------------------------------------------------------|
-| `chrony`      | Configure NTP time synchronization with custom servers        |
-| `expand-lvm`  | Expand LVM partition/filesystem to use all available disk space |
-| `gpg-import`  | Import GPG keys from file, content, or keyserver              |
-| `gpg-preset`  | Cache GPG passphrase in gpg-agent for non-interactive operations |
-| `yadm`        | Clone dotfiles repository with SSH/HTTPS, bootstrap, decrypt  |
+| Command      | Description                                                      |
+|--------------|------------------------------------------------------------------|
+| `chrony`     | Configure NTP time synchronization with custom servers           |
+| `expand-lvm` | Expand LVM partition/filesystem to use all available disk space  |
+| `gpg-import` | Import GPG keys from file, content, or keyserver                 |
+| `gpg-preset` | Cache GPG passphrase in gpg-agent for non-interactive operations |
+| `yadm`       | Clone dotfiles repository with SSH/HTTPS, bootstrap, decrypt     |
 
-All configure commands support `--dry-run` to preview changes. Run `homelabctl setup configure <name> --help` for detailed options.
+All configure commands support `--dry-run` to preview changes. Run `homelabctl setup configure <name> --help` for
+detailed options.
 
 **User Extensions:**
 
@@ -241,23 +254,37 @@ packages:
     category: utilities
     check-cmd: my-tool         # Command to verify installation
     homepage: https://example.com
+    requires: git              # Dependencies (auto-installed)
+    recommends: fzf            # Optional recommendations (shown as hint)
+    platform: # Platform-specific dependencies
+      linux:
+        recommends: pass gpg
+      linux-arm64: # OS-arch specific (higher priority than OS-only)
+        requires: dotnet-sdk
+        recommends: pass gpg
 ```
+
+Platform keys support both OS-only (`linux`, `darwin`) and OS-arch combinations (`linux-arm64`, `darwin-amd64`). The
+lookup chain is: `os-arch` → `os` → base.
 
 2. Create installer at `~/.config/homelabctl/setup/installers/my-tool.sh`:
 
 ```bash
 #!/usr/bin/env bash
 _setup_install_my_tool() {
-    local version="${1:-latest}"
-    local pm
-    pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
+  local version="${1:-latest}"
+  local pm
+  pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
 
-    case "$pm" in
-    brew)   brew install my-tool ;;
-    dnf)    sudo dnf install -y my-tool ;;
-    apt)    sudo apt-get install -y my-tool ;;
-    *)      radp_log_error "Unsupported platform"; return 1 ;;
-    esac
+  case "$pm" in
+  brew) brew install my-tool ;;
+  dnf) sudo dnf install -y my-tool ;;
+  apt) sudo apt-get install -y my-tool ;;
+  *)
+    radp_log_error "Unsupported platform";
+    return 1
+    ;;
+  esac
 }
 ```
 
@@ -297,11 +324,11 @@ Shell completion is automatically configured during installation. To regenerate 
 ```shell
 # Bash
 mkdir -p ~/.local/share/bash-completion/completions
-homelabctl completion bash > ~/.local/share/bash-completion/completions/homelabctl
+homelabctl completion bash >~/.local/share/bash-completion/completions/homelabctl
 
 # Zsh
 mkdir -p ~/.zfunc
-homelabctl completion zsh > ~/.zfunc/_homelabctl
+homelabctl completion zsh >~/.zfunc/_homelabctl
 # Add to ~/.zshrc: fpath=(~/.zfunc $fpath)
 ```
 

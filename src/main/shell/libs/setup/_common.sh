@@ -91,6 +91,18 @@ _setup_get_os() {
 }
 
 #######################################
+# Get platform string (os-arch format)
+# Returns:
+#   Platform string like linux-amd64, darwin-arm64
+#######################################
+_setup_get_platform() {
+  local os arch
+  os=$(_setup_get_os)
+  arch=$(_setup_get_arch)
+  echo "${os}-${arch}"
+}
+
+#######################################
 # Get vfox home directory
 # Returns:
 #   Path to vfox home directory
@@ -206,4 +218,155 @@ _setup_vfox_refresh_path() {
   eval "$(vfox env -s "$shell_name" 2>/dev/null)" || true
 
   hash -r 2>/dev/null || true
+}
+
+#######################################
+# Get ordered installation list for a package
+# Resolves dependencies recursively with cycle detection
+# Arguments:
+#   1 - package name
+# Outputs:
+#   Package names in install order (deps first, target last)
+# Returns:
+#   0 on success, 1 on circular dependency or error
+#######################################
+_setup_get_install_order() {
+  local pkg="$1"
+  local -A _visited=()
+  local -A _in_progress=()
+
+  _setup_resolve_deps_recursive "$pkg" _visited _in_progress
+}
+
+#######################################
+# Internal recursive dependency resolver
+# Arguments:
+#   1 - package name
+#   2 - nameref to visited associative array
+#   3 - nameref to in_progress associative array
+# Outputs:
+#   Package names in dependency order
+# Returns:
+#   0 on success, 1 on circular dependency
+#######################################
+_setup_resolve_deps_recursive() {
+  local pkg="$1"
+  local -n __visited="$2"
+  local -n __in_progress="$3"
+
+  # Check for circular dependency
+  if [[ "${__in_progress[$pkg]:-}" == "1" ]]; then
+    radp_log_error "Circular dependency detected: $pkg"
+    return 1
+  fi
+
+  # Skip if already processed
+  if [[ "${__visited[$pkg]:-}" == "1" ]]; then
+    return 0
+  fi
+
+  # Mark as in-progress
+  __in_progress["$pkg"]="1"
+
+  # Get required dependencies
+  local requires dep
+  requires=$(_setup_registry_get_package_requires "$pkg")
+
+  # Recursively resolve each dependency
+  for dep in $requires; do
+    # Verify dependency exists in registry
+    if ! _setup_registry_has_package "$dep"; then
+      radp_log_warn "Dependency '$dep' for '$pkg' not found in registry, skipping"
+      continue
+    fi
+
+    # Recurse
+    if ! _setup_resolve_deps_recursive "$dep" "$2" "$3"; then
+      return 1
+    fi
+  done
+
+  # Mark as visited and output
+  __visited["$pkg"]="1"
+  unset '__in_progress[$pkg]'
+  echo "$pkg"
+}
+
+#######################################
+# Show recommended packages hint
+# Displays uninstalled recommended packages
+# Arguments:
+#   1 - package name
+#######################################
+_setup_show_recommends() {
+  local pkg="$1"
+  local recommends
+  recommends=$(_setup_registry_get_package_recommends "$pkg")
+
+  [[ -z "$recommends" ]] && return 0
+
+  local rec not_installed=""
+  for rec in $recommends; do
+    local check_cmd
+    check_cmd=$(_setup_registry_get_package_cmd "$rec")
+    if ! _setup_is_installed "$check_cmd"; then
+      not_installed="$not_installed $rec"
+    fi
+  done
+
+  # Only show hint if there are uninstalled recommended packages
+  if [[ -n "$not_installed" ]]; then
+    radp_log_info "Recommended packages (optional):$not_installed"
+    radp_log_info "Install with: homelabctl setup install <package>"
+  fi
+}
+
+#######################################
+# Check for package conflicts
+# Arguments:
+#   1 - package name to install
+# Returns:
+#   0 if no conflicts, 1 if conflicts exist
+# Outputs:
+#   Error message with conflicting packages
+#######################################
+_setup_check_conflicts() {
+  local pkg="$1"
+  local conflicts installed_conflicts=""
+
+  # Get conflicts for this package
+  conflicts=$(_setup_registry_get_package_conflicts "$pkg")
+
+  # Check if any conflicting packages are installed
+  local conflict_pkg
+  for conflict_pkg in $conflicts; do
+    local check_cmd
+    check_cmd=$(_setup_registry_get_package_cmd "$conflict_pkg")
+    if _setup_is_installed "$check_cmd"; then
+      installed_conflicts="$installed_conflicts $conflict_pkg"
+    fi
+  done
+
+  # Also check reverse conflicts (packages that conflict with this one)
+  local other_pkg other_conflicts
+  for other_pkg in "${!_SETUP_PACKAGES[@]}"; do
+    other_conflicts=$(_setup_registry_get_package_conflicts "$other_pkg")
+    if [[ " $other_conflicts " == *" $pkg "* ]]; then
+      local check_cmd
+      check_cmd=$(_setup_registry_get_package_cmd "$other_pkg")
+      if _setup_is_installed "$check_cmd"; then
+        # Avoid duplicates
+        if [[ " $installed_conflicts " != *" $other_pkg "* ]]; then
+          installed_conflicts="$installed_conflicts $other_pkg"
+        fi
+      fi
+    fi
+  done
+
+  if [[ -n "$installed_conflicts" ]]; then
+    radp_log_error "Cannot install $pkg: conflicts with installed package(s):$installed_conflicts"
+    return 1
+  fi
+
+  return 0
 }

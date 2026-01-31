@@ -1,9 +1,15 @@
 # CHANGELOG
 
-## v0.1.15
+## v0.1.16
 
 ### feat
 
+- Add platform dependency support for OS+architecture combinations (e.g., `linux-arm64`, `darwin-amd64`)
+    - Lookup chain: `os-arch` → `os` → base (e.g., `linux-arm64` → `linux` → base)
+    - Enables architecture-specific dependencies (e.g., `git-credential-manager` requires `dotnet-sdk` on Linux ARM64)
+- Add `setup deps <name>` command to show package dependency tree
+- Add `setup deps <name> --reverse` to show reverse dependencies
+- Add installer: dotnet-sdk
 - Add installer: gitlab-runner
 - Add `setup configure` command group for system configuration tasks
   - `setup configure list` - Dynamically list available configurations from directory
@@ -27,6 +33,8 @@
 
 ### fix
 
+- Fix `setup deps` command not showing dependency tree due to `set -e` exit on `((count++))` when count is 0
+- Fix `setup info --all-platforms` not showing all platform entries due to `set -e` exit
 - Fix `setup list` showing no packages due to undefined `HOMELABCTL_ROOT` (should use `RADP_APP_ROOT`)
 - Fix `version` and `vf info` commands showing inconsistent version with banner
 - Fix tmux not working on CentOS Stream 9 due to missing perl dependency

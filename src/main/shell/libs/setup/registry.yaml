@@ -1,5 +1,37 @@
 # Package registry for homelabctl setup
 # This file defines available packages and their metadata
+#
+# Schema Reference:
+# -----------------
+# packages:
+#   <package-name>:
+#     desc: <string>                 # Required: short description
+#     category: <category-name>      # Required: must match defined category
+#     check-cmd: <command>           # Optional: command to check if installed (default: package name)
+#     homepage: <url>                # Optional: project homepage
+#
+#     # Dependency fields (space-separated package names)
+#     requires: <pkg1> <pkg2>        # Required deps, auto-installed before target
+#     recommends: <pkg1> <pkg2>      # Recommended deps, shown as hint after install
+#     conflicts: <pkg1> <pkg2>       # Mutually exclusive, blocks install if any installed
+#
+#     # Platform-specific dependencies (nested format)
+#     # Platforms: linux, darwin, freebsd, etc. (from `uname -s`, lowercased)
+#     # Default behavior: platform values are APPENDED to base values
+#     # Override syntax: prefix with ! to REPLACE base values
+#     #   - "!pkg1 pkg2" -> clears base, uses "pkg1 pkg2"
+#     #   - "!"          -> clears base, returns empty
+#     platform:
+#       linux:
+#         requires: <pkg>            # Appended to base requires on Linux
+#         recommends: <pkg>          # Appended to base recommends on Linux
+#         conflicts: <pkg>           # Appended to base conflicts on Linux
+#       darwin:
+#         recommends: "!pkg"         # Override: replaces base recommends on macOS
+#
+# categories:
+#   <category-name>:
+#     desc: <string>                 # Category description
 
 packages:
   # System Prerequisites
@@ -32,6 +64,7 @@ packages:
     desc: Framework for managing Zsh configuration
     category: shell
     check-cmd: omz
+    requires: zsh
     homepage: https://ohmyz.sh/
 
   starship:
@@ -49,6 +82,7 @@ packages:
   fzf-tab-completion:
     desc: Tab completion using fzf for bash/zsh
     category: shell
+    requires: fzf
     homepage: https://github.com/lincheney/fzf-tab-completion
 
   # Editors
@@ -63,37 +97,49 @@ packages:
     category: editors
     check-cmd: nvim
     homepage: https://neovim.io/
+    recommends: ripgrep
 
   # Languages and Runtimes
+  dotnet-sdk:
+    desc: .NET SDK for building and running .NET applications
+    category: languages
+    check-cmd: dotnet
+    homepage: https://dotnet.microsoft.com/
+
   nodejs:
     desc: JavaScript runtime
     category: languages
     check-cmd: node
     homepage: https://nodejs.org/
+    recommends: vfox
 
   jdk:
     desc: Java Development Kit
     category: languages
     check-cmd: java
     homepage: https://adoptium.net/
+    recommends: vfox
 
   python:
     desc: Python programming language
     category: languages
     check-cmd: python3
     homepage: https://www.python.org/
+    recommends: vfox
 
   go:
     desc: Go programming language
     category: languages
     check-cmd: go
     homepage: https://go.dev/
+    recommends: vfox
 
   rust:
     desc: Rust programming language
     category: languages
     check-cmd: rustc
     homepage: https://www.rust-lang.org/
+    recommends: vfox
 
   vfox:
     desc: Cross-platform version manager
@@ -106,12 +152,14 @@ packages:
     category: languages
     check-cmd: ruby
     homepage: https://www.ruby-lang.org/
+    recommends: vfox
 
   mvn:
     desc: Apache Maven build tool
     category: languages
     check-cmd: mvn
     homepage: https://maven.apache.org/
+    recommends: vfox
 
   # DevOps Tools
   kubectl:
@@ -174,6 +222,7 @@ packages:
     category: vcs
     check-cmd: lazygit
     homepage: https://github.com/jesseduffield/lazygit
+    requires: git
 
   tig:
     desc: Text-mode interface for git
@@ -185,7 +234,18 @@ packages:
     desc: Cross-platform Git credential storage
     category: vcs
     check-cmd: git-credential-manager
+    requires: git
     homepage: https://github.com/git-ecosystem/git-credential-manager
+    # Platform-specific:
+    # - Linux AMD64: uses prebuilt binary, recommends pass/gpg for credential storage
+    # - Linux ARM64: no prebuilt binary, requires dotnet-sdk (dotnet tool install)
+    # - macOS: uses Homebrew and system keychain
+    platform:
+      linux:
+        recommends: pass gpg
+      linux-arm64:
+        requires: dotnet-sdk
+        recommends: pass gpg
 
   yadm:
     desc: Yet Another Dotfiles Manager
@@ -210,6 +270,7 @@ packages:
     desc: Standard unix password manager
     category: security
     check-cmd: pass
+    requires: gpg
     homepage: https://www.passwordstore.org/
 
   # Search and File Utilities
@@ -218,6 +279,11 @@ packages:
     category: search
     check-cmd: fzf
     homepage: https://github.com/junegunn/fzf
+    platform:
+      darwin:
+        recommends: fzf-tab
+      linux:
+        recommends: fzf-tab-completion
 
   fd:
     desc: Fast and user-friendly find alternative
@@ -260,6 +326,7 @@ packages:
     desc: Markdown linting tool
     category: dev-tools
     check-cmd: markdownlint
+    requires: nodejs
     homepage: https://github.com/igorshubovych/markdownlint-cli
 
   # System Utilities

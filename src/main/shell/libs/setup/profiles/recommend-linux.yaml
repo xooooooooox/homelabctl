@@ -22,6 +22,7 @@ packages:
   - name: neovim
 
   # Security
+  - name: pass
   - name: gpg
 
   # Shell enhancements

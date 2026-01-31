@@ -6,6 +6,7 @@
 # @option --dry-run Show what would be installed
 # @option --continue Continue on error
 # @option --skip-installed Skip already installed packages
+# @option --no-deps Skip automatic dependency installation
 # @example setup profile apply recommend
 # @example setup profile apply recommend --dry-run
 # @example setup profile apply recommend --continue
@@ -15,6 +16,7 @@ cmd_setup_profile_apply() {
   local dry_run="${opt_dry_run:-}"
   local continue_on_error="${opt_continue:-}"
   local skip_installed="${opt_skip_installed:-}"
+  local no_deps="${opt_no_deps:-}"
 
   if [[ -z "$profile_name" ]]; then
     radp_cli_help_command "setup profile apply"
@@ -65,6 +67,9 @@ cmd_setup_profile_apply() {
 
   total=${#packages[@]}
 
+  # Track installed packages to avoid reinstalling deps
+  local -A already_installed_in_session=()
+
   for pkg_entry in "${packages[@]}"; do
     IFS='|' read -r pkg_name pkg_version <<<"$pkg_entry"
 
@@ -81,31 +86,93 @@ cmd_setup_profile_apply() {
       fi
     fi
 
-    if [[ -n "$dry_run" ]]; then
-      if [[ "$pkg_version" == "latest" ]]; then
-        echo "  - $pkg_name"
+    # Resolve dependencies for this package
+    local -a pkg_install_order=()
+    if [[ -z "$no_deps" ]]; then
+      local dep_list
+      if dep_list=$(_setup_get_install_order "$pkg_name" 2>/dev/null); then
+        while IFS= read -r dep; do
+          [[ -n "$dep" ]] && pkg_install_order+=("$dep")
+        done <<<"$dep_list"
       else
-        echo "  - $pkg_name (v$pkg_version)"
+        pkg_install_order=("$pkg_name")
       fi
-      continue
-    fi
-
-    echo ""
-    radp_log_info "[$((installed + failed + skipped + 1))/$total] Installing $pkg_name ${pkg_version}..."
-
-    if _setup_run_installer "$pkg_name" "$pkg_version"; then
-      ((++installed))
-      radp_log_info "$pkg_name installed successfully"
     else
-      ((++failed))
-      if [[ -z "$continue_on_error" ]]; then
-        radp_log_error "Failed to install $pkg_name, stopping"
-        echo ""
-        echo "Summary: $installed installed, $failed failed, $skipped skipped"
-        return 1
-      fi
-      radp_log_warn "Failed to install $pkg_name, continuing..."
+      pkg_install_order=("$pkg_name")
     fi
+
+    # Install package and its dependencies
+    local dep_pkg
+    for dep_pkg in "${pkg_install_order[@]}"; do
+      # Skip if already installed in this session
+      [[ -n "${already_installed_in_session[$dep_pkg]:-}" ]] && continue
+
+      # Skip already installed deps (but not the target package unless --skip-installed)
+      if [[ "$dep_pkg" != "$pkg_name" ]]; then
+        local dep_check_cmd
+        dep_check_cmd=$(_setup_registry_get_package_cmd "$dep_pkg")
+        if _setup_is_installed "$dep_check_cmd"; then
+          already_installed_in_session["$dep_pkg"]=1
+          continue
+        fi
+      fi
+
+      if [[ -n "$dry_run" ]]; then
+        if [[ "$dep_pkg" == "$pkg_name" ]]; then
+          if [[ "$pkg_version" == "latest" ]]; then
+            echo "  - $pkg_name"
+          else
+            echo "  - $pkg_name (v$pkg_version)"
+          fi
+        else
+          echo "  - $dep_pkg (dependency of $pkg_name)"
+        fi
+        already_installed_in_session["$dep_pkg"]=1
+        continue
+      fi
+
+      local install_version="latest"
+      [[ "$dep_pkg" == "$pkg_name" ]] && install_version="$pkg_version"
+
+      echo ""
+      if [[ "$dep_pkg" == "$pkg_name" ]]; then
+        radp_log_info "[$((installed + failed + skipped + 1))/$total] Installing $dep_pkg ${install_version}..."
+      else
+        radp_log_info "Installing dependency $dep_pkg for $pkg_name..."
+      fi
+
+      if _setup_run_installer "$dep_pkg" "$install_version"; then
+        already_installed_in_session["$dep_pkg"]=1
+        if [[ "$dep_pkg" == "$pkg_name" ]]; then
+          ((++installed))
+          radp_log_info "$pkg_name installed successfully"
+        else
+          radp_log_info "$dep_pkg installed successfully"
+        fi
+      else
+        if [[ "$dep_pkg" == "$pkg_name" ]]; then
+          ((++failed))
+          if [[ -z "$continue_on_error" ]]; then
+            radp_log_error "Failed to install $pkg_name, stopping"
+            echo ""
+            echo "Summary: $installed installed, $failed failed, $skipped skipped"
+            return 1
+          fi
+          radp_log_warn "Failed to install $pkg_name, continuing..."
+        else
+          # Dependency failed
+          ((++failed))
+          if [[ -z "$continue_on_error" ]]; then
+            radp_log_error "Failed to install dependency $dep_pkg for $pkg_name, stopping"
+            echo ""
+            echo "Summary: $installed installed, $failed failed, $skipped skipped"
+            return 1
+          fi
+          radp_log_warn "Failed to install dependency $dep_pkg, continuing..."
+          break # Skip remaining deps and the target package
+        fi
+      fi
+    done
   done
 
   if [[ -n "$dry_run" ]]; then

@@ -32,12 +32,13 @@ export RADP_VF_HOME="/path/to/radp-vagrant-framework"
 - `vf template list` - List available project templates
 - `vf template show` - Show template details and variables
 - `vf version` - Show radp-vagrant-framework version
-- `setup install <name>` - Install a software package (-v version, --dry-run)
+- `setup install <name>` - Install a software package (-v version, --dry-run, --no-deps)
 - `setup list` - List available packages (-c category, --installed, --categories)
-- `setup info <name>` - Show package details
+- `setup info <name>` - Show package details (includes dependencies and conflicts)
+- `setup deps <name>` - Show package dependency tree (--reverse for reverse deps)
 - `setup profile list` - List available setup profiles
 - `setup profile show <name>` - Show profile details
-- `setup profile apply <name>` - Apply a profile (--dry-run, --continue, --skip-installed)
+- `setup profile apply <name>` - Apply a profile (--dry-run, --continue, --skip-installed, --no-deps)
 - `setup configure list` - List available system configurations
 - `setup configure chrony` - Configure chrony time synchronization
 - `setup configure expand-lvm` - Expand LVM partition and filesystem
@@ -75,6 +76,7 @@ homelabctl/
 │   │   │   ├── install.sh
 │   │   │   ├── list.sh
 │   │   │   ├── info.sh
+│   │   │   ├── deps.sh         # homelabctl setup deps <name>
 │   │   │   ├── profile/        # homelabctl setup profile <subcommand>
 │   │   │   │   ├── list.sh
 │   │   │   │   ├── show.sh
@@ -99,7 +101,7 @@ homelabctl/
 │           ├── registry.yaml   # Package registry
 │           ├── profiles/       # Profile definitions
 │           │   └── recommend.yaml
-│           └── installers/     # Package installers (43 files)
+│           └── installers/     # Package installers (44 files)
 │               ├── ansible.sh
 │               ├── bat.sh
 │               ├── docker.sh
@@ -107,6 +109,7 @@ homelabctl/
 │               ├── fastfetch.sh
 │               ├── fd.sh
 │               ├── fzf.sh
+│               ├── fzf-tab-completion.sh
 │               ├── git-credential-manager.sh
 │               ├── git.sh
 │               ├── gitlab-runner.sh
@@ -242,10 +245,10 @@ libs/setup/_common.sh            Shared helpers (arch/os detection, vfox PATH re
 
 | File | Role |
 |------|------|
-| `commands/setup/install.sh` | CLI entry: parse args, check registry, call `_setup_run_installer` |
-| `libs/setup/registry.sh` | Load & query `registry.yaml` (builtin + user merge) |
+| `commands/setup/install.sh` | CLI entry: parse args, resolve dependencies, call `_setup_run_installer` |
+| `libs/setup/registry.sh` | Load & query `registry.yaml` (builtin + user merge), dependency getters |
 | `libs/setup/installer.sh` | `_setup_load_installer` (source `.sh`), `_setup_run_installer` (call function), `_setup_install_binary` (copy binary to `/usr/local/bin`) |
-| `libs/setup/_common.sh` | `_setup_is_installed`, `_setup_get_arch`, `_setup_get_os`, `_setup_vfox_refresh_path` |
+| `libs/setup/_common.sh` | `_setup_is_installed`, `_setup_get_arch`, `_setup_get_os`, `_setup_vfox_refresh_path`, `_setup_get_install_order` (dependency resolution) |
 | `libs/setup/installers/*.sh` | Each file exports `_setup_install_<name>(version)` |
 
 ### Install Flow
@@ -361,6 +364,103 @@ Users can extend the setup feature by adding custom packages and profiles in `~/
 
 User files take precedence over builtin files.
 
+### Registry YAML Schema
+
+The `registry.yaml` file defines packages and categories. Complete field reference:
+
+```yaml
+# Package registry for homelabctl setup
+packages:
+  <package-name>:                    # Package identifier (alphanumeric, hyphens, underscores)
+    # Required fields
+    desc: <string>                   # Short description
+    category: <category-name>        # Must match a category defined below
+
+    # Optional fields
+    check-cmd: <command>             # Command to check if installed (default: package name)
+    homepage: <url>                  # Project homepage URL
+
+    # Dependency fields (space-separated package names)
+    requires: <pkg1> <pkg2>          # Required dependencies, auto-installed
+    recommends: <pkg1> <pkg2>        # Recommended packages, shown as hint
+    conflicts: <pkg1> <pkg2>         # Mutually exclusive packages, blocks install
+
+    # Platform-specific dependencies (nested format)
+    # Supported platform keys:
+    #   - OS only: linux, darwin, freebsd (from `uname -s`, lowercased)
+    #   - OS-arch: linux-amd64, linux-arm64, darwin-arm64, etc.
+    # Lookup chain: os-arch → os → (none)
+    #   - If os-arch exists, use it exclusively (no fallback to os)
+    #   - If os-arch not found, fall back to os
+    # Default behavior: platform values are APPENDED to base values
+    # Override syntax: prefix with ! to REPLACE base values
+    platform:
+      linux:
+        requires: <pkg>              # Linux (all arch): appended to base
+        recommends: <pkg>
+      linux-arm64:
+        requires: <pkg>              # Linux ARM64 only: overrides linux key
+      darwin:
+        recommends: "!pkg"           # Override: replaces base recommends on macOS
+        # "!" alone clears base, returns empty
+
+categories:
+  <category-name>:                   # Category identifier
+    desc: <string>                   # Category description
+```
+
+**Platform Lookup Chain:**
+
+The system uses a priority-based lookup: `os-arch` → `os` → (none). Only ONE platform value is selected, then merged with base.
+
+| Current Platform | Lookup Order | Example |
+|------------------|--------------|---------|
+| linux-arm64 | `linux-arm64` → `linux` | If `linux-arm64` exists, use it; else fallback to `linux` |
+| linux-amd64 | `linux-amd64` → `linux` | If `linux-amd64` not found, use `linux` |
+| darwin-arm64 | `darwin-arm64` → `darwin` | Apple Silicon: check `darwin-arm64` first |
+
+**Platform Dependency Merge Rules:**
+
+| Platform Value | Behavior | Example |
+|----------------|----------|---------|
+| `pkg1 pkg2` | Appends to base | base `a b` + platform `c` = `a b c` |
+| `!pkg1 pkg2` | Replaces base | base `a b` + platform `!c d` = `c d` |
+| `!` | Clears (empty) | base `a b` + platform `!` = (empty) |
+
+**Complete Example:**
+```yaml
+packages:
+  git-credential-manager:
+    desc: Cross-platform Git credential storage
+    category: vcs
+    requires: git
+    platform:
+      linux:
+        recommends: pass gpg         # Linux AMD64: uses prebuilt binary
+      linux-arm64:
+        requires: dotnet-sdk         # Linux ARM64: needs dotnet tool
+        recommends: pass gpg
+
+  my-tool:
+    desc: My custom development tool
+    category: dev-tools
+    check-cmd: mytool
+    homepage: https://github.com/example/my-tool
+    requires: git nodejs
+    recommends: fzf bat
+    conflicts: old-tool legacy-tool
+    platform:
+      linux:
+        requires: libssl-dev         # Linux: git nodejs libssl-dev
+        recommends: pass             # Linux: fzf bat pass
+      darwin:
+        recommends: "!"              # macOS: (no recommends, cleared)
+
+categories:
+  dev-tools:
+    desc: Development and code quality tools
+```
+
 ### Adding a Custom Package
 
 1. Define the package in `~/.config/homelabctl/setup/registry.yaml`:
@@ -370,6 +470,11 @@ packages:
     desc: My custom tool
     category: utilities
     check-cmd: my-tool
+    requires: git                    # Optional: dependencies
+    homepage: https://example.com    # Optional: project URL
+    platform:                        # Optional: platform-specific deps
+      linux:
+        requires: libsecret-tools
 ```
 
 2. Create installer at `~/.config/homelabctl/setup/installers/my-tool.sh`:
@@ -381,19 +486,108 @@ _setup_install_my_tool() {
 }
 ```
 
-### Adding a Custom Profile
+### Profile YAML Schema
 
-Create `~/.config/homelabctl/setup/profiles/my-profile.yaml`:
+Profile files define a set of packages to install together:
+
 ```yaml
-name: my-profile
-desc: My custom profile
+# Profile definition
+name: <profile-name>                 # Profile identifier
+desc: <string>                       # Profile description
+
+# Platform constraint
+# platform: any | linux | darwin | freebsd | ...
+# - any: all platforms (default)
+# - linux: Linux only
+# - darwin: macOS only
+# - other values from `uname -s` (lowercased)
 platform: any
 
 packages:
+  - name: <package-name>             # Package from registry
+    version: "<version>"             # Optional: specific version (default: latest)
+  - name: <another-package>
+```
+
+**Example:**
+```yaml
+name: my-profile
+desc: My custom development environment
+platform: linux
+
+packages:
+  - name: git
   - name: fzf
-  - name: bat
-  - name: my-tool
-    version: "1.0.0"
+  - name: nodejs
+    version: "20"
+  - name: jdk
+    version: "17"
+```
+
+### Package Dependencies
+
+**Dependency types:**
+
+| Field | Behavior |
+|-------|----------|
+| `requires` | Auto-installed before target. Fails if dependency fails. |
+| `recommends` | Hint displayed after install (if not installed). |
+| `conflicts` | Blocks install if any conflicting package is installed. |
+
+**Platform-specific dependencies:**
+
+Use nested `platform` block for platform-specific dependencies. Supports both OS-only keys (`linux`, `darwin`) and OS-arch keys (`linux-arm64`, `darwin-amd64`):
+
+```yaml
+git-credential-manager:
+  requires: git                      # All platforms
+  platform:
+    linux:
+      recommends: pass gpg           # Linux AMD64: prebuilt binary available
+    linux-arm64:
+      requires: dotnet-sdk           # Linux ARM64: no prebuilt, use dotnet tool
+      recommends: pass gpg
+    # darwin omitted = macOS uses Homebrew + system keychain
+```
+
+**Lookup chain:** `os-arch` → `os` → (none). If `linux-arm64` key exists, it's used exclusively (doesn't inherit from `linux`).
+
+Platform values are **appended** to base by default. Use `!` prefix to **override** (replace) base values.
+
+**Built-in dependencies:**
+
+| Package | requires | recommends | conflicts |
+|---------|----------|------------|-----------|
+| markdownlint-cli | nodejs | - | - |
+| ohmyzsh | zsh | - | - |
+| fzf-tab-completion | fzf | - | - |
+| pass | gpg | - | - |
+| git-credential-manager | git | pass gpg (Linux) | - |
+| git-credential-manager (linux-arm64) | git dotnet-sdk | pass gpg | - |
+
+**CLI usage:**
+```bash
+# Install with dependencies (default)
+homelabctl setup install markdownlint-cli --dry-run
+# Output: nodejs, markdownlint-cli
+
+# Skip dependencies
+homelabctl setup install markdownlint-cli --no-deps --dry-run
+# Output: markdownlint-cli only
+
+# View package info with dependencies
+homelabctl setup info markdownlint-cli
+# Shows: Requires, Recommends, Conflicts, Required by
+
+# View dependency tree
+homelabctl setup deps markdownlint-cli
+# markdownlint-cli
+# └── nodejs
+
+# View reverse dependency tree (what depends on this)
+homelabctl setup deps nodejs --reverse
+# nodejs
+# └── markdownlint-cli
 ```
 
 ## Configure Feature
