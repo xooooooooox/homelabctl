@@ -47,11 +47,19 @@ find %{buildroot}%{_libdir}/homelabctl/src -type f -name "*.sh" -exec chmod 0755
 mkdir -p %{buildroot}%{_bindir}
 ln -s %{_libdir}/homelabctl/bin/homelabctl %{buildroot}%{_bindir}/homelabctl
 
+# install shell completions
+mkdir -p %{buildroot}%{_datadir}/bash-completion/completions
+mkdir -p %{buildroot}%{_datadir}/zsh/site-functions
+cp -a completions/homelabctl.bash %{buildroot}%{_datadir}/bash-completion/completions/homelabctl
+cp -a completions/homelabctl.zsh %{buildroot}%{_datadir}/zsh/site-functions/_homelabctl
+
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/homelabctl
 %{_libdir}/homelabctl/
+%{_datadir}/bash-completion/completions/homelabctl
+%{_datadir}/zsh/site-functions/_homelabctl
 
 %changelog
 * Sat Jan 25 2026 xooooooooox <xozoz.sos@gmail.com> - 0.1.0-1

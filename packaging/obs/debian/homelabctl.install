@@ -1,2 +1,4 @@
 bin usr/lib/homelabctl
 src usr/lib/homelabctl
+completions/homelabctl.bash usr/share/bash-completion/completions/homelabctl
+completions/homelabctl.zsh usr/share/zsh/vendor-completions/_homelabctl
