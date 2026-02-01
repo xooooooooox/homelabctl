@@ -225,7 +225,7 @@ _homelabctl() {
                 COMPREPLY=($(compgen -W "$radp_vf_cmds" -- "$cur"))
             fi
             ;;
-        vf *)
+        'vf '*)
             # Delegate vf subcommands to radp-vf completion
             if type _radp_vf &>/dev/null; then
                 local radp_vf_words=("radp-vf" "${words[@]:2}")
@@ -242,7 +242,7 @@ _homelabctl() {
                         local vagrant_cmds="up halt destroy status ssh provision reload suspend resume snapshot --help"
                         COMPREPLY=($(compgen -W "$vagrant_cmds" -- "$cur"))
                         ;;
-                    vf vg *)
+                    'vf vg '*)
                         # Delegate to vagrant completion if available
                         if type _vagrant &>/dev/null; then
                             _vagrant
