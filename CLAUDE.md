@@ -371,7 +371,12 @@ packages:
     category: <category-name>        # Must match a category defined below
 
     # Optional fields
-    check-cmd: <command>             # Command to check if installed (default: package name)
+    check-cmd: <spec>                # How to check if installed (default: package name as command)
+                                     # Formats:
+                                     #   <command>        - check via 'command -v'
+                                     #   "dir:<path>"     - check if directory exists
+                                     #   "file:<path>"    - check if file exists
+                                     # Path supports ~ expansion (e.g., "dir:~/.fzf-tab-completion")
     homepage: <url>                  # Project homepage URL
 
     # Dependency fields (space-separated package names)

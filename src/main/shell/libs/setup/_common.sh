@@ -3,15 +3,37 @@
 # Sourced by installer.sh and registry.sh
 
 #######################################
-# Check if a command is available
+# Check if a package is installed
 # Arguments:
-#   1 - command name
+#   1 - check specification, supports:
+#       - command name (default): checks via 'command -v'
+#       - "dir:<path>": checks if directory exists
+#       - "file:<path>": checks if file exists
 # Returns:
-#   0 if available, 1 if not
+#   0 if installed, 1 if not
 #######################################
 _setup_is_installed() {
-  local cmd="$1"
-  command -v "$cmd" &>/dev/null
+  local spec="$1"
+
+  # Handle special prefixes
+  case "$spec" in
+    dir:*)
+      local dir="${spec#dir:}"
+      # Expand ~ to $HOME
+      dir="${dir/#\~/$HOME}"
+      [[ -d "$dir" ]]
+      ;;
+    file:*)
+      local file="${spec#file:}"
+      # Expand ~ to $HOME
+      file="${file/#\~/$HOME}"
+      [[ -f "$file" ]]
+      ;;
+    *)
+      # Default: check command
+      command -v "$spec" &>/dev/null
+      ;;
+  esac
 }
 
 #######################################

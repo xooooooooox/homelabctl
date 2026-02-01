@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## v0.1.25
+
+### feat
+
+- Add directory and file check support for `check-cmd` in registry
+  - New syntax: `"dir:<path>"` to check if directory exists
+  - New syntax: `"file:<path>"` to check if file exists
+  - Supports `~` expansion (e.g., `"dir:~/.fzf-tab-completion"`)
+  - Useful for packages installed as directories rather than commands
+
+### fix
+
+- Fix bash completion syntax error causing completion to fail
+  - Change `vf *)` to `'vf '*)` in case pattern (space must be inside quotes)
+  - Same fix for nested `vf vg *)` pattern
+- Fix `fzf-tab-completion` showing as not installed even when `~/.fzf-tab-completion/` exists
+  - Changed `check-cmd` to `"dir:~/.fzf-tab-completion"`
+- Fix `ohmyzsh` showing as not installed when running from bash
+  - Changed `check-cmd` from `omz` (zsh function) to `"dir:~/.oh-my-zsh"`
+- Fix shell completions not auto-loading when installed via package manager (apt/dnf)
+  - Add completion files to deb/rpm packages
+  - Completions now installed to `/usr/share/bash-completion/completions/` and `/usr/share/zsh/site-functions/`
+
 ## v0.1.24
 
 ### feat

@@ -64,7 +64,7 @@ packages:
   ohmyzsh:
     desc: Framework for managing Zsh configuration
     category: shell
-    check-cmd: omz
+    check-cmd: "dir:~/.oh-my-zsh"
     requires: zsh
     homepage: https://ohmyz.sh/
 
@@ -84,6 +84,7 @@ packages:
   fzf-tab-completion:
     desc: Tab completion using fzf for bash/zsh
     category: shell
+    check-cmd: "dir:~/.fzf-tab-completion"
     requires: fzf
     homepage: https://github.com/lincheney/fzf-tab-completion
 
