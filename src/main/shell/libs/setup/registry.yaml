@@ -328,6 +328,12 @@ packages:
     check-cmd: eza
     homepage: https://github.com/eza-community/eza
 
+  tealdeer:
+    desc: Fast tldr client written in Rust (tldr)
+    category: search
+    check-cmd: tldr
+    homepage: https://github.com/dbrgn/tealdeer
+
   # Development Tools
   jq:
     desc: Lightweight JSON processor
