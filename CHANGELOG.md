@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## v0.1.28
+
+### feat
+
+- optimize setup profile
+- Add installer tealder
+
+### fix
+
+- fix completion not work
+- fix completion not work
+
+### docs
+
+- update changelog
+
 ## v0.1.27
 
 ### feat
