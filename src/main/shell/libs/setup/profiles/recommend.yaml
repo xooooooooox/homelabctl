@@ -35,7 +35,7 @@ packages:
   - name: fzf
   - name: fd
   - name: bat
-  - name: tealder
+  - name: tealdeer
 
   # Version manager
   - name: vfox
