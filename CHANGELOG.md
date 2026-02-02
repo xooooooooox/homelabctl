@@ -10,6 +10,7 @@
   - Supports `~` expansion (e.g., `"dir:~/.fzf-tab-completion"`)
   - Useful for packages installed as directories rather than commands
 - Optimize generated completion script, sets local _RADP_VF_DELEGATED=1 before calling `_radp_vf`
+- Add installer `tealder`
 
 ### fix
 
