@@ -33,7 +33,7 @@ cmd_vf() {
       export RADP_VAGRANT_ENV="$gr_radp_extend_homelabctl_vf_env"
   fi
   if [[ -n "$gr_radp_extend_homelabctl_vf_config_dir" ]]; then
-    exec "$radp_vf" -c "$gr_radp_extend_homelabctl_vf_config_dir" "$@"
+    exec "$radp_vf" "$@" -c "$gr_radp_extend_homelabctl_vf_config_dir"
   else
     exec "$radp_vf" "$@"
   fi
