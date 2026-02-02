@@ -29,8 +29,7 @@ cmd_completion() {
                 COMP_CWORD=\$radp_vf_cword\\
                 COMP_LINE=\"\${radp_vf_words[*]}\"\\
                 COMP_POINT=\${#COMP_LINE}\\
-                local _RADP_VF_DELEGATED=1\\
-                _radp_vf\\
+                _RADP_VF_DELEGATED=1 _radp_vf\\
             else\\
                 # Fallback if radp-vf completion not loaded\\
                 COMPREPLY=(\$(compgen -W \"completion dump-config generate info init list template validate version vg --help\" -- \"\$cur\"))\\
@@ -45,8 +44,7 @@ cmd_completion() {
                 COMP_CWORD=\$radp_vf_cword\\
                 COMP_LINE=\"\${radp_vf_words[*]}\"\\
                 COMP_POINT=\${#COMP_LINE}\\
-                local _RADP_VF_DELEGATED=1\\
-                _radp_vf\\
+                _RADP_VF_DELEGATED=1 _radp_vf\\
             else\\
                 COMPREPLY=()\\
             fi\\
@@ -106,10 +104,9 @@ _completion_output_vf_zsh() {
 _homelabctl_vf() {
     # Delegate to radp-vf's native completion for consistent experience
     if (( $+functions[_radp_vf] )); then
-        # Shift words to simulate radp-vf being called directly
-        local -a radp_vf_words=("radp-vf" "${words[@]:2}")
-        words=("${radp_vf_words[@]}")
-        (( CURRENT = CURRENT - 1 ))
+        # In args state, words[1] is "vf" - just replace with "radp-vf"
+        # CURRENT is already correct, no adjustment needed
+        words[1]="radp-vf"
         _radp_vf
     else
         # Fallback if radp-vf completion not loaded
