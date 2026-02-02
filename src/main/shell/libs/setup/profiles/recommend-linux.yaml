@@ -27,11 +27,16 @@ packages:
 
   # Shell enhancements
   - name: zoxide
-  - name: fzf
   - name: fzf-tab-completion
-  - name: fd
+
+  # dev-tools
   - name: jq
+
+  # search
+  - name: fzf
+  - name: fd
   - name: bat
+  - name: tealder
 
   # Version manager
   - name: vfox

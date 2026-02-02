@@ -27,10 +27,15 @@ packages:
 
   # Shell enhancements
   - name: zoxide
+
+  # dev-tools
+  - name: jq
+
+  # search
   - name: fzf
   - name: fd
-  - name: jq
   - name: bat
+  - name: tealder
 
   # Version manager
   - name: vfox
