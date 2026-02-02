@@ -28,7 +28,6 @@ packages:
   # Shell enhancements
   - name: zoxide
   - name: fzf
-  - name: fzf-tab-completion
   - name: fd
   - name: jq
   - name: bat
