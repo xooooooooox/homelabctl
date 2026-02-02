@@ -217,8 +217,7 @@ _homelabctl() {
                 COMP_CWORD=$radp_vf_cword
                 COMP_LINE="${radp_vf_words[*]}"
                 COMP_POINT=${#COMP_LINE}
-                local _RADP_VF_DELEGATED=1
-                _radp_vf
+                _RADP_VF_DELEGATED=1 _radp_vf
             else
                 # Fallback if radp-vf completion not loaded
                 COMPREPLY=($(compgen -W "completion dump-config generate info init list template validate version vg --help" -- "$cur"))
@@ -233,8 +232,7 @@ _homelabctl() {
                 COMP_CWORD=$radp_vf_cword
                 COMP_LINE="${radp_vf_words[*]}"
                 COMP_POINT=${#COMP_LINE}
-                local _RADP_VF_DELEGATED=1
-                _radp_vf
+                _RADP_VF_DELEGATED=1 _radp_vf
             else
                 COMPREPLY=()
             fi
