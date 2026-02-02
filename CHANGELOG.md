@@ -4,22 +4,6 @@
 
 ### feat
 
-- optimize setup profile
-- Add installer tealder
-
-### fix
-
-- fix completion not work
-- fix completion not work
-
-### docs
-
-- update changelog
-
-## v0.1.27
-
-### feat
-
 - Add directory and file check support for `check-cmd` in registry
   - New syntax: `"dir:<path>"` to check if directory exists
   - New syntax: `"file:<path>"` to check if file exists
