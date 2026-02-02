@@ -323,9 +323,10 @@ _homelabctl "$@"
 _homelabctl_vf() {
     # Delegate to radp-vf's native completion for consistent experience
     if (( $+functions[_radp_vf] )); then
-        # In args state, words[1] is "vf" - just replace with "radp-vf"
-        # CURRENT is already correct, no adjustment needed
-        words[1]="radp-vf"
+        # Shift words to simulate radp-vf being called directly
+        local -a radp_vf_words=("radp-vf" "${words[@]:2}")
+        words=("${radp_vf_words[@]}")
+        (( CURRENT = CURRENT - 1 ))
         _radp_vf
     else
         # Fallback if radp-vf completion not loaded
