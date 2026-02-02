@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.1.26
+## v0.1.27
 
 ### feat
 
@@ -9,6 +9,7 @@
   - New syntax: `"file:<path>"` to check if file exists
   - Supports `~` expansion (e.g., `"dir:~/.fzf-tab-completion"`)
   - Useful for packages installed as directories rather than commands
+- Optimize generated completion script, sets local _RADP_VF_DELEGATED=1 before calling `_radp_vf`
 
 ### fix
 

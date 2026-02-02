@@ -276,7 +276,65 @@ _homelabctl_version() {
 }
 
 _homelabctl_vf() {
-    _arguments '(-h --help)'{-h,--help}'[Show help]' '*:args:'
+    # Delegate to radp-vf's native completion for consistent experience
+    if (( $+functions[_radp_vf] )); then
+        # Shift words to simulate radp-vf being called directly
+        local -a radp_vf_words=("radp-vf" "${words[@]:2}")
+        words=("${radp_vf_words[@]}")
+        (( CURRENT = CURRENT - 1 ))
+        _radp_vf
+    else
+        # Fallback if radp-vf completion not loaded
+        local context state state_descr line
+        typeset -A opt_args
+
+        _arguments -C \
+            '(-h --help)'{-h,--help}'[Show help]' \
+            '1: :->command' \
+            '*:: :->args'
+
+        case "$state" in
+            command)
+                local -a radp_vf_cmds=(
+                    'completion:Generate shell completion script'
+                    'dump-config:Dump merged configuration'
+                    'generate:Generate standalone Vagrantfile'
+                    'info:Show environment and configuration info'
+                    'init:Initialize a new project with sample configuration'
+                    'list:List clusters and guests from configuration'
+                    'template:Manage project templates'
+                    'validate:Validate YAML configuration files'
+                    'version:Show version'
+                    'vg:Run vagrant command with framework'
+                )
+                _describe -t commands 'radp-vf command' radp_vf_cmds
+                ;;
+            args)
+                case "${words[1]}" in
+                    vg)
+                        # Delegate to vagrant completion if available
+                        if (( $+functions[_vagrant] )); then
+                            _vagrant
+                        else
+                            local -a vagrant_cmds=(
+                                'up:Start and provision VMs'
+                                'halt:Stop VMs'
+                                'destroy:Destroy VMs'
+                                'status:Show VM status'
+                                'ssh:SSH into VM'
+                                'provision:Run provisioners'
+                                'reload:Restart VMs'
+                            )
+                            _describe -t commands 'vagrant command' vagrant_cmds
+                        fi
+                        ;;
+                    *)
+                        _files
+                        ;;
+                esac
+                ;;
+        esac
+    fi
 }
 
 _homelabctl() {
@@ -318,67 +376,3 @@ _homelabctl() {
 }
 
 _homelabctl "$@"
-
-# Override _homelabctl_vf to delegate to radp-vf's native completion
-_homelabctl_vf() {
-    # Delegate to radp-vf's native completion for consistent experience
-    if (( $+functions[_radp_vf] )); then
-        # Shift context to simulate radp-vf being called directly
-        _radp_vf "$@"
-    else
-        # Fallback if radp-vf completion not loaded
-        local context state state_descr line
-        typeset -A opt_args
-
-        _arguments -C \
-            '(-h --help)'{-h,--help}'[Show help]' \
-            '1: :->command' \
-            '*:: :->args'
-
-        case "$state" in
-            command)
-                local -a radp_vf_cmds=(
-                    'init:Initialize a new project with sample configuration'
-                    'vg:Run vagrant command with framework'
-                    'list:List clusters and guests from configuration'
-                    'dump-config:Dump merged configuration'
-                    'generate:Generate standalone Vagrantfile'
-                    'validate:Validate YAML configuration files'
-                    'info:Show environment and configuration info'
-                    'template:Manage project templates'
-                    'completion:Generate shell completion script'
-                    'version:Show version'
-                    'help:Show help'
-                )
-                _describe -t commands 'radp-vf command' radp_vf_cmds
-                ;;
-            args)
-                case "${words[1]}" in
-                    vg)
-                        # Delegate to vagrant completion
-                        if (( $+functions[_vagrant] )); then
-                            _vagrant "$@"
-                        else
-                            local -a vagrant_cmds=(
-                                'up:Start and provision VMs'
-                                'halt:Stop VMs'
-                                'destroy:Destroy VMs'
-                                'status:Show VM status'
-                                'ssh:SSH into VM'
-                                'provision:Run provisioners'
-                                'reload:Restart VMs'
-                                'suspend:Suspend VMs'
-                                'resume:Resume suspended VMs'
-                                'snapshot:Manage snapshots'
-                            )
-                            _describe -t commands 'vagrant command' vagrant_cmds
-                        fi
-                        ;;
-                    *)
-                        _files
-                        ;;
-                esac
-                ;;
-        esac
-    fi
-}

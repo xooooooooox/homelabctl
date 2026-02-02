@@ -15,26 +15,25 @@ cmd_completion() {
 
   case "$shell" in
   bash)
-    # For bash: helpers first, then completion script with vf case replaced
+    # For bash: helpers first, then completion script with vf delegation
     _completion_output_helpers
     # Generate and replace the vf case with radp-vf delegation
     radp_cli_completion_generate "$shell" | sed "
         /^        'vf')$/,/^            ;;$/ c\\
         'vf')\\
-            # Delegate to radp-vf's native completion for consistent experience\\
+            # Delegate to radp-vf completion\\
             if type _radp_vf \&>/dev/null; then\\
-                # Shift words to simulate radp-vf being called directly\\
                 local radp_vf_words=(\"radp-vf\" \"\${words[@]:2}\")\\
                 local radp_vf_cword=\$((cword - 1))\\
                 COMP_WORDS=(\"\${radp_vf_words[@]}\")\\
                 COMP_CWORD=\$radp_vf_cword\\
                 COMP_LINE=\"\${radp_vf_words[*]}\"\\
                 COMP_POINT=\${#COMP_LINE}\\
+                local _RADP_VF_DELEGATED=1\\
                 _radp_vf\\
             else\\
                 # Fallback if radp-vf completion not loaded\\
-                local radp_vf_cmds=\"init vg list dump-config generate validate info template completion version help --help\"\\
-                COMPREPLY=(\$(compgen -W \"\$radp_vf_cmds\" -- \"\$cur\"))\\
+                COMPREPLY=(\$(compgen -W \"completion dump-config generate info init list template validate version vg --help\" -- \"\$cur\"))\\
             fi\\
             ;;\\
         'vf '*)\\
@@ -46,26 +45,10 @@ cmd_completion() {
                 COMP_CWORD=\$radp_vf_cword\\
                 COMP_LINE=\"\${radp_vf_words[*]}\"\\
                 COMP_POINT=\${#COMP_LINE}\\
+                local _RADP_VF_DELEGATED=1\\
                 _radp_vf\\
             else\\
-                # Fallback for vf vg\\
-                case \"\$cmd_path\" in\\
-                    'vf vg')\\
-                        local vagrant_cmds=\"up halt destroy status ssh provision reload suspend resume snapshot --help\"\\
-                        COMPREPLY=(\$(compgen -W \"\$vagrant_cmds\" -- \"\$cur\"))\\
-                        ;;\\
-                    'vf vg '*)\\
-                        # Delegate to vagrant completion if available\\
-                        if type _vagrant \&>/dev/null; then\\
-                            _vagrant\\
-                        else\\
-                            COMPREPLY=()\\
-                        fi\\
-                        ;;\\
-                    *)\\
-                        COMPREPLY=()\\
-                        ;;\\
-                esac\\
+                COMPREPLY=()\\
             fi\\
             ;;
     "
@@ -114,7 +97,7 @@ COMPLETION_HELPERS
 
 #######################################
 # Output custom _homelabctl_vf for zsh
-# Overrides framework-generated version to delegate to radp-vf completion
+# Delegates to radp-vf completion for consistent experience
 #######################################
 _completion_output_vf_zsh() {
   cat <<'VF_ZSH'
@@ -123,8 +106,11 @@ _completion_output_vf_zsh() {
 _homelabctl_vf() {
     # Delegate to radp-vf's native completion for consistent experience
     if (( $+functions[_radp_vf] )); then
-        # Shift context to simulate radp-vf being called directly
-        _radp_vf "$@"
+        # Shift words to simulate radp-vf being called directly
+        local -a radp_vf_words=("radp-vf" "${words[@]:2}")
+        words=("${radp_vf_words[@]}")
+        (( CURRENT = CURRENT - 1 ))
+        _radp_vf
     else
         # Fallback if radp-vf completion not loaded
         local context state state_descr line
@@ -138,26 +124,25 @@ _homelabctl_vf() {
         case "$state" in
             command)
                 local -a radp_vf_cmds=(
-                    'init:Initialize a new project with sample configuration'
-                    'vg:Run vagrant command with framework'
-                    'list:List clusters and guests from configuration'
+                    'completion:Generate shell completion script'
                     'dump-config:Dump merged configuration'
                     'generate:Generate standalone Vagrantfile'
-                    'validate:Validate YAML configuration files'
                     'info:Show environment and configuration info'
+                    'init:Initialize a new project with sample configuration'
+                    'list:List clusters and guests from configuration'
                     'template:Manage project templates'
-                    'completion:Generate shell completion script'
+                    'validate:Validate YAML configuration files'
                     'version:Show version'
-                    'help:Show help'
+                    'vg:Run vagrant command with framework'
                 )
                 _describe -t commands 'radp-vf command' radp_vf_cmds
                 ;;
             args)
                 case "${words[1]}" in
                     vg)
-                        # Delegate to vagrant completion
+                        # Delegate to vagrant completion if available
                         if (( $+functions[_vagrant] )); then
-                            _vagrant "$@"
+                            _vagrant
                         else
                             local -a vagrant_cmds=(
                                 'up:Start and provision VMs'
@@ -167,9 +152,6 @@ _homelabctl_vf() {
                                 'ssh:SSH into VM'
                                 'provision:Run provisioners'
                                 'reload:Restart VMs'
-                                'suspend:Suspend VMs'
-                                'resume:Resume suspended VMs'
-                                'snapshot:Manage snapshots'
                             )
                             _describe -t commands 'vagrant command' vagrant_cmds
                         fi
