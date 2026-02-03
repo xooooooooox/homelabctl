@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.1.31
+
+### feat
+
+- Support targeting VMs by cluster name via `vf vg` command (requires radp-vagrant-framework v0.2.22+)
+  - `homelabctl vf vg up -C my-cluster` - start all VMs in a cluster
+  - `homelabctl vf vg up -C my-cluster -G 1,2` - start specific guests in a cluster
+  - `homelabctl vf vg up -C cluster1,cluster2` - multiple clusters
+  - Shell completion for cluster names and guest IDs works automatically via delegation
+
 ## v0.1.30
 
 ### feat

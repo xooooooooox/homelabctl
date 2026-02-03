@@ -136,6 +136,14 @@ homelabctl vf vg up
 | `vf template list/show` | List or show templates           |
 | `vf version`            | Show framework version           |
 
+**Target VMs by cluster** (instead of full machine names):
+
+```shell
+homelabctl vf vg up -C my-cluster           # All VMs in cluster
+homelabctl vf vg up -C my-cluster -G 1,2    # Specific guests
+homelabctl vf vg up -C cluster1,cluster2    # Multiple clusters
+```
+
 Requires [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework).
 See [Vagrant Guide](docs/vagrant-guide.md) for details.
 

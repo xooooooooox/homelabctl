@@ -40,7 +40,7 @@ git clone https://github.com/xooooooooox/radp-vagrant-framework.git
 export PATH="$PWD/radp-vagrant-framework/bin:$PATH"
 
 # Add to shell config for persistence
-echo 'export PATH="/path/to/radp-vagrant-framework/bin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/path/to/radp-vagrant-framework/bin:$PATH"' >>~/.bashrc
 ```
 
 After installation, verify `radp-vf` is available:
@@ -60,59 +60,92 @@ cd myproject
 homelabctl vf init myproject -t single-node
 
 # Start VMs
-homelabctl vg up
+homelabctl vf vg up
 
 # Check status
-homelabctl vg status
+homelabctl vf vg status
 
 # SSH into a VM
-homelabctl vg ssh
+homelabctl vf vg ssh
 
 # Stop VMs
-homelabctl vg halt
+homelabctl vf vg halt
 
 # Destroy VMs
-homelabctl vg destroy
+homelabctl vf vg destroy
+
+# Target VMs by cluster (instead of full machine name)
+homelabctl vf vg up -C my-cluster
+homelabctl vf vg up -C my-cluster -G 1,2
 ```
 
 ## Commands
 
-### Vagrant Passthrough (vg)
+### Vagrant Passthrough (vf vg)
 
-The `vg` command passes arguments directly to `radp-vf vg`, which handles Vagrant integration.
+The `vf vg` command passes arguments to `radp-vf vg`, which handles Vagrant integration.
 
 ```shell
-homelabctl vg <vagrant-command> [options]
+homelabctl vf vg <vagrant-command >[options]
 ```
 
-| Command | Description |
-|---------|-------------|
-| `vg up` | Start and provision VMs |
-| `vg halt` | Stop VMs |
-| `vg destroy` | Remove VMs |
-| `vg status` | Show VM status |
-| `vg ssh [name]` | SSH into a VM |
-| `vg provision` | Re-run provisioners |
-| `vg reload` | Restart VMs |
-| `vg snapshot` | Manage snapshots |
+| Command            | Description             |
+|--------------------|-------------------------|
+| `vf vg up`         | Start and provision VMs |
+| `vf vg halt`       | Stop VMs                |
+| `vf vg destroy`    | Remove VMs              |
+| `vf vg status`     | Show VM status          |
+| `vf vg ssh [name]` | SSH into a VM           |
+| `vf vg provision`  | Re-run provisioners     |
+| `vf vg reload`     | Restart VMs             |
+| `vf vg snapshot`   | Manage snapshots        |
 
 The framework automatically sets `VAGRANT_VAGRANTFILE` and manages the Vagrant environment.
+
+#### Targeting VMs by Cluster
+
+Instead of typing full machine names like `homelab-gitlab-runner-1`, you can target VMs by cluster name:
+
+```shell
+# Start all VMs in a cluster
+homelabctl vf vg up -C my-cluster
+homelabctl vf vg up --cluster=my-cluster
+
+# Start specific guests in a cluster (comma-separated)
+homelabctl vf vg up -C my-cluster -G 1,2
+homelabctl vf vg up --cluster=my-cluster --guest-ids=1,2
+
+# Multiple clusters (comma-separated)
+homelabctl vf vg up -C gitlab-runner,develop-centos9
+
+# Original machine name syntax still works
+homelabctl vf vg up homelab-gitlab-runner-1
+```
+
+**Options:**
+
+| Option              | Short | Description                                       |
+|---------------------|-------|---------------------------------------------------|
+| `--cluster <names>` | `-C`  | Cluster names (comma-separated for multiple)      |
+| `--guest-ids <ids>` | `-G`  | Guest IDs (comma-separated, requires `--cluster`) |
+
+Shell completion is supported for cluster names, guest IDs, and machine names.
 
 ### Framework Commands (vf)
 
 The `vf` commands interact with radp-vagrant-framework for project management.
 
-| Command | Description |
-|---------|-------------|
-| `vf init [dir]` | Initialize a new vagrant project |
-| `vf list` | List clusters and guests |
-| `vf info` | Show environment information |
-| `vf validate` | Validate YAML configuration |
-| `vf dump-config` | Export merged configuration |
-| `vf generate` | Generate standalone Vagrantfile |
-| `vf template list` | List available templates |
-| `vf template show <name>` | Show template details |
-| `vf version` | Show framework version |
+| Command                   | Description                      |
+|---------------------------|----------------------------------|
+| `vf init [dir]`           | Initialize a new vagrant project |
+| `vf list`                 | List clusters and guests         |
+| `vf info`                 | Show environment information     |
+| `vf validate`             | Validate YAML configuration      |
+| `vf dump-config`          | Export merged configuration      |
+| `vf generate`             | Generate standalone Vagrantfile  |
+| `vf template list`        | List available templates         |
+| `vf template show <name>` | Show template details            |
+| `vf version`              | Show framework version           |
 
 ## Project Templates
 
@@ -142,13 +175,14 @@ homelabctl vf init myproject -t k8s-cluster --set cluster_name=homelab --set wor
 
 ### Built-in Templates
 
-| Template | Description |
-|----------|-------------|
-| `base` | Minimal setup for getting started |
-| `single-node` | Enhanced single VM with common provisions |
+| Template      | Description                                |
+|---------------|--------------------------------------------|
+| `base`        | Minimal setup for getting started          |
+| `single-node` | Enhanced single VM with common provisions  |
 | `k8s-cluster` | Kubernetes cluster with master and workers |
 
-**User templates** can be added to `~/.config/radp-vagrant/templates/` and will override built-in templates with the same name.
+**User templates** can be added to `~/.config/radp-vagrant/templates/` and will override built-in templates with the
+same name.
 
 ## Configuration
 
@@ -185,7 +219,7 @@ radp:
             manage_guest: true
 
       config:
-        common:                       # Global settings inherited by all guests
+        common: # Global settings inherited by all guests
           box:
             name: generic/ubuntu2204
             version: "4.3.12"
@@ -207,7 +241,7 @@ radp:
       config:
         clusters:
           - name: my-cluster
-            common:                   # Cluster-level common settings
+            common: # Cluster-level common settings
               box:
                 name: generic/centos9s
               provider:
@@ -244,19 +278,19 @@ Settings are inherited and merged in this order:
 Global common → Cluster common → Guest
 ```
 
-| Config Type | Merge Behavior |
-|-------------|----------------|
-| box, provider, network | Deep merge (guest overrides) |
-| provisions | Phase-aware: global-pre → cluster-pre → guest → cluster-post → global-post |
-| triggers, synced-folders | Concatenate |
+| Config Type              | Merge Behavior                                                             |
+|--------------------------|----------------------------------------------------------------------------|
+| box, provider, network   | Deep merge (guest overrides)                                               |
+| provisions               | Phase-aware: global-pre → cluster-pre → guest → cluster-post → global-post |
+| triggers, synced-folders | Concatenate                                                                |
 
 ### View Configuration
 
 ```shell
 # List clusters and guests
 homelabctl vf list
-homelabctl vf list -v              # Verbose
-homelabctl vf list --provisions    # Show provisioners
+homelabctl vf list -v # Verbose
+homelabctl vf list --provisions # Show provisioners
 homelabctl vf list --synced-folders
 
 # Export merged configuration
@@ -270,16 +304,16 @@ homelabctl vf validate
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `RADP_VAGRANT_CONFIG_DIR` | Configuration directory path | `./config` |
-| `RADP_VAGRANT_ENV` | Override environment name | Value from `radp.env` in vagrant.yaml |
+| Variable                  | Description                  | Default                               |
+|---------------------------|------------------------------|---------------------------------------|
+| `RADP_VAGRANT_CONFIG_DIR` | Configuration directory path | `./config`                            |
+| `RADP_VAGRANT_ENV`        | Override environment name    | Value from `radp.env` in vagrant.yaml |
 
 ### Setting Environment
 
 ```shell
 # Use specific environment
-RADP_VAGRANT_ENV=prod homelabctl vg up
+RADP_VAGRANT_ENV=prod homelabctl vf vg up
 
 # Use custom config directory
 RADP_VAGRANT_CONFIG_DIR=/path/to/config homelabctl vf list
@@ -301,13 +335,13 @@ homelabctl vf init myvm -t single-node
 cd myvm
 
 # Start VM
-homelabctl vg up
+homelabctl vf vg up
 
 # SSH into VM
-homelabctl vg ssh
+homelabctl vf vg ssh
 
 # Stop VM
-homelabctl vg halt
+homelabctl vf vg halt
 ```
 
 ### Multi-VM Cluster
@@ -321,29 +355,29 @@ cd mycluster
 homelabctl vf list -v
 
 # Start all VMs
-homelabctl vg up
+homelabctl vf vg up
 
 # SSH into specific VM
-homelabctl vg ssh master
+homelabctl vf vg ssh master
 
 # Check status
-homelabctl vg status
+homelabctl vf vg status
 ```
 
 ### Working with Snapshots
 
 ```shell
 # Create snapshot
-homelabctl vg snapshot save clean-state
+homelabctl vf vg snapshot save clean-state
 
 # List snapshots
-homelabctl vg snapshot list
+homelabctl vf vg snapshot list
 
 # Restore snapshot
-homelabctl vg snapshot restore clean-state
+homelabctl vf vg snapshot restore clean-state
 
 # Delete snapshot
-homelabctl vg snapshot delete clean-state
+homelabctl vf vg snapshot delete clean-state
 ```
 
 ### Generate Standalone Vagrantfile
@@ -362,17 +396,17 @@ This creates a standalone Vagrantfile that doesn't require radp-vagrant-framewor
 
 The framework includes ready-to-use provisions (prefix with `radp:`):
 
-| Name | Description |
-|------|-------------|
-| `radp:time/chrony-sync` | Configure chrony for NTP time sync |
-| `radp:system/expand-lvm` | Expand LVM partition and filesystem |
-| `radp:ssh/host-trust` | Add host SSH key to guest |
-| `radp:ssh/cluster-trust` | SSH trust between VMs in cluster |
-| `radp:crypto/gpg-import` | Import GPG keys |
-| `radp:crypto/gpg-preset-passphrase` | Preset GPG passphrase in gpg-agent |
-| `radp:git/clone` | Clone git repository |
-| `radp:yadm/clone` | Clone dotfiles using yadm |
-| `radp:nfs/external-nfs-mount` | Mount external NFS shares |
+| Name                                | Description                         |
+|-------------------------------------|-------------------------------------|
+| `radp:time/chrony-sync`             | Configure chrony for NTP time sync  |
+| `radp:system/expand-lvm`            | Expand LVM partition and filesystem |
+| `radp:ssh/host-trust`               | Add host SSH key to guest           |
+| `radp:ssh/cluster-trust`            | SSH trust between VMs in cluster    |
+| `radp:crypto/gpg-import`            | Import GPG keys                     |
+| `radp:crypto/gpg-preset-passphrase` | Preset GPG passphrase in gpg-agent  |
+| `radp:git/clone`                    | Clone git repository                |
+| `radp:yadm/clone`                   | Clone dotfiles using yadm           |
+| `radp:nfs/external-nfs-mount`       | Mount external NFS shares           |
 
 ## Troubleshooting
 
@@ -410,10 +444,10 @@ Check VirtualBox/provider status and logs:
 
 ```shell
 # Check VM status
-homelabctl vg status
+homelabctl vf vg status
 
 # View Vagrant debug output
-VAGRANT_LOG=debug homelabctl vg up
+VAGRANT_LOG=debug homelabctl vf vg up
 ```
 
 ### Configuration validation errors
@@ -425,6 +459,7 @@ homelabctl vf validate
 ```
 
 Common issues:
+
 - Clusters must be in `vagrant-{env}.yaml`, not in base `vagrant.yaml`
 - Duplicate cluster names or guest IDs within same environment
 - Missing `radp.env` in base `vagrant.yaml`

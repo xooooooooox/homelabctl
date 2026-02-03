@@ -134,6 +134,14 @@ homelabctl vf vg up
 | `vf template list/show` | 列出或显示模板                       |
 | `vf version`            | 显示框架版本                        |
 
+**通过集群指定虚拟机**（无需输入完整 machine name）：
+
+```shell
+homelabctl vf vg up -C my-cluster           # 集群内所有虚拟机
+homelabctl vf vg up -C my-cluster -G 1,2    # 指定 guest
+homelabctl vf vg up -C cluster1,cluster2    # 多个集群
+```
+
 需要安装 [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework)。详情请参阅 [Vagrant 指南](docs/vagrant-guide.md)。
 
 ### 软件安装 (setup)
