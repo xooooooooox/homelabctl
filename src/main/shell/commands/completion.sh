@@ -23,6 +23,13 @@ cmd_completion() {
         'vf')\\
             # Delegate to radp-vf completion\\
             if type _radp_vf \&>/dev/null; then\\
+                # Set config from homelabctl config if not in command line\\
+                local _hctl_vf_config_dir\\
+                _hctl_vf_config_dir=\"\$(_homelabctl_vf_config_dir)\"\\
+                [[ -n \"\$_hctl_vf_config_dir\" ]] && export RADP_VAGRANT_CONFIG_DIR=\"\$_hctl_vf_config_dir\"\\
+                local _hctl_vf_env\\
+                _hctl_vf_env=\"\$(_homelabctl_vf_env)\"\\
+                [[ -n \"\$_hctl_vf_env\" ]] && export RADP_VAGRANT_ENV=\"\$_hctl_vf_env\"\\
                 local radp_vf_words=(\"radp-vf\" \"\${words[@]:2}\")\\
                 local radp_vf_cword=\$((cword - 1))\\
                 COMP_WORDS=(\"\${radp_vf_words[@]}\")\\
@@ -38,6 +45,13 @@ cmd_completion() {
         'vf '*)\\
             # Delegate vf subcommands to radp-vf completion\\
             if type _radp_vf \&>/dev/null; then\\
+                # Set config from homelabctl config if not in command line\\
+                local _hctl_vf_config_dir\\
+                _hctl_vf_config_dir=\"\$(_homelabctl_vf_config_dir)\"\\
+                [[ -n \"\$_hctl_vf_config_dir\" ]] && export RADP_VAGRANT_CONFIG_DIR=\"\$_hctl_vf_config_dir\"\\
+                local _hctl_vf_env\\
+                _hctl_vf_env=\"\$(_homelabctl_vf_env)\"\\
+                [[ -n \"\$_hctl_vf_env\" ]] && export RADP_VAGRANT_ENV=\"\$_hctl_vf_env\"\\
                 local radp_vf_words=(\"radp-vf\" \"\${words[@]:2}\")\\
                 local radp_vf_cword=\$((cword - 1))\\
                 COMP_WORDS=(\"\${radp_vf_words[@]}\")\\
@@ -90,6 +104,30 @@ _homelabctl_complete_profiles() {
   homelabctl -q setup profile list --names-only 2>/dev/null
 }
 
+# Get vf config_dir from homelabctl config (for completion delegation)
+_homelabctl_vf_config_dir() {
+  # Check if already set via env var
+  if [[ -n "${RADP_VAGRANT_CONFIG_DIR:-}" ]]; then
+    echo "$RADP_VAGRANT_CONFIG_DIR"
+    return
+  fi
+  # Try to get from homelabctl config
+  local config_dir
+  config_dir=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"config_dir": *"[^"]*"' | head -1 | sed 's/"config_dir": *"\([^"]*\)"/\1/')
+  [[ -n "$config_dir" ]] && echo "$config_dir"
+}
+
+# Get vf env from homelabctl config
+_homelabctl_vf_env() {
+  if [[ -n "${RADP_VAGRANT_ENV:-}" ]]; then
+    echo "$RADP_VAGRANT_ENV"
+    return
+  fi
+  local env_val
+  env_val=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"env": *"[^"]*"' | tail -1 | sed 's/"env": *"\([^"]*\)"/\1/')
+  [[ -n "$env_val" ]] && echo "$env_val"
+}
+
 COMPLETION_HELPERS
 }
 
@@ -104,6 +142,12 @@ _completion_output_vf_zsh() {
 _homelabctl_vf() {
     # Delegate to radp-vf's native completion for consistent experience
     if (( $+functions[_radp_vf] )); then
+        # Set config from homelabctl config if not already set
+        local _hctl_vf_config_dir _hctl_vf_env
+        _hctl_vf_config_dir="$(_homelabctl_vf_config_dir)"
+        [[ -n "$_hctl_vf_config_dir" ]] && export RADP_VAGRANT_CONFIG_DIR="$_hctl_vf_config_dir"
+        _hctl_vf_env="$(_homelabctl_vf_env)"
+        [[ -n "$_hctl_vf_env" ]] && export RADP_VAGRANT_ENV="$_hctl_vf_env"
         # In args state, words[1] is "vf" - just replace with "radp-vf"
         # CURRENT is already correct, no adjustment needed
         words[1]="radp-vf"
