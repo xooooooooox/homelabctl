@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.6.27
+
+### docs
+
+- update docs
+- update docs
+- update docs
+- update docs
+
 ## v0.1.32
 
 ### feat
