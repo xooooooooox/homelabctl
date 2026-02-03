@@ -9,11 +9,6 @@
   - `homelabctl vf vg up -C my-cluster -G 1,2` - start specific guests in a cluster
   - `homelabctl vf vg up -C cluster1,cluster2` - multiple clusters
   - Shell completion for cluster names and guest IDs works automatically via delegation
-
-## v0.1.30
-
-### feat
-
 - Add directory and file check support for `check-cmd` in registry
   - New syntax: `"dir:<path>"` to check if directory exists
   - New syntax: `"file:<path>"` to check if file exists
@@ -21,27 +16,9 @@
   - Useful for packages installed as directories rather than commands
 - Optimize generated completion script, sets local _RADP_VF_DELEGATED=1 before calling `_radp_vf`
 - Add installer `tealder`
-
-### fix
-
-- Fix bash completion syntax error causing completion to fail
-  - Change `vf *)` to `'vf '*)` in case pattern (space must be inside quotes)
-  - Same fix for nested `vf vg *)` pattern
-- Fix `fzf-tab-completion` showing as not installed even when `~/.fzf-tab-completion/` exists
-  - Changed `check-cmd` to `"dir:~/.fzf-tab-completion"`
-- Fix `ohmyzsh` showing as not installed when running from bash
-  - Changed `check-cmd` from `omz` (zsh function) to `"dir:~/.oh-my-zsh"`
-- Fix shell completions not auto-loading when installed via package manager (apt/dnf)
-  - Add completion files to deb/rpm packages
-  - Completions now installed to `/usr/share/bash-completion/completions/` and `/usr/share/zsh/site-functions/`
-
-## v0.1.24
-
-### feat
-
 - Add platform dependency support for OS+architecture combinations (e.g., `linux-arm64`, `darwin-amd64`)
-    - Lookup chain: `os-arch` → `os` → base (e.g., `linux-arm64` → `linux` → base)
-    - Enables architecture-specific dependencies (e.g., `git-credential-manager` requires `dotnet-sdk` on Linux ARM64)
+  - Lookup chain: `os-arch` → `os` → base (e.g., `linux-arm64` → `linux` → base)
+  - Enables architecture-specific dependencies (e.g., `git-credential-manager` requires `dotnet-sdk` on Linux ARM64)
 - Add `setup deps <name>` command to show package dependency tree
 - Add `setup deps <name> --reverse` to show reverse dependencies
 - Add installer: dotnet-sdk
@@ -68,6 +45,16 @@
 
 ### fix
 
+- Fix bash completion syntax error causing completion to fail
+  - Change `vf *)` to `'vf '*)` in case pattern (space must be inside quotes)
+  - Same fix for nested `vf vg *)` pattern
+- Fix `fzf-tab-completion` showing as not installed even when `~/.fzf-tab-completion/` exists
+  - Changed `check-cmd` to `"dir:~/.fzf-tab-completion"`
+- Fix `ohmyzsh` showing as not installed when running from bash
+  - Changed `check-cmd` from `omz` (zsh function) to `"dir:~/.oh-my-zsh"`
+- Fix shell completions not auto-loading when installed via package manager (apt/dnf)
+  - Add completion files to deb/rpm packages
+  - Completions now installed to `/usr/share/bash-completion/completions/` and `/usr/share/zsh/site-functions/`
 - Fix `setup deps` command not showing dependency tree due to `set -e` exit on `((count++))` when count is 0
 - Fix `setup info --all-platforms` not showing all platform entries due to `set -e` exit
 - Fix `setup list` showing no packages due to undefined `HOMELABCTL_ROOT` (should use `RADP_APP_ROOT`)
@@ -76,9 +63,9 @@
 - Fix zsh completion not showing package names for `setup install <tab>` (banner/log output was breaking completion)
 - Fix apply.sh interrupt after package installed
 - Fix vfox-installed SDKs not available in PATH for subsequent installers
-    - Problem: `vfox use --global` requires hook support and doesn't work in non-interactive scripts, causing nodejs/jdk/go/python/ruby binaries to be missing from PATH
-    - Solution: Add verification step after vfox operations to explicitly find and add SDK bin directory to PATH if the binary is not found
-    - Affected installers: nodejs.sh, jdk.sh, go.sh, python.sh, ruby.sh
+  - Problem: `vfox use --global` requires hook support and doesn't work in non-interactive scripts
+  - Solution: Add verification step after vfox operations to explicitly find and add SDK bin directory to PATH
+  - Affected installers: nodejs.sh, jdk.sh, go.sh, python.sh, ruby.sh
 - Improve `_setup_vfox_find_sdk_bin` to use `-executable` flag with fallback to `-perm /111` for better compatibility
 
 ### refactor
