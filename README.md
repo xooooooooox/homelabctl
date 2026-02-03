@@ -194,6 +194,26 @@ mkdir -p ~/.zfunc
 homelabctl completion zsh >~/.zfunc/_homelabctl
 ```
 
+### VF Completion
+
+The `homelabctl vf` command supports dynamic completion for cluster names, guest IDs, and machine names. Config is automatically read from homelabctl's config file:
+
+```yaml
+# ~/.config/homelabctl/config.yaml
+radp:
+  extend:
+    homelabctl:
+      vf:
+        config_dir: $HOME/.config/homelabctl/vagrant
+```
+
+This allows completion to work without specifying `-c` on command line:
+
+```bash
+homelabctl vf vg --cluster <tab>        # Shows cluster names
+homelabctl vf vg --cluster dev -G <tab> # Shows guest IDs
+```
+
 ## Documentation
 
 - [Installation Guide](docs/installation.md) - Full installation options, upgrade, uninstall

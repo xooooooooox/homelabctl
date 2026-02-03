@@ -215,6 +215,47 @@ cmd_vf_init() {
 - `RADP_VAGRANT_CONFIG_DIR` - Override config directory (default: ./config)
 - `RADP_VAGRANT_ENV` - Override environment name
 
+## VF Completion Integration
+
+The `homelabctl vf` command delegates completion to `radp-vf` with config integration.
+
+### How it works
+
+1. **Config from homelabctl**: When completing `homelabctl vf vg --cluster <tab>`, the completion reads `config_dir` and `env` from homelabctl's config file (`~/.config/homelabctl/config.yaml`) via `homelabctl --config --all --json`
+
+2. **Environment variables**: Sets `RADP_VAGRANT_CONFIG_DIR` and `RADP_VAGRANT_ENV` before delegating to `_radp_vf`
+
+3. **Delegation**: Uses `_RADP_VF_DELEGATED=1` flag to skip `_init_completion` in radp-vf completion
+
+### Config file integration
+
+homelabctl config (`~/.config/homelabctl/config.yaml`):
+```yaml
+radp:
+  extend:
+    homelabctl:
+      vf:
+        config_dir: $HOME/.config/homelabctl/vagrant
+        config_base_filename: vagrant.yaml
+        env: homelab
+```
+
+This allows `homelabctl vf vg --cluster <tab>` to work without specifying `-c` on command line.
+
+### Completion helper functions
+
+The completion script (`completions/homelabctl.bash`, `completions/homelabctl.zsh`) includes:
+
+- `_homelabctl_vf_config_dir()` - Gets config_dir from `RADP_VAGRANT_CONFIG_DIR` or homelabctl config
+- `_homelabctl_vf_env()` - Gets env from `RADP_VAGRANT_ENV` or homelabctl config
+
+### Regenerating completions
+
+```bash
+./bin/homelabctl completion bash > completions/homelabctl.bash
+./bin/homelabctl completion zsh > completions/homelabctl.zsh
+```
+
 ## Setup Feature
 
 The setup command manages software installation across different platforms.

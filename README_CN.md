@@ -189,6 +189,26 @@ mkdir -p ~/.zfunc
 homelabctl completion zsh >~/.zfunc/_homelabctl
 ```
 
+### VF 补全
+
+`homelabctl vf` 命令支持集群名称、guest ID 和 machine name 的动态补全。配置会自动从 homelabctl 的配置文件中读取：
+
+```yaml
+# ~/.config/homelabctl/config.yaml
+radp:
+  extend:
+    homelabctl:
+      vf:
+        config_dir: $HOME/.config/homelabctl/vagrant
+```
+
+这样无需在命令行指定 `-c` 即可使用补全：
+
+```bash
+homelabctl vf vg --cluster <tab>        # 显示集群名称
+homelabctl vf vg --cluster dev -G <tab> # 显示 guest ID
+```
+
 ## 文档
 
 - [安装指南](docs/installation.md) - 完整安装选项、升级、卸载
