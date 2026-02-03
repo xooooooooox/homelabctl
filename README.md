@@ -216,10 +216,17 @@ homelabctl vf vg --cluster dev -G <tab> # Shows guest IDs
 
 ## Documentation
 
+- [Getting Started](docs/getting-started.md) - Quick start guide
 - [Installation Guide](docs/installation.md) - Full installation options, upgrade, uninstall
-- [Setup Guide](docs/setup-guide.md) - Package installation, profiles, custom extensions
-- [Vagrant Guide](docs/vagrant-guide.md) - VM management, templates, configuration
+- [Setup Guide](docs/user-guide/setup-guide.md) - Package installation, profiles, custom extensions
+- [Vagrant Guide](docs/user-guide/vagrant-guide.md) - VM management, templates, configuration
+- [CLI Reference](docs/reference/cli-reference.md) - Complete command reference
 - [Configuration](docs/configuration.md) - YAML configuration system
+
+## Related Projects
+
+- [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework) - Bash CLI framework (dependency)
+- [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework) - YAML-driven Vagrant framework
 
 ## Contributing
 

@@ -466,5 +466,10 @@ Common issues:
 
 ## Further Reading
 
-For detailed VM configuration options, provisioners, network settings, and advanced features, see the
-[radp-vagrant-framework documentation](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/configuration-reference.md).
+For detailed VM configuration options, see the radp-vagrant-framework documentation:
+
+- [Configuration Reference](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/configuration.md) - Box, provider, network, synced folders
+- [Provisions Guide](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/user-guide/provisions.md) - Shell provisions and builtin provisions
+- [Triggers Guide](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/user-guide/triggers.md) - Before/after triggers
+- [Plugins Guide](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/user-guide/plugins.md) - vagrant-hostmanager, vagrant-vbguest, etc.
+- [Templates Guide](https://github.com/xooooooooox/radp-vagrant-framework/blob/main/docs/user-guide/templates.md) - Project templates
