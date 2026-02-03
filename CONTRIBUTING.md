@@ -146,36 +146,45 @@ release-prep (manual trigger)
        ▼
 create-version-tag
        │
-       ├──────────────────────┬──────────────────────┐
-       ▼                      ▼                      ▼
-update-spec-version    update-homebrew-tap    (GitHub Release)
+       ├───────────────────┬───────────────────┬──────────────────┬──────────────────┐
+       ▼                   ▼                   ▼                  ▼                  ▼
+update-spec-version  update-homebrew-tap  build-portable  cleanup-branches  (GitHub Release)
        │
        ├──────────────┐
        ▼              ▼
 build-copr-package  build-obs-package
-       │              │
-       └──────┬───────┘
-              ▼
-  attach-release-packages
+       │              │               │
+       └──────────────┴───────────────┘
+                      │
+                      ▼
+         attach-release-packages
 ```
 
 ### Steps
 
 1. Trigger `release-prep` workflow with bump_type (patch/minor/major/manual)
 2. Review and merge the generated PR
-3. Subsequent workflows run automatically
+3. Subsequent workflows run automatically:
+    - `create-version-tag` → creates and pushes the Git tag
+    - `build-copr-package` → builds RPM for Fedora/RHEL
+    - `build-obs-package` → builds for openSUSE/Debian
+    - `update-homebrew-tap` → updates the Homebrew formula
+    - `build-portable` → builds portable binaries for all platforms
+    - `attach-release-packages` → uploads built packages to GitHub Release
 
 ## GitHub Actions Reference
 
-| Workflow                      | Trigger            | Purpose                      |
-|-------------------------------|--------------------|------------------------------|
-| `release-prep.yml`            | Manual on `main`   | Create release branch and PR |
-| `create-version-tag.yml`      | PR merge or manual | Validate and create git tag  |
-| `update-spec-version.yml`     | After tag creation | Update spec Version field    |
-| `build-copr-package.yml`      | After spec update  | Trigger COPR build           |
-| `build-obs-package.yml`       | After spec update  | Sync to OBS and build        |
-| `update-homebrew-tap.yml`     | Tag push           | Update Homebrew formula      |
-| `attach-release-packages.yml` | Release published  | Upload packages to release   |
+| Workflow                      | Trigger                                 | Purpose                                                       |
+|-------------------------------|-----------------------------------------|---------------------------------------------------------------|
+| `release-prep.yml`            | Manual on `main`                        | Create release branch and PR                                  |
+| `create-version-tag.yml`      | PR merge or manual                      | Validate and create git tag                                   |
+| `update-spec-version.yml`     | After tag creation                      | Update spec Version field                                     |
+| `build-copr-package.yml`      | After spec update                       | Trigger COPR build                                            |
+| `build-obs-package.yml`       | After spec update                       | Sync to OBS and build                                         |
+| `build-portable.yml`          | After `create-version-tag`              | Build portable binaries for all platforms                     |
+| `update-homebrew-tap.yml`     | Tag push                                | Update Homebrew formula                                       |
+| `attach-release-packages.yml` | After build/homebrew workflows complete | Create GitHub Release and attach built packages               |
+| `cleanup-branches.yml`        | Weekly schedule or manual               | Delete stale workflow branches                                |
 
 ## Required Secrets
 

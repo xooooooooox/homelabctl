@@ -83,6 +83,24 @@ sudo dnf copr enable -y xooooooooox/radp
 sudo dnf install -y radp-bash-framework homelabctl
 ```
 
+### Portable Binary
+
+Download a self-contained portable binary from [GitHub Releases](https://github.com/xooooooooox/homelabctl/releases):
+
+```shell
+# macOS Apple Silicon
+curl -fsSL https://github.com/xooooooooox/homelabctl/releases/latest/download/homelabctl-portable-darwin-arm64 -o homelabctl
+chmod +x homelabctl
+./homelabctl --help
+
+# Linux x86_64
+curl -fsSL https://github.com/xooooooooox/homelabctl/releases/latest/download/homelabctl-portable-linux-amd64 -o homelabctl
+chmod +x homelabctl
+./homelabctl --help
+```
+
+> **Note**: Portable binary requires [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework) to be installed.
+
 See [Installation Guide](docs/installation.md) for more options including Debian/Ubuntu, manual installation, and
 upgrading.
 

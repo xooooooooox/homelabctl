@@ -82,6 +82,24 @@ sudo dnf copr enable -y xooooooooox/radp
 sudo dnf install -y radp-bash-framework homelabctl
 ```
 
+### 便携版二进制
+
+从 [GitHub Releases](https://github.com/xooooooooox/homelabctl/releases) 下载自包含的便携版二进制：
+
+```shell
+# macOS Apple Silicon
+curl -fsSL https://github.com/xooooooooox/homelabctl/releases/latest/download/homelabctl-portable-darwin-arm64 -o homelabctl
+chmod +x homelabctl
+./homelabctl --help
+
+# Linux x86_64
+curl -fsSL https://github.com/xooooooooox/homelabctl/releases/latest/download/homelabctl-portable-linux-amd64 -o homelabctl
+chmod +x homelabctl
+./homelabctl --help
+```
+
+> **注意**：便携版需要预先安装 [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework)。
+
 更多安装选项请参阅[安装指南](docs/installation.md)，包括 Debian/Ubuntu、手动安装和升级。
 
 ## 快速开始
