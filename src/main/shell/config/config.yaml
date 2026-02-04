@@ -19,3 +19,36 @@ radp:
   extend:
     homelabctl:
       # Add your application-specific configuration here
+
+      # GitLab configuration
+      gitlab:
+        # Installation settings
+        default_type: gitlab-ce
+        default_version: latest
+
+        # Directory paths
+        config_home: /etc/gitlab
+        data_home: /var/opt/gitlab
+        backup_home: /var/opt/gitlab/backups
+        config_backup_home: /etc/gitlab/config_backup
+
+        # Remote/NAS backup location (optional, leave empty to disable)
+        backup_home_remote: "/backup_data"
+
+        # Backup settings
+        backup_keep_days: 15
+        backup_schedule: "0 4 * * *"
+
+        # User configuration file (optional, applied during init)
+        user_config_file: "/data/homelab_gitlab.rb"
+
+        # System requirements
+        min_cpu_cores: 4
+        min_ram_gb: 4
+
+        # External data directory (NAS mount point)
+        # If configured, install will create symlink:
+        #   {external_data_dir}/gitlab -> /var/opt/gitlab
+        # This allows GitLab data to be stored on NAS without changing default paths
+        # Original: g_guest_data_dir=/data
+        external_data_dir: "/data"
