@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## v0.2.0
+
+### feat
+
+- Add `gitlab` command group for complete GitLab management
+  - `gitlab install` - Install GitLab (CE/EE) via linux_package
+  - `gitlab init` - Initialize GitLab after installation
+  - `gitlab status` - Show GitLab status and version info
+  - `gitlab healthcheck` - Run GitLab health checks
+  - `gitlab start/stop/restart` - Service management
+  - `gitlab reset-password` - Reset GitLab user password
+  - `gitlab backup create` - Create data and/or config backup
+  - `gitlab backup list` - List available backups
+  - `gitlab backup cleanup` - Clean old backups
+  - `gitlab restore` - Restore from backup
+
+### removed
+
+- Remove `gitlab-runner` installer (migrated to `gitlab` command group)
+
 ## v0.1.32
 
 ### feat
@@ -22,7 +42,6 @@
 - Add `setup deps <name>` command to show package dependency tree
 - Add `setup deps <name> --reverse` to show reverse dependencies
 - Add installer: dotnet-sdk
-- Add installer: gitlab-runner
 - Add `setup configure` command group for system configuration tasks
   - `setup configure list` - Dynamically list available configurations from directory
   - `setup configure chrony` - Configure chrony for time synchronization

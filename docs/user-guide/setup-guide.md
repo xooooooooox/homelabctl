@@ -133,7 +133,6 @@ Packages are organized into categories. Use `homelabctl setup list --categories`
 | docker        | Container platform                 |
 | terraform     | Infrastructure as Code             |
 | ansible       | IT automation platform             |
-| gitlab-runner | GitLab CI runner                   |
 
 ### vcs - Version Control
 

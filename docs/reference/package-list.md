@@ -64,7 +64,6 @@ Available packages for `homelabctl setup install`.
 | terraform | Infrastructure as code |
 | ansible | IT automation |
 | vagrant | Development environments |
-| gitlab-runner | GitLab CI runner |
 
 ### vcs
 

@@ -218,13 +218,6 @@ packages:
     recommends: python
     homepage: https://www.ansible.com/
 
-  gitlab-runner:
-    desc: GitLab CI/CD runner
-    category: devops
-    check-cmd: gitlab-runner
-    recommends: git docker
-    homepage: https://docs.gitlab.com/runner/
-
   # Version Control and Git Tools
   git:
     desc: Distributed version control system
