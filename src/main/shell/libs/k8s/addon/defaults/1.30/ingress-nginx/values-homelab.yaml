@@ -1,0 +1,5 @@
+# ingress-nginx Helm values for homelab
+controller:
+  service:
+    type: LoadBalancer
+    externalTrafficPolicy: Local

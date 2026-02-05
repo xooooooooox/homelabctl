@@ -1,0 +1,10 @@
+# MetalLB IP Address Pool
+# NOTE: Modify addresses to match your network
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.1.200-192.168.1.250  # TODO: Change to your IP range

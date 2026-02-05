@@ -1,0 +1,117 @@
+# K8S Addon Registry
+# Defines available Kubernetes addons for homelabctl
+# Each addon can be installed via: homelabctl k8s addon install <name>
+
+addons:
+  metallb:
+    desc: Load balancer for bare metal Kubernetes
+    category: networking
+    default_version: "0.14.8"
+    helm:
+      repo_name: metallb
+      repo_url: https://metallb.github.io/metallb
+      chart: metallb/metallb
+      namespace: metallb-system
+      create_namespace: true
+    post_install:
+      - type: manifest
+        desc: Create IPAddressPool
+        path: metallb/IPAddressPool.yaml
+      - type: manifest
+        desc: Create L2Advertisement
+        path: metallb/L2Advertisement.yaml
+
+  k8tz:
+    desc: Kubernetes timezone injector
+    category: utilities
+    default_version: "0.16.2"
+    helm:
+      repo_name: k8tz
+      repo_url: https://k8tz.github.io/k8tz/
+      chart: k8tz/k8tz
+      namespace: default
+      values:
+        timezone: Asia/Shanghai
+
+  ingress-nginx:
+    desc: NGINX Ingress Controller
+    category: networking
+    default_version: "4.11.1"
+    helm:
+      repo_name: ingress-nginx
+      repo_url: https://kubernetes.github.io/ingress-nginx
+      chart: ingress-nginx/ingress-nginx
+      namespace: ingress-nginx
+      create_namespace: true
+
+  cert-manager:
+    desc: Certificate management controller
+    category: security
+    default_version: "1.15.3"
+    helm:
+      repo_name: jetstack
+      repo_url: https://charts.jetstack.io
+      chart: jetstack/cert-manager
+      namespace: cert-manager
+      create_namespace: true
+      version_prefix: "v"
+    # Note: cert-manager requires CRDs, handled by values file
+
+  alidns-webhook:
+    desc: Aliyun DNS webhook for cert-manager
+    category: security
+    default_version: "0.8.1"
+    depends_on:
+      - cert-manager
+    helm:
+      repo_name: cert-manager-alidns-webhook
+      repo_url: https://devmachine-fr.github.io/cert-manager-alidns-webhook
+      chart: cert-manager-alidns-webhook/alidns-webhook
+      namespace: cert-manager
+    post_install:
+      - type: manifest
+        desc: Create alidns secret
+        path: alidns-webhook/alidns-secret.yaml
+      - type: manifest
+        desc: Create cluster issuer
+        path: alidns-webhook/cluster-issuer.yaml
+
+  kubernetes-dashboard:
+    desc: Kubernetes Dashboard Web UI
+    category: monitoring
+    default_version: "7.5.0"
+    helm:
+      repo_name: kubernetes-dashboard
+      repo_url: https://kubernetes.github.io/dashboard/
+      chart: kubernetes-dashboard/kubernetes-dashboard
+      namespace: kubernetes-dashboard
+      create_namespace: true
+    post_install:
+      - type: manifest
+        desc: Create dashboard ingress
+        path: kubernetes-dashboard/kubernetes-dashboard-ingress.yaml
+      - type: manifest
+        desc: Create dashboard access control
+        path: kubernetes-dashboard/kubernetes-dashboard-access-control.yaml
+
+  metrics-server:
+    desc: Kubernetes Metrics Server
+    category: monitoring
+    default_version: "3.12.1"
+    helm:
+      repo_name: metrics-server
+      repo_url: https://kubernetes-sigs.github.io/metrics-server/
+      chart: metrics-server/metrics-server
+      namespace: kube-system
+
+  nfs-subdir-external-provisioner:
+    desc: NFS subdir external provisioner for dynamic PV
+    category: storage
+    default_version: "4.0.18"
+    helm:
+      repo_name: nfs-subdir-external-provisioner
+      repo_url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+      chart: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
+      namespace: nfs-provisioner
+      create_namespace: true
+    # Note: Requires nfs-utils on all nodes and values file with NFS server config

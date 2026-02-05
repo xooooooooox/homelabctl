@@ -1,0 +1,5 @@
+# cert-manager Helm values for homelab
+# Enable CRDs installation
+crds:
+  enabled: true
+  keep: true

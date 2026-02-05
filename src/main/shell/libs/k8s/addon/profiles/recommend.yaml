@@ -1,0 +1,32 @@
+# Quickstart Profile for Kubernetes Addons
+# Provides essential addons for a basic production-ready cluster
+name: quickstart
+desc: Essential addons for a basic production-ready cluster
+# platform: any | linux | darwin
+# Kubernetes addons are Linux-only but can be managed from any platform
+platform: any
+
+addons:
+  # Networking - Load balancer for bare metal
+  - name: metallb
+    desc: Required for LoadBalancer services on bare metal
+
+  # Utilities - Timezone injection
+  - name: k8tz
+    desc: Automatically injects timezone to pods
+
+  # Networking - Ingress controller
+  - name: ingress-nginx
+    desc: NGINX-based ingress controller
+
+  # Security - Certificate management
+  - name: cert-manager
+    desc: Automated TLS certificate management
+
+  # Monitoring - Web UI
+  - name: kubernetes-dashboard
+    desc: Web-based Kubernetes management UI
+
+  # Monitoring - Metrics
+  - name: metrics-server
+    desc: Resource metrics for HPA and kubectl top

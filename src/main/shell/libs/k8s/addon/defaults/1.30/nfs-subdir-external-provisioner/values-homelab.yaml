@@ -1,0 +1,9 @@
+# nfs-subdir-external-provisioner Helm values for homelab
+# NOTE: Configure your NFS server
+nfs:
+  server: 192.168.1.100  # TODO: Change to your NFS server IP
+  path: /data/k8s-nfs    # TODO: Change to your NFS export path
+storageClass:
+  name: nfs-client
+  defaultClass: true
+  reclaimPolicy: Retain

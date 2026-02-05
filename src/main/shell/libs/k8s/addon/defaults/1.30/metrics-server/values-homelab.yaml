@@ -1,0 +1,4 @@
+# metrics-server Helm values for homelab
+# For self-signed certificates in homelab environments
+args:
+  - --kubelet-insecure-tls
