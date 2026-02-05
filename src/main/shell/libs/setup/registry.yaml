@@ -205,6 +205,19 @@ packages:
     check-cmd: docker
     homepage: https://www.docker.com/
 
+  containerd:
+    desc: Industry-standard container runtime
+    category: devops
+    check-cmd: containerd
+    homepage: https://containerd.io/
+
+  docker-compose:
+    desc: Multi-container Docker applications
+    category: devops
+    check-cmd: docker-compose
+    recommends: docker
+    homepage: https://docs.docker.com/compose/
+
   terraform:
     desc: Infrastructure as code tool
     category: devops
