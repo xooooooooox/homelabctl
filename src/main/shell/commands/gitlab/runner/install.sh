@@ -9,7 +9,7 @@ cmd_gitlab_runner_install() {
   radp_set_dry_run "${opt_dry_run:-}"
 
   # Check if already installed
-  if command -v gitlab-runner &>/dev/null; then
+  if _common_is_command_available gitlab-runner; then
     local runner_version
     runner_version=$(gitlab-runner --version 2>/dev/null | head -1 || echo "unknown")
     radp_log_info "GitLab Runner is already installed"
@@ -118,9 +118,8 @@ _gitlab_runner_install_from_binary() {
   radp_log_info "Installing GitLab Runner from binary..."
 
   local arch os
-  arch=$(radp_os_get_distro_arch 2>/dev/null || uname -m)
-  os=$(radp_os_get_distro_os 2>/dev/null || uname -s)
-  os="${os,,}"
+  arch=$(_common_get_arch)
+  os=$(_common_get_os)
 
   # Normalize architecture
   case "$arch" in

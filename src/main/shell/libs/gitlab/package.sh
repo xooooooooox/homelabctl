@@ -243,7 +243,7 @@ _gitlab_install_postfix() {
   pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
 
   # Check if already installed and running
-  if command -v postfix &>/dev/null && systemctl is-active postfix &>/dev/null; then
+  if _common_is_command_available postfix && systemctl is-active postfix &>/dev/null; then
     radp_log_info "postfix is already installed and running"
     return 0
   fi

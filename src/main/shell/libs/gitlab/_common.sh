@@ -4,11 +4,12 @@
 
 #######################################
 # Check if GitLab is installed
+# Wrapper for _common_is_command_available
 # Returns:
 #   0 if installed, 1 if not
 #######################################
 _gitlab_is_installed() {
-  command -v gitlab-ctl &>/dev/null
+  _common_is_command_available gitlab-ctl
 }
 
 #######################################
@@ -32,7 +33,7 @@ _gitlab_get_version() {
   _gitlab_is_installed || return 1
 
   # Try gitlab-rake first
-  if command -v gitlab-rake &>/dev/null; then
+  if _common_is_command_available gitlab-rake; then
     local version
     version=$($gr_sudo gitlab-rake gitlab:env:info 2>/dev/null | grep -E '^GitLab:' | awk '{print $2}')
     if [[ -n "$version" ]]; then
@@ -252,45 +253,16 @@ _gitlab_get_today() {
 
 #######################################
 # Check system requirements for GitLab
+# Wrapper for _common_check_requirements
 # Arguments:
 #   --skip-prompt  Skip confirmation prompt on failure
 # Returns:
 #   0 if requirements met, 1 if not
 #######################################
 _gitlab_check_requirements() {
-  local skip_prompt=""
-
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --skip-prompt) skip_prompt="true"; shift ;;
-      *) shift ;;
-    esac
-  done
-
-  local min_cpu min_ram
-  min_cpu=$(_gitlab_get_min_cpu_cores)
-  min_ram=$(_gitlab_get_min_ram_gb)
-
-  local failed=""
-
-  if ! radp_os_check_min_cpu_cores "$min_cpu"; then
-    failed="true"
-  fi
-
-  if ! radp_os_check_min_ram "${min_ram}GB"; then
-    failed="true"
-  fi
-
-  if [[ -n "$failed" ]]; then
-    if [[ -z "$skip_prompt" ]]; then
-      radp_log_warn "System does not meet minimum requirements for GitLab"
-      if ! radp_io_prompt_confirm --msg "Continue anyway? (y/N)" --default N --timeout 60; then
-        return 1
-      fi
-    else
-      return 1
-    fi
-  fi
-
-  return 0
+  _common_check_requirements \
+    --min-cpu "$(_gitlab_get_min_cpu_cores)" \
+    --min-ram "$(_gitlab_get_min_ram_gb)" \
+    --product "GitLab" \
+    "$@"
 }
