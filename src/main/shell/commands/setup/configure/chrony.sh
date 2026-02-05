@@ -47,7 +47,7 @@ cmd_setup_configure_chrony() {
 }
 
 _configure_chrony_install() {
-  if command -v chronyc &>/dev/null; then
+  if _common_is_command_available chronyc; then
     radp_log_info "chrony is already installed"
     return 0
   fi
@@ -150,7 +150,7 @@ _configure_chrony_timezone() {
 
   radp_log_info "Setting timezone to: $timezone"
 
-  if command -v timedatectl &>/dev/null; then
+  if _common_is_command_available timedatectl; then
     radp_exec_sudo "Set timezone to $timezone" timedatectl set-timezone "$timezone"
   elif [[ -f "/usr/share/zoneinfo/$timezone" ]]; then
     radp_exec_sudo "Link timezone file" ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
@@ -183,10 +183,10 @@ _configure_chrony_start() {
 
   radp_log_info "Enabling and starting $service_name service..."
 
-  if command -v systemctl &>/dev/null; then
+  if _common_is_command_available systemctl; then
     radp_exec_sudo "Enable $service_name service" systemctl enable "$service_name" 2>/dev/null || true
     radp_exec_sudo "Restart $service_name service" systemctl restart "$service_name"
-  elif command -v service &>/dev/null; then
+  elif _common_is_command_available service; then
     radp_exec_sudo "Restart $service_name service" service "$service_name" restart
   else
     radp_log_warn "Cannot manage chrony service: no systemctl or service command"

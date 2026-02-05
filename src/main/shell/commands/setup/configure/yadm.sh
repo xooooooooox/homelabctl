@@ -77,13 +77,13 @@ cmd_setup_configure_yadm() {
   fi
 
   # Install git if not present
-  if ! command -v git &>/dev/null; then
+  if ! _common_is_command_available git; then
     radp_log_info "Installing git (required by yadm)..."
     radp_exec_sudo "Install git" radp_os_install_pkgs git
   fi
 
   # Install yadm if not present
-  if ! command -v yadm &>/dev/null; then
+  if ! _common_is_command_available yadm; then
     radp_log_info "Installing yadm..."
     _configure_yadm_install
   fi
@@ -221,7 +221,7 @@ _configure_yadm_install() {
     ;;
   esac
 
-  if ! command -v yadm &>/dev/null; then
+  if ! _common_is_command_available yadm; then
     radp_log_error "Failed to install yadm"
     return 1
   fi

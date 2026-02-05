@@ -18,7 +18,7 @@
 # All arguments are passed through to radp-vf
 cmd_vf() {
   local radp_vf=""
-  if ! command -v radp-vf &>/dev/null; then
+  if ! _common_is_command_available radp-vf; then
     radp_log_error "radp-vf not found in PATH. Install radp-vagrant-framework first."
     radp_log_error "See: https://github.com/xooooooooox/radp-vagrant-framework#installation"
     return 1

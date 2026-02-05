@@ -62,7 +62,7 @@ cmd_setup_configure_gpg_import() {
   radp_log_info "Configuring GPG key import for user '$target_user'..."
 
   # Install gnupg if needed
-  if ! command -v gpg &>/dev/null; then
+  if ! _common_is_command_available gpg; then
     radp_log_info "Installing gnupg..."
     radp_exec_sudo "Install gnupg" radp_os_install_pkgs gnupg --pm apt gnupg -- --pm yum gnupg2 -- --pm dnf gnupg2 --
   fi

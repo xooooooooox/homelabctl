@@ -87,7 +87,7 @@ cmd_setup_configure_gpg_preset() {
 
   if [[ -n "$libexecdir" && -x "${libexecdir}/gpg-preset-passphrase" ]]; then
     gpg_preset_cmd="${libexecdir}/gpg-preset-passphrase"
-  elif command -v gpg-preset-passphrase &>/dev/null; then
+  elif _common_is_command_available gpg-preset-passphrase; then
     gpg_preset_cmd="gpg-preset-passphrase"
   else
     radp_log_error "gpg-preset-passphrase command not found"

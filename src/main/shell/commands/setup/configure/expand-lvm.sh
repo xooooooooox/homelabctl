@@ -97,7 +97,7 @@ cmd_setup_configure_expand_lvm() {
 }
 
 _expand_lvm_install_growpart() {
-  if command -v growpart &>/dev/null; then
+  if _common_is_command_available growpart; then
     radp_log_info "growpart is already installed"
     return 0
   fi
