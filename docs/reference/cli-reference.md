@@ -493,6 +493,466 @@ homelabctl gitlab restore /path/to/backup.tar --force
 homelabctl gitlab restore --source /mnt/nas/backups
 ```
 
+### init setup
+
+Initialize setup user configuration directory.
+
+```shell
+homelabctl init setup [options]
+```
+
+| Option      | Description                |
+|-------------|----------------------------|
+| `--force`   | Overwrite existing files   |
+| `--dry-run` | Show what would be created |
+
+**Examples:**
+
+```shell
+homelabctl init setup
+homelabctl init setup --dry-run
+homelabctl init setup --force
+```
+
+### init k8s
+
+Initialize k8s user configuration directory.
+
+```shell
+homelabctl init k8s [options]
+```
+
+| Option      | Description                |
+|-------------|----------------------------|
+| `--force`   | Overwrite existing files   |
+| `--dry-run` | Show what would be created |
+
+**Examples:**
+
+```shell
+homelabctl init k8s
+homelabctl init k8s --dry-run
+```
+
+### init all
+
+Initialize all user configuration directories (setup + k8s).
+
+```shell
+homelabctl init all [options]
+```
+
+| Option      | Description                |
+|-------------|----------------------------|
+| `--force`   | Overwrite existing files   |
+| `--dry-run` | Show what would be created |
+
+### init vf
+
+Initialize vagrant project (passthrough to radp-vf init).
+
+```shell
+homelabctl init vf [radp-vf-init-options]
+```
+
+All arguments are passed through to `radp-vf init`.
+
+**Examples:**
+
+```shell
+homelabctl init vf myproject
+homelabctl init vf myproject -t k8s-cluster
+homelabctl init vf --list-templates
+```
+
+### k8s health
+
+Check Kubernetes cluster health.
+
+```shell
+homelabctl k8s health [options]
+```
+
+| Option      | Description           |
+|-------------|-----------------------|
+| `--verbose` | Show detailed output  |
+
+**Examples:**
+
+```shell
+homelabctl k8s health
+homelabctl k8s health --verbose
+```
+
+### k8s install
+
+Install Kubernetes (kubeadm, kubelet, kubectl).
+
+```shell
+homelabctl k8s install [options]
+```
+
+| Option                     | Description                               |
+|----------------------------|-------------------------------------------|
+| `-t, --type <type>`        | Install type: kubeadm or minikube         |
+| `-v, --version <ver>`      | Kubernetes version (default: 1.30)        |
+| `--skip-prerequisites`     | Skip prerequisites configuration          |
+| `--skip-container-runtime` | Skip container runtime installation       |
+| `--dry-run`                | Show what would be done                   |
+
+**Examples:**
+
+```shell
+homelabctl k8s install
+homelabctl k8s install -v 1.29
+homelabctl k8s install -t kubeadm -v 1.30
+```
+
+### k8s init master
+
+Initialize Kubernetes master node.
+
+```shell
+homelabctl k8s init master [options]
+```
+
+| Option                                | Description                            |
+|---------------------------------------|----------------------------------------|
+| `-a, --apiserver-advertise-address!`  | API server advertise address (required)|
+| `-p, --pod-network-cidr <cidr>`       | Pod network CIDR (default: 10.244.0.0/16)|
+| `--dry-run`                           | Show what would be done                |
+
+**Examples:**
+
+```shell
+homelabctl k8s init master -a 192.168.1.100
+homelabctl k8s init master -a 192.168.1.100 -p 10.244.0.0/16
+```
+
+### k8s init worker
+
+Initialize Kubernetes worker node and join cluster.
+
+```shell
+homelabctl k8s init worker [options]
+```
+
+| Option                              | Description                                |
+|-------------------------------------|--------------------------------------------|
+| `-c, --control-plane! <host:port>`  | Control plane address (required)           |
+| `-t, --token <token>`               | Join token (optional)                      |
+| `--discovery-token-ca-cert-hash`    | CA cert hash (optional)                    |
+| `--dry-run`                         | Show what would be done                    |
+
+**Examples:**
+
+```shell
+homelabctl k8s init worker -c 192.168.1.100:6443
+homelabctl k8s init worker -c 192.168.1.100:6443 -t abcdef.1234567890abcdef
+```
+
+### k8s addon install
+
+Install a Kubernetes addon.
+
+```shell
+homelabctl k8s addon install <name> [options]
+```
+
+| Option                    | Description                      |
+|---------------------------|----------------------------------|
+| `-v, --version <ver>`     | Addon version                    |
+| `-f, --values <file>`     | Custom values file for helm      |
+| `--dry-run`               | Show what would be done          |
+
+**Examples:**
+
+```shell
+homelabctl k8s addon install metallb
+homelabctl k8s addon install ingress-nginx -v 4.11.1
+homelabctl k8s addon install cert-manager -f /path/to/values.yaml
+```
+
+### k8s addon uninstall
+
+Uninstall a Kubernetes addon.
+
+```shell
+homelabctl k8s addon uninstall <name> [options]
+```
+
+| Option      | Description             |
+|-------------|-------------------------|
+| `--dry-run` | Show what would be done |
+
+**Examples:**
+
+```shell
+homelabctl k8s addon uninstall metallb
+homelabctl k8s addon uninstall ingress-nginx
+```
+
+### k8s addon list
+
+List available Kubernetes addons.
+
+```shell
+homelabctl k8s addon list [options]
+```
+
+| Option        | Description                |
+|---------------|----------------------------|
+| `--installed` | Show only installed addons |
+
+**Examples:**
+
+```shell
+homelabctl k8s addon list
+homelabctl k8s addon list --installed
+```
+
+### k8s addon quickstart
+
+Install recommended addons (alias for 'profile apply quickstart').
+
+```shell
+homelabctl k8s addon quickstart [options]
+```
+
+| Option             | Description                     |
+|--------------------|---------------------------------|
+| `--dry-run`        | Show what would be done         |
+| `--continue`       | Continue on error               |
+| `--skip-installed` | Skip already installed addons   |
+
+### k8s addon profile list
+
+List available addon profiles.
+
+```shell
+homelabctl k8s addon profile list [options]
+```
+
+| Option         | Description                        |
+|----------------|------------------------------------|
+| `--names-only` | Output profile names only          |
+
+### k8s addon profile show
+
+Show addon profile details.
+
+```shell
+homelabctl k8s addon profile show <name>
+```
+
+**Examples:**
+
+```shell
+homelabctl k8s addon profile show quickstart
+homelabctl k8s addon profile show production
+```
+
+### k8s addon profile apply
+
+Apply an addon profile (install multiple addons).
+
+```shell
+homelabctl k8s addon profile apply <name> [options]
+```
+
+| Option             | Description                     |
+|--------------------|---------------------------------|
+| `--dry-run`        | Show what would be installed    |
+| `--continue`       | Continue on error               |
+| `--skip-installed` | Skip already installed addons   |
+
+**Examples:**
+
+```shell
+homelabctl k8s addon profile apply quickstart
+homelabctl k8s addon profile apply quickstart --dry-run
+homelabctl k8s addon profile apply production --continue
+```
+
+### k8s token create
+
+Create a new Kubernetes join token.
+
+```shell
+homelabctl k8s token create [options]
+```
+
+| Option                  | Description                           |
+|-------------------------|---------------------------------------|
+| `--print-join-command`  | Print full join command after creation|
+
+**Examples:**
+
+```shell
+homelabctl k8s token create
+homelabctl k8s token create --print-join-command
+```
+
+### k8s token get
+
+Get current valid Kubernetes token.
+
+```shell
+homelabctl k8s token get [options]
+```
+
+| Option           | Description                              |
+|------------------|------------------------------------------|
+| `--create`       | Create new token if no valid token exists|
+| `--join-command` | Print full join command instead of token |
+
+**Examples:**
+
+```shell
+homelabctl k8s token get
+homelabctl k8s token get --create
+homelabctl k8s token get --join-command
+```
+
+### k8s backup create
+
+Create etcd backup.
+
+```shell
+homelabctl k8s backup create [options]
+```
+
+| Option           | Description                                          |
+|------------------|------------------------------------------------------|
+| `-d, --dir`      | Backup directory (default: /var/opt/k8s/backups/etcd)|
+| `--dry-run`      | Show what would be done                              |
+
+**Examples:**
+
+```shell
+homelabctl k8s backup create
+homelabctl k8s backup create -d /backup/etcd
+```
+
+### k8s backup list
+
+List available etcd backups.
+
+```shell
+homelabctl k8s backup list [options]
+```
+
+| Option      | Description                                          |
+|-------------|------------------------------------------------------|
+| `-d, --dir` | Backup directory (default: /var/opt/k8s/backups/etcd)|
+
+### k8s backup restore
+
+Restore etcd from backup.
+
+```shell
+homelabctl k8s backup restore <file> [options]
+```
+
+| Option           | Description                          |
+|------------------|--------------------------------------|
+| `--data-dir`     | etcd data directory (default: /var/lib/etcd)|
+| `--dry-run`      | Show what would be done              |
+| `--force`        | Skip confirmation prompt             |
+
+**Examples:**
+
+```shell
+homelabctl k8s backup restore /var/opt/k8s/backups/etcd/etcd-snapshot-20240101120000.db
+```
+
+### setup uninstall
+
+Uninstall a software package.
+
+```shell
+homelabctl setup uninstall <name> [options]
+```
+
+| Option      | Description                              |
+|-------------|------------------------------------------|
+| `--purge`   | Remove configuration files as well       |
+| `--dry-run` | Show what would be uninstalled           |
+
+**Examples:**
+
+```shell
+homelabctl setup uninstall docker
+homelabctl setup uninstall docker --purge
+homelabctl setup uninstall containerd --dry-run
+```
+
+### setup configure docker rootless
+
+Configure Docker for non-root user access.
+
+```shell
+homelabctl setup configure docker rootless [options]
+```
+
+| Option           | Description                       |
+|------------------|-----------------------------------|
+| `-u, --user`     | Target user (default: current)    |
+| `--dry-run`      | Show what would be done           |
+
+**Examples:**
+
+```shell
+homelabctl setup configure docker rootless
+homelabctl setup configure docker rootless -u vagrant
+homelabctl setup configure docker rootless --dry-run
+```
+
+### setup configure docker acceleration
+
+Configure Docker acceleration (proxy or registry mirrors).
+
+```shell
+homelabctl setup configure docker acceleration [options]
+```
+
+| Option             | Description                                  |
+|--------------------|----------------------------------------------|
+| `--proxy <url>`    | HTTP/HTTPS proxy URL                         |
+| `--https-proxy`    | HTTPS proxy URL (default: same as --proxy)   |
+| `--no-proxy`       | Hosts to bypass proxy (default: localhost,127.0.0.1)|
+| `--mirrors <list>` | Comma-separated registry mirror URLs         |
+| `--remove-proxy`   | Remove existing proxy configuration          |
+| `--dry-run`        | Show what would be done                      |
+
+**Examples:**
+
+```shell
+homelabctl setup configure docker acceleration --mirrors "https://mirror.ccs.tencentyun.com"
+homelabctl setup configure docker acceleration --proxy "http://192.168.1.1:8080"
+homelabctl setup configure docker acceleration --proxy "http://proxy:8080" --no-proxy "localhost,127.0.0.1,10.0.0.0/8"
+homelabctl setup configure docker acceleration --remove-proxy
+```
+
+### gitlab runner install
+
+Install GitLab Runner.
+
+```shell
+homelabctl gitlab runner install [options]
+```
+
+| Option      | Description             |
+|-------------|-------------------------|
+| `--dry-run` | Show what would be done |
+
+**Examples:**
+
+```shell
+homelabctl gitlab runner install
+homelabctl gitlab runner install --dry-run
+```
+
 ### version
 
 Show homelabctl version.
@@ -521,5 +981,6 @@ homelabctl completion <bash | zsh>
 
 - [Getting Started](../getting-started.md) - Quick start guide
 - [Setup Guide](../user-guide/setup-guide.md) - Setup feature details
+- [K8s Guide](../user-guide/k8s-guide.md) - Kubernetes management
 - [GitLab Guide](../user-guide/gitlab-guide.md) - GitLab management
 - [Vagrant Guide](../user-guide/vagrant-guide.md) - VM management

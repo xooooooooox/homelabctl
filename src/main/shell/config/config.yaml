@@ -52,3 +52,40 @@ radp:
         # This allows GitLab data to be stored on NAS without changing default paths
         # Original: g_guest_data_dir=/data
         external_data_dir: "/data"
+
+      # Kubernetes configuration
+      k8s:
+        # Installation settings
+        default_version: "1.30"
+        default_install_type: kubeadm
+
+        # Cluster network settings
+        default_pod_cidr: "10.244.0.0/16"
+        default_cni: flannel
+        flannel_url: "https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml"
+
+        # System requirements
+        min_cpu_cores: 2
+        min_ram_gb: 2
+
+        # Directory paths
+        backup_home: /var/opt/k8s/backups/etcd
+        extra_config_path: ~/.config/homelabctl/k8s
+
+        # Backup settings
+        backup_schedule: "0 2 * * *"
+        backup_keep_days: 7
+
+        # Addon profiles are defined in YAML files:
+        #   Builtin: libs/k8s/addon/profiles/*.yaml
+        #   User: ~/.config/homelabctl/k8s/addon/profiles/*.yaml
+        # Use: homelabctl k8s addon profile list
+
+        # Container runtime proxy configuration (optional)
+        # Enable if your nodes need HTTP proxy to pull images
+        container_runtime_proxy:
+          enabled: false
+          http_proxy: ""
+          https_proxy: ""
+          # Bypass proxy for cluster networks and local addresses
+          no_proxy: "localhost,127.0.0.1,10.96.0.0/12,10.244.0.0/16"

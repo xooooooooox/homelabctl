@@ -15,6 +15,36 @@
   - `gitlab backup list` - List available backups
   - `gitlab backup cleanup` - Clean old backups
   - `gitlab restore` - Restore from backup
+- Add `gitlab runner install` command - Install GitLab Runner
+- Add `init` command group for user configuration initialization
+  - `init setup` - Initialize setup user configuration directory
+  - `init k8s` - Initialize k8s user configuration directory
+  - `init all` - Initialize all user configuration directories
+  - `init vf` - Initialize vagrant project (passthrough to radp-vf)
+- Add `k8s` command group for complete Kubernetes management
+  - `k8s health` - Check Kubernetes cluster health
+  - `k8s install` - Install Kubernetes (kubeadm, kubelet, kubectl)
+  - `k8s init master` - Initialize Kubernetes master node
+  - `k8s init worker` - Initialize Kubernetes worker node
+  - `k8s addon install` - Install a Kubernetes addon
+  - `k8s addon uninstall` - Uninstall a Kubernetes addon
+  - `k8s addon list` - List available Kubernetes addons
+  - `k8s addon quickstart` - Install recommended addons
+  - `k8s addon profile list` - List available addon profiles
+  - `k8s addon profile show` - Show addon profile details
+  - `k8s addon profile apply` - Apply an addon profile
+  - `k8s token create` - Create a new join token
+  - `k8s token get` - Get current valid token
+  - `k8s backup create` - Create etcd backup
+  - `k8s backup list` - List available etcd backups
+  - `k8s backup restore` - Restore etcd from backup
+- Add `setup configure docker` subcommands
+  - `setup configure docker rootless` - Configure Docker for non-root user access
+  - `setup configure docker acceleration` - Configure Docker proxy or registry mirrors
+- Add `setup uninstall` command - Uninstall software packages with optional purge
+- Add new installers
+  - `containerd` - Container runtime for Kubernetes
+  - `docker-compose` - Docker Compose plugin
 
 ### removed
 
