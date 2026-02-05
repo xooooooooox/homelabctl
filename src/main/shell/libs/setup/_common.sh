@@ -4,36 +4,14 @@
 
 #######################################
 # Check if a package is installed
+# Wrapper for _common_is_installed
 # Arguments:
-#   1 - check specification, supports:
-#       - command name (default): checks via 'command -v'
-#       - "dir:<path>": checks if directory exists
-#       - "file:<path>": checks if file exists
+#   1 - check specification (command, dir:<path>, file:<path>)
 # Returns:
 #   0 if installed, 1 if not
 #######################################
 _setup_is_installed() {
-  local spec="$1"
-
-  # Handle special prefixes
-  case "$spec" in
-    dir:*)
-      local dir="${spec#dir:}"
-      # Expand ~ to $HOME
-      dir="${dir/#\~/$HOME}"
-      [[ -d "$dir" ]]
-      ;;
-    file:*)
-      local file="${spec#file:}"
-      # Expand ~ to $HOME
-      file="${file/#\~/$HOME}"
-      [[ -f "$file" ]]
-      ;;
-    *)
-      # Default: check command
-      command -v "$spec" &>/dev/null
-      ;;
-  esac
+  _common_is_installed "$@"
 }
 
 #######################################
@@ -60,68 +38,57 @@ _setup_get_builtin_dir() {
 
 #######################################
 # Simple YAML value parser
-# Extracts value for a key from YAML content
+# Wrapper for _common_yaml_get_value
 # Arguments:
 #   1 - key name
 #   2 - YAML content (via stdin if not provided)
-# Returns:
+# Outputs:
 #   Value for the key
 #######################################
 _setup_yaml_get_value() {
-  local key="$1"
-  local content="${2:-$(cat)}"
-
-  echo "$content" | grep -E "^[[:space:]]*${key}:" | head -1 | sed "s/^[[:space:]]*${key}:[[:space:]]*//" | sed 's/^["'"'"']//' | sed 's/["'"'"']$//'
+  _common_yaml_get_value "$@"
 }
 
 #######################################
 # Parse YAML list items
+# Wrapper for _common_yaml_get_list_items
 # Arguments:
-#   1 - YAML content (via stdin)
-# Returns:
+#   stdin - YAML content
+# Outputs:
 #   List items, one per line
 #######################################
 _setup_yaml_get_list_items() {
-  grep -E '^[[:space:]]*-[[:space:]]' | sed 's/^[[:space:]]*-[[:space:]]*//'
+  _common_yaml_get_list_items
 }
 
 #######################################
 # Get architecture in common format
-# Returns:
+# Wrapper for _common_get_arch
+# Outputs:
 #   amd64 or arm64
 #######################################
 _setup_get_arch() {
-  local arch
-  arch=$(radp_os_get_distro_arch 2>/dev/null || uname -m)
-
-  case "$arch" in
-  x86_64 | amd64) echo "amd64" ;;
-  aarch64 | arm64) echo "arm64" ;;
-  *) echo "$arch" ;;
-  esac
+  _common_get_arch
 }
 
 #######################################
 # Get OS name in common format
-# Returns:
+# Wrapper for _common_get_os
+# Outputs:
 #   linux or darwin
 #######################################
 _setup_get_os() {
-  local os
-  os=$(radp_os_get_distro_os 2>/dev/null || uname -s)
-  echo "${os,,}"
+  _common_get_os
 }
 
 #######################################
 # Get platform string (os-arch format)
-# Returns:
+# Wrapper for _common_get_platform
+# Outputs:
 #   Platform string like linux-amd64, darwin-arm64
 #######################################
 _setup_get_platform() {
-  local os arch
-  os=$(_setup_get_os)
-  arch=$(_setup_get_arch)
-  echo "${os}-${arch}"
+  _common_get_platform
 }
 
 #######################################

@@ -11,28 +11,28 @@
 #   0 - loaded, 1 - not found
 #######################################
 _setup_load_installer() {
-    local name="$1"
-    local builtin_dir user_dir
-    builtin_dir=$(_setup_get_builtin_dir)
-    user_dir=$(_setup_get_user_dir)
+  local name="$1"
+  local builtin_dir user_dir
+  builtin_dir=$(_setup_get_builtin_dir)
+  user_dir=$(_setup_get_user_dir)
 
-    # Check user installers first
-    local user_installer="$user_dir/installers/${name}.sh"
-    if [[ -f "$user_installer" ]]; then
-        # shellcheck source=/dev/null
-        source "$user_installer"
-        return 0
-    fi
+  # Check user installers first
+  local user_installer="$user_dir/installers/${name}.sh"
+  if [[ -f "$user_installer" ]]; then
+    # shellcheck source=/dev/null
+    source "$user_installer"
+    return 0
+  fi
 
-    # Check builtin installers
-    local builtin_installer="$builtin_dir/installers/${name}.sh"
-    if [[ -f "$builtin_installer" ]]; then
-        # shellcheck source=/dev/null
-        source "$builtin_installer"
-        return 0
-    fi
+  # Check builtin installers
+  local builtin_installer="$builtin_dir/installers/${name}.sh"
+  if [[ -f "$builtin_installer" ]]; then
+    # shellcheck source=/dev/null
+    source "$builtin_installer"
+    return 0
+  fi
 
-    return 1
+  return 1
 }
 
 #######################################
@@ -44,26 +44,79 @@ _setup_load_installer() {
 #   0 - success, 1 - failure
 #######################################
 _setup_run_installer() {
-    local name="$1"
-    local version="${2:-latest}"
+  local name="$1"
+  local version="${2:-latest}"
 
-    # Load installer
-    if ! _setup_load_installer "$name"; then
-        radp_log_error "No installer found for: $name"
-        return 1
-    fi
+  # Load installer
+  if ! _setup_load_installer "$name"; then
+    radp_log_error "No installer found for: $name"
+    return 1
+  fi
 
-    # Normalize function name (replace - with _)
-    local install_func="_setup_install_${name//-/_}"
+  # Normalize function name (replace - with _)
+  local install_func="_setup_install_${name//-/_}"
 
-    # Check if install function exists
-    if ! declare -f "$install_func" &>/dev/null; then
-        radp_log_error "Install function not found: $install_func"
-        return 1
-    fi
+  # Check if install function exists
+  if ! declare -f "$install_func" &>/dev/null; then
+    radp_log_error "Install function not found: $install_func"
+    return 1
+  fi
 
-    # Run the installer
-    "$install_func" "$version"
+  # Run the installer
+  "$install_func" "$version"
+}
+
+#######################################
+# Check if uninstaller exists for a package
+# Arguments:
+#   1 - package name
+# Returns:
+#   0 - uninstaller exists, 1 - not found
+#######################################
+_setup_has_uninstaller() {
+  local name="$1"
+
+  # Load installer (which may contain uninstaller)
+  if ! _setup_load_installer "$name"; then
+    return 1
+  fi
+
+  # Normalize function name (replace - with _)
+  local uninstall_func="_setup_uninstall_${name//-/_}"
+
+  # Check if uninstall function exists
+  declare -f "$uninstall_func" &>/dev/null
+}
+
+#######################################
+# Run uninstaller for a package
+# Arguments:
+#   1 - package name
+#   2 - purge flag (optional, if non-empty removes config files)
+# Returns:
+#   0 - success, 1 - failure
+#######################################
+_setup_run_uninstaller() {
+  local name="$1"
+  local purge="${2:-}"
+
+  # Load installer (which contains uninstaller)
+  if ! _setup_load_installer "$name"; then
+    radp_log_error "No installer found for: $name"
+    return 1
+  fi
+
+  # Normalize function name (replace - with _)
+  local uninstall_func="_setup_uninstall_${name//-/_}"
+
+  # Check if uninstall function exists
+  if ! declare -f "$uninstall_func" &>/dev/null; then
+    radp_log_error "Uninstall function not found: $uninstall_func"
+    return 1
+  fi
+
+  # Run the uninstaller
+  "$uninstall_func" "$purge"
 }
 
 #######################################
@@ -75,13 +128,13 @@ _setup_run_installer() {
 #   0 if installed, 1 if not
 #######################################
 _setup_check_installed() {
-    local name="$1"
-    local check_cmd
+  local name="$1"
+  local check_cmd
 
-    check_cmd=$(_setup_registry_get_package_cmd "$name")
-    [[ -z "$check_cmd" ]] && check_cmd="$name"
+  check_cmd=$(_setup_registry_get_package_cmd "$name")
+  [[ -z "$check_cmd" ]] && check_cmd="$name"
 
-    _setup_is_installed "$check_cmd"
+  _setup_is_installed "$check_cmd"
 }
 
 #######################################
@@ -92,32 +145,32 @@ _setup_check_installed() {
 #   Version string or empty
 #######################################
 _setup_get_installed_version() {
-    local name="$1"
-    local check_cmd
+  local name="$1"
+  local check_cmd
 
-    check_cmd=$(_setup_registry_get_package_cmd "$name")
-    [[ -z "$check_cmd" ]] && check_cmd="$name"
+  check_cmd=$(_setup_registry_get_package_cmd "$name")
+  [[ -z "$check_cmd" ]] && check_cmd="$name"
 
-    if ! _setup_is_installed "$check_cmd"; then
-        return 1
-    fi
+  if ! _setup_is_installed "$check_cmd"; then
+    return 1
+  fi
 
-    # Try common version flags
-    # Note: avoid -v (lowercase) as it means "verbose" for many tools (tmux, ssh, etc.)
-    # and would start an interactive session instead of printing version
-    local version=""
-    version=$(timeout 5 "$check_cmd" --version 2>/dev/null | head -1) ||
+  # Try common version flags
+  # Note: avoid -v (lowercase) as it means "verbose" for many tools (tmux, ssh, etc.)
+  # and would start an interactive session instead of printing version
+  local version=""
+  version=$(timeout 5 "$check_cmd" --version 2>/dev/null | head -1) ||
     version=$(timeout 5 "$check_cmd" -V 2>/dev/null | head -1) ||
     version=$(timeout 5 "$check_cmd" version 2>/dev/null | head -1) ||
     version=""
 
-    # Clean up version output
-    if [[ -n "$version" ]]; then
-        # Extract version number pattern
-        version=$(echo "$version" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
-    fi
+  # Clean up version output
+  if [[ -n "$version" ]]; then
+    # Extract version number pattern
+    version=$(echo "$version" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
+  fi
 
-    echo "$version"
+  echo "$version"
 }
 
 #######################################
@@ -130,40 +183,40 @@ _setup_get_installed_version() {
 #   0 on success, 1 on failure
 #######################################
 _setup_install_binary() {
-    local src="$1"
-    local name="${2:-$(basename "$src")}"
-    local dest_dir="${3:-/usr/local/bin}"
+  local src="$1"
+  local name="${2:-$(basename "$src")}"
+  local dest_dir="${3:-/usr/local/bin}"
 
-    if [[ ! -f "$src" ]]; then
-        radp_log_error "Source binary not found: $src"
-        return 1
-    fi
+  if [[ ! -f "$src" ]]; then
+    radp_log_error "Source binary not found: $src"
+    return 1
+  fi
 
-    $gr_sudo mkdir -p "$dest_dir" || return 1
-    $gr_sudo cp "$src" "$dest_dir/$name" || return 1
-    $gr_sudo chmod +x "$dest_dir/$name" || return 1
+  $gr_sudo mkdir -p "$dest_dir" || return 1
+  $gr_sudo cp "$src" "$dest_dir/$name" || return 1
+  $gr_sudo chmod +x "$dest_dir/$name" || return 1
 
-    radp_log_info "Installed $name to $dest_dir"
-    return 0
+  radp_log_info "Installed $name to $dest_dir"
+  return 0
 }
 
 #######################################
 # Wrapper for radp_io_extract (for backward compatibility)
 #######################################
 _setup_extract_archive() {
-    radp_io_extract "$@"
+  radp_io_extract "$@"
 }
 
 #######################################
 # Wrapper for radp_io_mktemp_dir (for backward compatibility)
 #######################################
 _setup_mktemp_dir() {
-    radp_io_mktemp_dir "homelabctl-setup"
+  radp_io_mktemp_dir "homelabctl-setup"
 }
 
 #######################################
 # Wrapper for radp_net_github_latest_release (for backward compatibility)
 #######################################
 _setup_github_latest_version() {
-    radp_net_github_latest_release "$@"
+  radp_net_github_latest_release "$@"
 }

@@ -66,7 +66,7 @@ _setup_python_via_vfox() {
   _setup_vfox_refresh_path
 
   # Verify python3 is available, if not, explicitly find and add to PATH
-  if ! command -v python3 &>/dev/null; then
+  if ! _common_is_command_available python3; then
     local python_bin_dir
     python_bin_dir=$(_setup_vfox_find_sdk_bin "python" "python3")
     if [[ -n "$python_bin_dir" ]]; then

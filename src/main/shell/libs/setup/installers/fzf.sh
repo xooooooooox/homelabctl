@@ -43,7 +43,7 @@ _setup_install_fzf() {
 _setup_fzf_from_git() {
   local fzf_home="$HOME/.fzf"
 
-  if ! command -v git >/dev/null 2>&1; then
+  if ! _common_is_command_available git; then
     radp_log_error "git is required for fzf git install but not found"
     return 1
   fi

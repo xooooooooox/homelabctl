@@ -17,7 +17,7 @@ _setup_install_fzf_tab_completion() {
   fi
 
   # git is required
-  if ! command -v git >/dev/null 2>&1; then
+  if ! _common_is_command_available git; then
     radp_log_error "git is required for fzf-tab-completion install but not found"
     return 1
   fi

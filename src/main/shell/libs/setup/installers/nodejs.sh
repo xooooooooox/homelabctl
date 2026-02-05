@@ -74,7 +74,7 @@ _setup_nodejs_via_vfox() {
   _setup_vfox_refresh_path
 
   # Verify node is available, if not, explicitly find and add to PATH
-  if ! command -v node &>/dev/null; then
+  if ! _common_is_command_available node; then
     local nodejs_bin_dir
     nodejs_bin_dir=$(_setup_vfox_find_sdk_bin "nodejs" "node")
     if [[ -n "$nodejs_bin_dir" ]]; then

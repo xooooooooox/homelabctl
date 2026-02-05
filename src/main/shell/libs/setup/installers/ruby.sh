@@ -68,7 +68,7 @@ _setup_ruby_via_vfox() {
   _setup_vfox_refresh_path
 
   # Verify ruby is available, if not, explicitly find and add to PATH
-  if ! command -v ruby &>/dev/null; then
+  if ! _common_is_command_available ruby; then
     local ruby_bin_dir
     ruby_bin_dir=$(_setup_vfox_find_sdk_bin "ruby" "ruby")
     if [[ -n "$ruby_bin_dir" ]]; then
