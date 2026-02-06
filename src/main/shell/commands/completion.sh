@@ -68,15 +68,18 @@ cmd_completion() {
     ;;
   zsh)
     # For zsh: #compdef must be first line
-    # Output #compdef header first
     echo "#compdef homelabctl"
     echo ""
     # Then helper functions
     _completion_output_helpers
-    # Then rest of completion script (skip the #compdef line from generator)
-    radp_cli_completion_generate "$shell" | tail -n +2
-    # Then custom overrides (redefine functions to override framework-generated ones)
+    # Framework-generated script, but REMOVE "_homelabctl "$@"" line
+    # so our override is defined BEFORE execution
+    radp_cli_completion_generate "$shell" | tail -n +2 | sed '/^_homelabctl "\$@"$/d'
+    # Custom overrides
     _completion_output_vf_zsh
+    # Execution call at the very end (after all overrides)
+    echo ''
+    echo '_homelabctl "$@"'
     ;;
   *)
     radp_log_error "Unsupported shell: $shell (supported: bash, zsh)"
@@ -107,26 +110,38 @@ _homelabctl_complete_profiles() {
 
 # Get vf config_dir from homelabctl config (for completion delegation)
 _homelabctl_vf_config_dir() {
-  # Check if already set via env var
+  # Priority 1: Check if already set via env var
   if [[ -n "${RADP_VAGRANT_CONFIG_DIR:-}" ]]; then
     echo "$RADP_VAGRANT_CONFIG_DIR"
     return
   fi
-  # Try to get from homelabctl config
-  local config_dir
-  config_dir=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"config_dir": *"[^"]*"' | head -1 | sed 's/"config_dir": *"\([^"]*\)"/\1/')
-  [[ -n "$config_dir" ]] && echo "$config_dir"
+  # Priority 2: Default homelabctl vf config location
+  local default_dir="$HOME/.config/homelabctl/vagrant"
+  if [[ -f "$default_dir/vagrant.yaml" ]]; then
+    echo "$default_dir"
+    return
+  fi
+  # Priority 3: Current directory if it has vagrant.yaml
+  if [[ -f "./vagrant.yaml" ]]; then
+    echo "."
+    return
+  fi
 }
 
 # Get vf env from homelabctl config
 _homelabctl_vf_env() {
+  # Check if set via env var
   if [[ -n "${RADP_VAGRANT_ENV:-}" ]]; then
     echo "$RADP_VAGRANT_ENV"
     return
   fi
-  local env_val
-  env_val=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"env": *"[^"]*"' | tail -1 | sed 's/"env": *"\([^"]*\)"/\1/')
-  [[ -n "$env_val" ]] && echo "$env_val"
+  # Try to read from homelabctl's config.yaml
+  local config_file="$HOME/.config/homelabctl/config.yaml"
+  if [[ -f "$config_file" ]] && command -v yq &>/dev/null; then
+    local env_val
+    env_val=$(yq -r '.radp.env // empty' "$config_file" 2>/dev/null)
+    [[ -n "$env_val" ]] && echo "$env_val"
+  fi
 }
 
 COMPLETION_HELPERS
@@ -141,69 +156,21 @@ _completion_output_vf_zsh() {
 
 # Override _homelabctl_vf to delegate to radp-vf's native completion
 _homelabctl_vf() {
-    # Delegate to radp-vf's native completion for consistent experience
-    if (( $+functions[_radp_vf] )); then
-        # Set config from homelabctl config if not already set
-        local _hctl_vf_config_dir _hctl_vf_env
-        _hctl_vf_config_dir="$(_homelabctl_vf_config_dir)"
-        [[ -n "$_hctl_vf_config_dir" ]] && export RADP_VAGRANT_CONFIG_DIR="$_hctl_vf_config_dir"
-        _hctl_vf_env="$(_homelabctl_vf_env)"
-        [[ -n "$_hctl_vf_env" ]] && export RADP_VAGRANT_ENV="$_hctl_vf_env"
-        # In args state, words[1] is "vf" - just replace with "radp-vf"
-        # CURRENT is already correct, no adjustment needed
-        words[1]="radp-vf"
-        _radp_vf
+    # Set config from homelabctl config if not already set
+    local _hctl_vf_config_dir _hctl_vf_env
+    _hctl_vf_config_dir="$(_homelabctl_vf_config_dir)"
+    [[ -n "$_hctl_vf_config_dir" ]] && export RADP_VAGRANT_CONFIG_DIR="$_hctl_vf_config_dir"
+    _hctl_vf_env="$(_homelabctl_vf_env)"
+    [[ -n "$_hctl_vf_env" ]] && export RADP_VAGRANT_ENV="$_hctl_vf_env"
+
+    # Replace "vf" with "radp-vf" so _radp-vf sees the right command name
+    words[1]="radp-vf"
+
+    # Delegate to radp-vf completion (file _radp-vf, autoloaded by compinit)
+    if (( $+functions[_radp-vf] )); then
+        _radp-vf
     else
-        # Fallback if radp-vf completion not loaded
-        local context state state_descr line
-        typeset -A opt_args
-
-        _arguments -C \
-            '(-h --help)'{-h,--help}'[Show help]' \
-            '1: :->command' \
-            '*:: :->args'
-
-        case "$state" in
-            command)
-                local -a radp_vf_cmds=(
-                    'completion:Generate shell completion script'
-                    'dump-config:Dump merged configuration'
-                    'generate:Generate standalone Vagrantfile'
-                    'info:Show environment and configuration info'
-                    'init:Initialize a new project with sample configuration'
-                    'list:List clusters and guests from configuration'
-                    'template:Manage project templates'
-                    'validate:Validate YAML configuration files'
-                    'version:Show version'
-                    'vg:Run vagrant command with framework'
-                )
-                _describe -t commands 'radp-vf command' radp_vf_cmds
-                ;;
-            args)
-                case "${words[1]}" in
-                    vg)
-                        # Delegate to vagrant completion if available
-                        if (( $+functions[_vagrant] )); then
-                            _vagrant
-                        else
-                            local -a vagrant_cmds=(
-                                'up:Start and provision VMs'
-                                'halt:Stop VMs'
-                                'destroy:Destroy VMs'
-                                'status:Show VM status'
-                                'ssh:SSH into VM'
-                                'provision:Run provisioners'
-                                'reload:Restart VMs'
-                            )
-                            _describe -t commands 'vagrant command' vagrant_cmds
-                        fi
-                        ;;
-                    *)
-                        _files
-                        ;;
-                esac
-                ;;
-        esac
+        _files
     fi
 }
 VF_ZSH
