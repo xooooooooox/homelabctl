@@ -14,26 +14,38 @@ _homelabctl_complete_profiles() {
 
 # Get vf config_dir from homelabctl config (for completion delegation)
 _homelabctl_vf_config_dir() {
-  # Check if already set via env var
+  # Priority 1: Check if already set via env var
   if [[ -n "${RADP_VAGRANT_CONFIG_DIR:-}" ]]; then
     echo "$RADP_VAGRANT_CONFIG_DIR"
     return
   fi
-  # Try to get from homelabctl config
-  local config_dir
-  config_dir=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"config_dir": *"[^"]*"' | head -1 | sed 's/"config_dir": *"\([^"]*\)"/\1/')
-  [[ -n "$config_dir" ]] && echo "$config_dir"
+  # Priority 2: Default homelabctl vf config location
+  local default_dir="$HOME/.config/homelabctl/vagrant"
+  if [[ -f "$default_dir/vagrant.yaml" ]]; then
+    echo "$default_dir"
+    return
+  fi
+  # Priority 3: Current directory if it has vagrant.yaml
+  if [[ -f "./vagrant.yaml" ]]; then
+    echo "."
+    return
+  fi
 }
 
 # Get vf env from homelabctl config
 _homelabctl_vf_env() {
+  # Check if set via env var
   if [[ -n "${RADP_VAGRANT_ENV:-}" ]]; then
     echo "$RADP_VAGRANT_ENV"
     return
   fi
-  local env_val
-  env_val=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"env": *"[^"]*"' | tail -1 | sed 's/"env": *"\([^"]*\)"/\1/')
-  [[ -n "$env_val" ]] && echo "$env_val"
+  # Try to read from homelabctl's config.yaml
+  local config_file="$HOME/.config/homelabctl/config.yaml"
+  if [[ -f "$config_file" ]] && command -v yq &>/dev/null; then
+    local env_val
+    env_val=$(yq -r '.radp.env // empty' "$config_file" 2>/dev/null)
+    [[ -n "$env_val" ]] && echo "$env_val"
+  fi
 }
 
 # Bash completion script for homelabctl
@@ -72,34 +84,188 @@ _homelabctl() {
     # Command completions
     case "$cmd_path" in
         '')
-            COMPREPLY=($(compgen -W "completion setup version vf  -q --quiet -v --verbose --debug --config --all --json --help --version" -- "$cur"))
+            COMPREPLY=($(compgen -W "completion gitlab init k8s setup version vf  -q --quiet -v --verbose --debug --show-config --all --json  --help --version" -- "$cur"))
             ;;
         'completion')
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+            # 计算参数位置（减去命令路径深度）
+            local arg_idx=0
+            for ((i = 1; i < cword; i++)); do
+                case "${words[i]}" in
+                    -*) ;;
+                    *) ((arg_idx++)) ;;
+                esac
+            done
+            ((arg_idx -= 1)) || true
+            # 根据参数位置补全
+            case "$arg_idx" in
+                0)
+                    COMPREPLY=($(compgen -W "bash zsh" -- "$cur"))
+                    return
+                    ;;
+            esac
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'gitlab')
+            COMPREPLY=($(compgen -W "backup healthcheck init install reset-password restart restore runner start status stop  --help" -- "$cur"))
+            ;;
+        'gitlab backup')
+            COMPREPLY=($(compgen -W "cleanup create list  --help" -- "$cur"))
+            ;;
+        'gitlab backup cleanup')
+            COMPREPLY=($(compgen -W "--help  --keep-days" -- "$cur"))
+            ;;
+        'gitlab backup create')
+            COMPREPLY=($(compgen -W "--help  --target --type" -- "$cur"))
+            ;;
+        'gitlab backup list')
+            COMPREPLY=($(compgen -W "--help  --type" -- "$cur"))
+            ;;
+        'gitlab healthcheck')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'gitlab init')
+            COMPREPLY=($(compgen -W "--help  --user-config --backup-schedule" -- "$cur"))
+            ;;
+        'gitlab install')
+            COMPREPLY=($(compgen -W "--help  -t --type -v --version --data-dir" -- "$cur"))
+            ;;
+        'gitlab reset-password')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'gitlab restart')
+            COMPREPLY=($(compgen -W "--help  --service" -- "$cur"))
+            ;;
+        'gitlab restore')
+            COMPREPLY=($(compgen -W "--help  --type --source" -- "$cur"))
+            ;;
+        'gitlab runner')
+            COMPREPLY=($(compgen -W "install  --help" -- "$cur"))
+            ;;
+        'gitlab runner install')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'gitlab start')
+            COMPREPLY=($(compgen -W "--help  --service" -- "$cur"))
+            ;;
+        'gitlab status')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'gitlab stop')
+            COMPREPLY=($(compgen -W "--help  --service" -- "$cur"))
+            ;;
+        'init')
+            COMPREPLY=($(compgen -W "all k8s setup vf  --help" -- "$cur"))
+            ;;
+        'init all')
+            COMPREPLY=($(compgen -W "--help  --force --dry-run" -- "$cur"))
+            ;;
+        'init k8s')
+            COMPREPLY=($(compgen -W "--help  --force --dry-run" -- "$cur"))
+            ;;
+        'init setup')
+            COMPREPLY=($(compgen -W "--help  --force --dry-run" -- "$cur"))
+            ;;
+        'init vf')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s')
+            COMPREPLY=($(compgen -W "addon backup health init install token  --help" -- "$cur"))
+            ;;
+        'k8s addon')
+            COMPREPLY=($(compgen -W "install list profile quickstart uninstall  --help" -- "$cur"))
+            ;;
+        'k8s addon install')
+            COMPREPLY=($(compgen -W "--help  -v --version -f --values" -- "$cur"))
+            ;;
+        'k8s addon list')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s addon profile')
+            COMPREPLY=($(compgen -W "apply list show  --help" -- "$cur"))
+            ;;
+        'k8s addon profile apply')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s addon profile list')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s addon profile show')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s addon quickstart')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s addon uninstall')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s backup')
+            COMPREPLY=($(compgen -W "create list restore  --help" -- "$cur"))
+            ;;
+        'k8s backup create')
+            COMPREPLY=($(compgen -W "--help  -d --dir" -- "$cur"))
+            ;;
+        'k8s backup list')
+            COMPREPLY=($(compgen -W "--help  -d --dir" -- "$cur"))
+            ;;
+        'k8s backup restore')
+            COMPREPLY=($(compgen -W "--help  --data-dir" -- "$cur"))
+            ;;
+        'k8s health')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s init')
+            COMPREPLY=($(compgen -W "master worker  --help" -- "$cur"))
+            ;;
+        'k8s init master')
+            COMPREPLY=($(compgen -W "--help  -a --apiserver-advertise-address -p --pod-network-cidr" -- "$cur"))
+            ;;
+        'k8s init worker')
+            COMPREPLY=($(compgen -W "--help  -c --control-plane -t --token --discovery-token-ca-cert-hash" -- "$cur"))
+            ;;
+        'k8s install')
+            COMPREPLY=($(compgen -W "--help  -t --type -v --version" -- "$cur"))
+            ;;
+        'k8s token')
+            COMPREPLY=($(compgen -W "create get  --help" -- "$cur"))
+            ;;
+        'k8s token create')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'k8s token get')
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
             ;;
         'setup')
-            COMPREPLY=($(compgen -W "configure deps info install list profile  --help" -- "$cur"))
+            COMPREPLY=($(compgen -W "configure deps info install list profile uninstall  --help" -- "$cur"))
             ;;
         'setup configure')
-            COMPREPLY=($(compgen -W "chrony expand-lvm gpg-import gpg-preset list yadm  --help" -- "$cur"))
+            COMPREPLY=($(compgen -W "chrony docker expand-lvm gpg-import gpg-preset list yadm  --help" -- "$cur"))
             ;;
         'setup configure chrony')
-            COMPREPLY=($(compgen -W "--help -s --servers -p --pool -t --timezone" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --servers --pool --timezone" -- "$cur"))
+            ;;
+        'setup configure docker')
+            COMPREPLY=($(compgen -W "acceleration rootless  --help" -- "$cur"))
+            ;;
+        'setup configure docker acceleration')
+            COMPREPLY=($(compgen -W "--help  --proxy --https-proxy --no-proxy --mirrors" -- "$cur"))
+            ;;
+        'setup configure docker rootless')
+            COMPREPLY=($(compgen -W "--help  -u --user" -- "$cur"))
             ;;
         'setup configure expand-lvm')
-            COMPREPLY=($(compgen -W "--help -p --partition -v --vg -l --lv" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --partition --vg --lv" -- "$cur"))
             ;;
         'setup configure gpg-import')
-            COMPREPLY=($(compgen -W "--help -p --public-key -p --public-key-file -s --secret-key-file -p --passphrase -p --passphrase-file -k --key-id -k --keyserver -t --trust-level -o --ownertrust-file -u --user" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --public-key --public-key-file --secret-key-file --passphrase --passphrase-file --key-id --keyserver --trust-level --ownertrust-file --user" -- "$cur"))
             ;;
         'setup configure gpg-preset')
-            COMPREPLY=($(compgen -W "--help -k --key-uid -p --passphrase -p --passphrase-file -u --user" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --key-uid --passphrase --passphrase-file --user" -- "$cur"))
             ;;
         'setup configure list')
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
             ;;
         'setup configure yadm')
-            COMPREPLY=($(compgen -W "--help -r --repo-url -c --class -h --https-user -h --https-token -h --https-token-file -s --ssh-key-file -s --ssh-host -s --ssh-port -u --user" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --repo-url --class --https-user --https-token --https-token-file --ssh-key-file --ssh-host --ssh-port --user" -- "$cur"))
             ;;
         'setup deps')
             # 计算参数位置（减去命令路径深度）
@@ -120,7 +286,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help -r --reverse" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --reverse" -- "$cur"))
             ;;
         'setup info')
             # 计算参数位置（减去命令路径深度）
@@ -141,7 +307,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help -a --all-platforms" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --all-platforms" -- "$cur"))
             ;;
         'setup install')
             # 计算参数位置（减去命令路径深度）
@@ -162,7 +328,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help -v --version -d --dry-run -n --no-deps" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -v --version --dry-run --no-deps" -- "$cur"))
             ;;
         'setup list')
             case "$prev" in
@@ -179,7 +345,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help -c --category -i --installed -c --categories -n --names-only -c --category-names" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -c --category --installed --categories --names-only --category-names" -- "$cur"))
             ;;
         'setup profile')
             COMPREPLY=($(compgen -W "apply list show  --help" -- "$cur"))
@@ -203,10 +369,10 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help -d --dry-run -c --continue -s --skip-installed -n --no-deps" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --dry-run --continue --skip-installed --no-deps" -- "$cur"))
             ;;
         'setup profile list')
-            COMPREPLY=($(compgen -W "--help -n --names-only" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --names-only" -- "$cur"))
             ;;
         'setup profile show')
             # 计算参数位置（减去命令路径深度）
@@ -227,10 +393,31 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            ;;
+        'setup uninstall')
+            # 计算参数位置（减去命令路径深度）
+            local arg_idx=0
+            for ((i = 1; i < cword; i++)); do
+                case "${words[i]}" in
+                    -*) ;;
+                    *) ((arg_idx++)) ;;
+                esac
+            done
+            ((arg_idx -= 2)) || true
+            # 根据参数位置补全
+            case "$arg_idx" in
+                0)
+                    local completions
+                    completions=$(_homelabctl_complete_packages 2>/dev/null)
+                    COMPREPLY=($(compgen -W "$completions" -- "$cur"))
+                    return
+                    ;;
+            esac
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
             ;;
         'version')
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help " -- "$cur"))
             ;;
         'vf')
             # Delegate to radp-vf completion

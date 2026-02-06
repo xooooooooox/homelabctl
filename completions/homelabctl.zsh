@@ -16,26 +16,38 @@ _homelabctl_complete_profiles() {
 
 # Get vf config_dir from homelabctl config (for completion delegation)
 _homelabctl_vf_config_dir() {
-  # Check if already set via env var
+  # Priority 1: Check if already set via env var
   if [[ -n "${RADP_VAGRANT_CONFIG_DIR:-}" ]]; then
     echo "$RADP_VAGRANT_CONFIG_DIR"
     return
   fi
-  # Try to get from homelabctl config
-  local config_dir
-  config_dir=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"config_dir": *"[^"]*"' | head -1 | sed 's/"config_dir": *"\([^"]*\)"/\1/')
-  [[ -n "$config_dir" ]] && echo "$config_dir"
+  # Priority 2: Default homelabctl vf config location
+  local default_dir="$HOME/.config/homelabctl/vagrant"
+  if [[ -f "$default_dir/vagrant.yaml" ]]; then
+    echo "$default_dir"
+    return
+  fi
+  # Priority 3: Current directory if it has vagrant.yaml
+  if [[ -f "./vagrant.yaml" ]]; then
+    echo "."
+    return
+  fi
 }
 
 # Get vf env from homelabctl config
 _homelabctl_vf_env() {
+  # Check if set via env var
   if [[ -n "${RADP_VAGRANT_ENV:-}" ]]; then
     echo "$RADP_VAGRANT_ENV"
     return
   fi
-  local env_val
-  env_val=$(homelabctl -q --config --all --json 2>/dev/null | grep -o '"env": *"[^"]*"' | tail -1 | sed 's/"env": *"\([^"]*\)"/\1/')
-  [[ -n "$env_val" ]] && echo "$env_val"
+  # Try to read from homelabctl's config.yaml
+  local config_file="$HOME/.config/homelabctl/config.yaml"
+  if [[ -f "$config_file" ]] && command -v yq &>/dev/null; then
+    local env_val
+    env_val=$(yq -r '.radp.env // empty' "$config_file" 2>/dev/null)
+    [[ -n "$env_val" ]] && echo "$env_val"
+  fi
 }
 
 
@@ -72,17 +84,550 @@ _homelabctl_arg_setup_profile_show_name() {
     _describe 'name' completions
 }
 
+_homelabctl_arg_setup_uninstall_name() {
+    local completions=($(_homelabctl_complete_packages 2>/dev/null))
+    _describe 'name' completions
+}
+
 _homelabctl_completion() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '1:shell:_files'
+        '1:shell:(bash zsh)'
+}
+
+_homelabctl_gitlab() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'backup:Manage backup'
+                'healthcheck:Run GitLab health checks'
+                'init:Initialize GitLab after installation'
+                'install:Install GitLab (gitlab-ce or gitlab-ee) via linux_package'
+                'reset-password:Reset GitLab user password'
+                'restart:Restart GitLab services'
+                'restore:Restore GitLab data and/or configuration from backup'
+                'runner:Manage runner'
+                'start:Start GitLab services'
+                'status:Show GitLab status and version info'
+                'stop:Stop GitLab services'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_gitlab_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_gitlab_backup() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'cleanup:Clean old GitLab backups'
+                'create:Create GitLab backup (data and/or configuration)'
+                'list:List available GitLab backups'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_gitlab_backup_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_gitlab_backup_cleanup() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--keep-days[Days to keep backups (default: from config)]:n:' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_backup_create() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--target[Target directory for backup]:path:' \
+        '--type[Backup type: all, data, config (default: all)]:type:' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_backup_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--type[Backup type: all, data, config (default: all)]:type:' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_healthcheck() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_init() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--user-config[User'\''s custom GitLab config file (e.g., /data/homelab_gitlab.rb)]:path:' \
+        '--backup-schedule[Backup crontab schedule (default: "0 4 * * *")]:cron:' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_install() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-t --type)'{-t,--type}'[GitLab type: gitlab-ce or gitlab-ee (default: gitlab-ce)]:type:' \
+        '(-v --version)'{-v,--version}'[GitLab version (default: latest)]:ver:' \
+        '--data-dir[Custom data directory (symlink target)]:path:' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_reset_password() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:username:_files'
+}
+
+_homelabctl_gitlab_restart() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--service[Specific service to restart (puma, sidekiq, etc.)]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_restore() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--type[Restore type: all, data, config (default: all)]:type:' \
+        '--source[Source directory to search for backups]:path:' \
+        '1:backup_file:_files'
+}
+
+_homelabctl_gitlab_runner() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'install:Install GitLab Runner'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_gitlab_runner_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_gitlab_runner_install() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_start() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--service[Specific service to start (puma, sidekiq, etc.)]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_status() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_gitlab_stop() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--service[Specific service to stop (puma, sidekiq, etc.)]:name:' \
+        '*:file:_files'
+}
+
+_homelabctl_init() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'all:Initialize all user configuration directories'
+                'k8s:Initialize k8s user configuration directory'
+                'setup:Initialize setup user configuration directory'
+                'vf:Initialize VF configuration directory'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_init_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_init_all() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--force[Overwrite existing files]' \
+        '--dry-run[Show what would be created without making changes]' \
+        '*:file:_files'
+}
+
+_homelabctl_init_k8s() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--force[Overwrite existing files]' \
+        '--dry-run[Show what would be created without making changes]' \
+        '*:file:_files'
+}
+
+_homelabctl_init_setup() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--force[Overwrite existing files]' \
+        '--dry-run[Show what would be created without making changes]' \
+        '*:file:_files'
+}
+
+_homelabctl_init_vf() {
+    _files
+}
+
+_homelabctl_k8s() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'addon:Manage addon'
+                'backup:Manage backup'
+                'health:Check Kubernetes cluster health'
+                'init:Manage init'
+                'install:Install Kubernetes (kubeadm, kubelet, kubectl)'
+                'token:Manage token'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_k8s_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_k8s_addon() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'install:Install a Kubernetes addon'
+                'list:List available Kubernetes addons'
+                'profile:Manage profile'
+                'quickstart:Install recommended addons (alias for '\''profile apply quickstart'\'')'
+                'uninstall:Uninstall a Kubernetes addon'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_k8s_addon_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_k8s_addon_install() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-v --version)'{-v,--version}'[Addon version (uses default if not specified)]:ver:' \
+        '(-f --values)'{-f,--values}'[Custom values file for helm]:file:' \
+        '1:name:_files'
+}
+
+_homelabctl_k8s_addon_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_addon_profile() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'apply:Apply an addon profile (install multiple addons)'
+                'list:List available addon profiles'
+                'show:Show addon profile details'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_k8s_addon_profile_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_k8s_addon_profile_apply() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:name:_files'
+}
+
+_homelabctl_k8s_addon_profile_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_addon_profile_show() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:name:_files'
+}
+
+_homelabctl_k8s_addon_quickstart() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_addon_uninstall() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:name:_files'
+}
+
+_homelabctl_k8s_backup() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'create:Create etcd backup'
+                'list:List available etcd backups'
+                'restore:Restore etcd from backup'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_k8s_backup_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_k8s_backup_create() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-d --dir)'{-d,--dir}'[Backup directory (default: /var/opt/k8s/backups/etcd)]:path:' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_backup_list() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-d --dir)'{-d,--dir}'[Backup directory (default: /var/opt/k8s/backups/etcd)]:path:' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_backup_restore() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--data-dir[etcd data directory (default: /var/lib/etcd)]:path:' \
+        '1:file:_files'
+}
+
+_homelabctl_k8s_health() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_init() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'master:Initialize Kubernetes master node'
+                'worker:Initialize Kubernetes worker node and join cluster'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_k8s_init_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_k8s_init_master() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-a --apiserver-advertise-address)'{-a,--apiserver-advertise-address}'[]:ip:' \
+        '(-p --pod-network-cidr)'{-p,--pod-network-cidr}'[Pod network CIDR (default: 10.244.0.0/16)]:cidr:' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_init_worker() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-c --control-plane)'{-c,--control-plane}'[]:host:port:' \
+        '(-t --token)'{-t,--token}'[Join token (optional, will retrieve from master if not provided)]:token:' \
+        '--discovery-token-ca-cert-hash[CA cert hash (optional, will retrieve if not provided)]:hash:' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_install() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-t --type)'{-t,--type}'[Install type: kubeadm or minikube (default: kubeadm)]:type:' \
+        '(-v --version)'{-v,--version}'[Kubernetes version (default: 1.30)]:ver:' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_token() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'create:Create a new Kubernetes join token'
+                'get:Get current valid Kubernetes token'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_k8s_token_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_k8s_token_create() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_token_get() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '*:file:_files'
 }
 
 _homelabctl_setup() {
     local context state state_descr line
     typeset -A opt_args
 
-    _arguments -C \
+    _arguments -C -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '1: :->command' \
         '*:: :->args'
@@ -96,6 +641,7 @@ _homelabctl_setup() {
                 'install:Install a software package'
                 'list:List available packages'
                 'profile:Manage profile'
+                'uninstall:Uninstall a software package'
             )
             _describe 'subcommand' commands
             ;;
@@ -114,7 +660,7 @@ _homelabctl_setup_configure() {
     local context state state_descr line
     typeset -A opt_args
 
-    _arguments -C \
+    _arguments -C -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '1: :->command' \
         '*:: :->args'
@@ -123,6 +669,7 @@ _homelabctl_setup_configure() {
         command)
             local commands=(
                 'chrony:Configure chrony for time synchronization'
+                'docker:Manage docker'
                 'expand-lvm:Expand LVM partition and filesystem to use all available disk space'
                 'gpg-import:Import GPG keys into user keyring'
                 'gpg-preset:Preset GPG passphrase in gpg-agent cache for non-interactive operations'
@@ -145,44 +692,89 @@ _homelabctl_setup_configure() {
 _homelabctl_setup_configure_chrony() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-s --servers)'{-s,--servers}'[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
-        '(-p --pool)'{-p,--pool}'[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
-        '(-t --timezone)'{-t,--timezone}'[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
+        '--servers[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
+        '--pool[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
+        '--timezone[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_configure_docker() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'acceleration:Configure Docker acceleration (proxy or registry mirrors)'
+                'rootless:Configure Docker for non-root user access'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_setup_configure_docker_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_setup_configure_docker_acceleration() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--proxy[HTTP/HTTPS proxy URL (e.g., http://192.168.1.1:8080)]:url:' \
+        '--https-proxy[HTTPS proxy URL (default: same as --proxy)]:url:' \
+        '--no-proxy[Comma-separated hosts to bypass proxy (default: localhost,127.0.0.1)]:list:' \
+        '--mirrors[Comma-separated registry mirror URLs]:list:' \
+        '*:file:_files'
+}
+
+_homelabctl_setup_configure_docker_rootless() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-u --user)'{-u,--user}'[Target user (default: current user)]:user:' \
         '*:file:_files'
 }
 
 _homelabctl_setup_configure_expand_lvm() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-p --partition)'{-p,--partition}'[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
-        '(-v --vg)'{-v,--vg}'[Volume group name. Auto-detected if not specified.]:name:' \
-        '(-l --lv)'{-l,--lv}'[Logical volume to expand. Auto-detected if not specified.]:name:' \
+        '--partition[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
+        '--vg[Volume group name. Auto-detected if not specified.]:name:' \
+        '--lv[Logical volume to expand. Auto-detected if not specified.]:name:' \
         '*:file:_files'
 }
 
 _homelabctl_setup_configure_gpg_import() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-p --public-key)'{-p,--public-key}'[GPG public key content (ASCII-armored)]:content:' \
-        '(-p --public-key-file)'{-p,--public-key-file}'[Path to GPG public key file]:file:' \
-        '(-s --secret-key-file)'{-s,--secret-key-file}'[Path to GPG secret key file]:file:' \
-        '(-p --passphrase)'{-p,--passphrase}'[Passphrase for secret key]:pass:' \
-        '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
-        '(-k --key-id)'{-k,--key-id}'[GPG key ID to fetch from keyserver]:id:' \
-        '(-k --keyserver)'{-k,--keyserver}'[Keyserver URL (default: keys.openpgp.org)]:url:' \
-        '(-t --trust-level)'{-t,--trust-level}'[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
-        '(-o --ownertrust-file)'{-o,--ownertrust-file}'[Path to ownertrust file]:file:' \
-        '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
+        '--public-key[GPG public key content (ASCII-armored)]:content:' \
+        '--public-key-file[Path to GPG public key file]:file:' \
+        '--secret-key-file[Path to GPG secret key file]:file:' \
+        '--passphrase[Passphrase for secret key]:pass:' \
+        '--passphrase-file[Path to file containing passphrase]:file:' \
+        '--key-id[GPG key ID to fetch from keyserver]:id:' \
+        '--keyserver[Keyserver URL (default: keys.openpgp.org)]:url:' \
+        '--trust-level[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
+        '--ownertrust-file[Path to ownertrust file]:file:' \
+        '--user[Target user (default: current user, requires sudo for other users)]:name:' \
         '*:file:_files'
 }
 
 _homelabctl_setup_configure_gpg_preset() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-k --key-uid)'{-k,--key-uid}'[Key UID (email) to identify the key (e.g., user@example.com)]:uid:' \
-        '(-p --passphrase)'{-p,--passphrase}'[Passphrase content]:pass:' \
-        '(-p --passphrase-file)'{-p,--passphrase-file}'[Path to file containing passphrase]:file:' \
-        '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
+        '--key-uid[Key UID (email) to identify the key (e.g., user@example.com)]:uid:' \
+        '--passphrase[Passphrase content]:pass:' \
+        '--passphrase-file[Path to file containing passphrase]:file:' \
+        '--user[Target user (default: current user, requires sudo for other users)]:name:' \
         '*:file:_files'
 }
 
@@ -195,29 +787,29 @@ _homelabctl_setup_configure_list() {
 _homelabctl_setup_configure_yadm() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-r --repo-url)'{-r,--repo-url}'[Dotfiles repository URL (HTTPS or SSH format)]:url:' \
-        '(-c --class)'{-c,--class}'[Set yadm class before clone]:class:' \
-        '(-h --https-user)'{-h,--https-user}'[Username for HTTPS authentication]:user:' \
-        '(-h --https-token)'{-h,--https-token}'[Personal access token for HTTPS authentication]:token:' \
-        '(-h --https-token-file)'{-h,--https-token-file}'[Path to file containing access token]:file:' \
-        '(-s --ssh-key-file)'{-s,--ssh-key-file}'[Path to SSH private key file]:file:' \
-        '(-s --ssh-host)'{-s,--ssh-host}'[Override SSH hostname/IP (for private servers)]:host:' \
-        '(-s --ssh-port)'{-s,--ssh-port}'[Override SSH port (default 22)]:port:' \
-        '(-u --user)'{-u,--user}'[Target user (default: current user, requires sudo for other users)]:name:' \
+        '--repo-url[Dotfiles repository URL (HTTPS or SSH format)]:url:' \
+        '--class[Set yadm class before clone]:class:' \
+        '--https-user[Username for HTTPS authentication]:user:' \
+        '--https-token[Personal access token for HTTPS authentication]:token:' \
+        '--https-token-file[Path to file containing access token]:file:' \
+        '--ssh-key-file[Path to SSH private key file]:file:' \
+        '--ssh-host[Override SSH hostname/IP (for private servers)]:host:' \
+        '--ssh-port[Override SSH port (default 22)]:port:' \
+        '--user[Target user (default: current user, requires sudo for other users)]:name:' \
         '*:file:_files'
 }
 
 _homelabctl_setup_deps() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-r --reverse)'{-r,--reverse}'[Show reverse dependencies (packages that depend on this one)]' \
+        '--reverse[Show reverse dependencies (packages that depend on this one)]' \
         '1:name:_homelabctl_arg_setup_deps_name'
 }
 
 _homelabctl_setup_info() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-a --all-platforms)'{-a,--all-platforms}'[Show dependencies for all platforms]' \
+        '--all-platforms[Show dependencies for all platforms]' \
         '1:name:_homelabctl_arg_setup_info_name'
 }
 
@@ -225,8 +817,8 @@ _homelabctl_setup_install() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-v --version)'{-v,--version}'[Specific version (default: latest)]:ver:' \
-        '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed without installing]' \
-        '(-n --no-deps)'{-n,--no-deps}'[Skip automatic dependency installation]' \
+        '--dry-run[Show what would be installed without installing]' \
+        '--no-deps[Skip automatic dependency installation]' \
         '1:name:_homelabctl_arg_setup_install_name'
 }
 
@@ -234,10 +826,10 @@ _homelabctl_setup_list() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-c --category)'{-c,--category}'[Filter by category]:name:_homelabctl_opt_setup_list_category' \
-        '(-i --installed)'{-i,--installed}'[Show only installed packages]' \
-        '(-c --categories)'{-c,--categories}'[List available categories]' \
-        '(-n --names-only)'{-n,--names-only}'[Output package names only (for completion)]' \
-        '(-c --category-names)'{-c,--category-names}'[Output category names only (for completion)]' \
+        '--installed[Show only installed packages]' \
+        '--categories[List available categories]' \
+        '--names-only[Output package names only (for completion)]' \
+        '--category-names[Output category names only (for completion)]' \
         '*:file:_files'
 }
 
@@ -245,7 +837,7 @@ _homelabctl_setup_profile() {
     local context state state_descr line
     typeset -A opt_args
 
-    _arguments -C \
+    _arguments -C -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '1: :->command' \
         '*:: :->args'
@@ -273,17 +865,17 @@ _homelabctl_setup_profile() {
 _homelabctl_setup_profile_apply() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-d --dry-run)'{-d,--dry-run}'[Show what would be installed]' \
-        '(-c --continue)'{-c,--continue}'[Continue on error]' \
-        '(-s --skip-installed)'{-s,--skip-installed}'[Skip already installed packages]' \
-        '(-n --no-deps)'{-n,--no-deps}'[Skip automatic dependency installation]' \
+        '--dry-run[Show what would be installed]' \
+        '--continue[Continue on error]' \
+        '--skip-installed[Skip already installed packages]' \
+        '--no-deps[Skip automatic dependency installation]' \
         '1:name:_homelabctl_arg_setup_profile_apply_name'
 }
 
 _homelabctl_setup_profile_list() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
-        '(-n --names-only)'{-n,--names-only}'[Output profile names only (for completion)]' \
+        '--names-only[Output profile names only (for completion)]' \
         '*:file:_files'
 }
 
@@ -293,6 +885,12 @@ _homelabctl_setup_profile_show() {
         '1:name:_homelabctl_arg_setup_profile_show_name'
 }
 
+_homelabctl_setup_uninstall() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1:name:_homelabctl_arg_setup_uninstall_name'
+}
+
 _homelabctl_version() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
@@ -300,23 +898,39 @@ _homelabctl_version() {
 }
 
 _homelabctl_vf() {
-    _arguments '(-h --help)'{-h,--help}'[Show help]' '*:args:'
+    _files
 }
 
 _homelabctl() {
     local context state state_descr line
     typeset -A opt_args
 
-    _arguments -C \
-        '(-h --help)'{-h,--help}'[Show help]' \
-        '--version[Show version]' \
-        '-q' \
-        '--quiet' \
+    # Workaround: Handle option prefix completion explicitly
+    # Without this, -<TAB> may fall through to command completion
+    # because _arguments -C doesn't trigger option completion for
+    # incomplete option prefixes when positional args are specified
+    if [[ $CURRENT -eq 2 && "${words[CURRENT]}" == -* ]]; then
+        _arguments -s \
+            '(-h --help)'{-h,--help}'[Show help]' \
+            '--version[Show version]' \
+        '(-q --quiet)'{-q,--quiet}'[Enable quiet mode]' \
         '(-v --verbose)'{-v,--verbose}'[Enable verbose output]' \
         '--debug[Enable debug output]' \
-        '--config' \
-        '--all' \
-        '--json' \
+        '--show-config[Show configuration]' \
+        '--all[Show all (with --show-config)]' \
+        '--json[Output as JSON (with --show-config)]' \
+        && return
+    fi
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--version[Show version]' \
+        '(-q --quiet)'{-q,--quiet}'[Enable quiet mode]' \
+        '(-v --verbose)'{-v,--verbose}'[Enable verbose output]' \
+        '--debug[Enable debug output]' \
+        '--show-config[Show configuration]' \
+        '--all[Show all (with --show-config)]' \
+        '--json[Output as JSON (with --show-config)]' \
         '1: :->command' \
         '*:: :->args'
 
@@ -324,6 +938,9 @@ _homelabctl() {
         command)
             local commands=(
                 'completion:Generate shell completion script'
+                'gitlab:Manage gitlab'
+                'init:Manage init'
+                'k8s:Manage k8s'
                 'setup:Manage setup'
                 'version:Show version information'
                 'vf:Run radp-vagrant-framework commands (passthrough to radp-vf)'
@@ -341,72 +958,25 @@ _homelabctl() {
     esac
 }
 
-_homelabctl "$@"
 
 # Override _homelabctl_vf to delegate to radp-vf's native completion
 _homelabctl_vf() {
-    # Delegate to radp-vf's native completion for consistent experience
-    if (( $+functions[_radp_vf] )); then
-        # Set config from homelabctl config if not already set
-        local _hctl_vf_config_dir _hctl_vf_env
-        _hctl_vf_config_dir="$(_homelabctl_vf_config_dir)"
-        [[ -n "$_hctl_vf_config_dir" ]] && export RADP_VAGRANT_CONFIG_DIR="$_hctl_vf_config_dir"
-        _hctl_vf_env="$(_homelabctl_vf_env)"
-        [[ -n "$_hctl_vf_env" ]] && export RADP_VAGRANT_ENV="$_hctl_vf_env"
-        # In args state, words[1] is "vf" - just replace with "radp-vf"
-        # CURRENT is already correct, no adjustment needed
-        words[1]="radp-vf"
-        _radp_vf
+    # Set config from homelabctl config if not already set
+    local _hctl_vf_config_dir _hctl_vf_env
+    _hctl_vf_config_dir="$(_homelabctl_vf_config_dir)"
+    [[ -n "$_hctl_vf_config_dir" ]] && export RADP_VAGRANT_CONFIG_DIR="$_hctl_vf_config_dir"
+    _hctl_vf_env="$(_homelabctl_vf_env)"
+    [[ -n "$_hctl_vf_env" ]] && export RADP_VAGRANT_ENV="$_hctl_vf_env"
+
+    # Replace "vf" with "radp-vf" so _radp-vf sees the right command name
+    words[1]="radp-vf"
+
+    # Delegate to radp-vf completion (file _radp-vf, autoloaded by compinit)
+    if (( $+functions[_radp-vf] )); then
+        _radp-vf
     else
-        # Fallback if radp-vf completion not loaded
-        local context state state_descr line
-        typeset -A opt_args
-
-        _arguments -C \
-            '(-h --help)'{-h,--help}'[Show help]' \
-            '1: :->command' \
-            '*:: :->args'
-
-        case "$state" in
-            command)
-                local -a radp_vf_cmds=(
-                    'completion:Generate shell completion script'
-                    'dump-config:Dump merged configuration'
-                    'generate:Generate standalone Vagrantfile'
-                    'info:Show environment and configuration info'
-                    'init:Initialize a new project with sample configuration'
-                    'list:List clusters and guests from configuration'
-                    'template:Manage project templates'
-                    'validate:Validate YAML configuration files'
-                    'version:Show version'
-                    'vg:Run vagrant command with framework'
-                )
-                _describe -t commands 'radp-vf command' radp_vf_cmds
-                ;;
-            args)
-                case "${words[1]}" in
-                    vg)
-                        # Delegate to vagrant completion if available
-                        if (( $+functions[_vagrant] )); then
-                            _vagrant
-                        else
-                            local -a vagrant_cmds=(
-                                'up:Start and provision VMs'
-                                'halt:Stop VMs'
-                                'destroy:Destroy VMs'
-                                'status:Show VM status'
-                                'ssh:SSH into VM'
-                                'provision:Run provisioners'
-                                'reload:Restart VMs'
-                            )
-                            _describe -t commands 'vagrant command' vagrant_cmds
-                        fi
-                        ;;
-                    *)
-                        _files
-                        ;;
-                esac
-                ;;
-        esac
+        _files
     fi
 }
+
+_homelabctl "$@"
