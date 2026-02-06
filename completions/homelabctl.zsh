@@ -165,6 +165,7 @@ _homelabctl_gitlab_backup_cleanup() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '--keep-days[Days to keep backups (default: from config)]:n:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -173,6 +174,8 @@ _homelabctl_gitlab_backup_create() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '--target[Target directory for backup]:path:' \
         '--type[Backup type: all, data, config (default: all)]:type:' \
+        '--skip-remote[Skip copy to remote/NAS location]' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -186,6 +189,9 @@ _homelabctl_gitlab_backup_list() {
 _homelabctl_gitlab_healthcheck() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--verbose[Show detailed output]' \
+        '--check-secrets[Also run secrets doctor]' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -194,6 +200,9 @@ _homelabctl_gitlab_init() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '--user-config[User'\''s custom GitLab config file (e.g., /data/homelab_gitlab.rb)]:path:' \
         '--backup-schedule[Backup crontab schedule (default: "0 4 * * *")]:cron:' \
+        '--skip-crontab[Skip automatic backup crontab setup]' \
+        '--skip-reconfigure[Skip reconfigure and restart (only setup directories and crontab)]' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -203,12 +212,16 @@ _homelabctl_gitlab_install() {
         '(-t --type)'{-t,--type}'[GitLab type: gitlab-ce or gitlab-ee (default: gitlab-ce)]:type:' \
         '(-v --version)'{-v,--version}'[GitLab version (default: latest)]:ver:' \
         '--data-dir[Custom data directory (symlink target)]:path:' \
+        '--skip-postfix[Skip postfix installation]' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
 _homelabctl_gitlab_reset_password() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--force[Skip confirmation prompt]' \
+        '--dry-run[Show what would be done]' \
         '1:username:_files'
 }
 
@@ -216,6 +229,7 @@ _homelabctl_gitlab_restart() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '--service[Specific service to restart (puma, sidekiq, etc.)]:name:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -224,6 +238,8 @@ _homelabctl_gitlab_restore() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '--type[Restore type: all, data, config (default: all)]:type:' \
         '--source[Source directory to search for backups]:path:' \
+        '--force[Skip confirmation prompts]' \
+        '--dry-run[Show what would be done]' \
         '1:backup_file:_files'
 }
 
@@ -257,6 +273,8 @@ _homelabctl_gitlab_runner() {
 _homelabctl_gitlab_runner_install() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '(-v --version)'{-v,--version}'[GitLab Runner version (default: latest)]:ver:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -264,12 +282,14 @@ _homelabctl_gitlab_start() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '--service[Specific service to start (puma, sidekiq, etc.)]:name:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
 _homelabctl_gitlab_status() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--services[Show all service status details]' \
         '*:file:_files'
 }
 
@@ -277,6 +297,7 @@ _homelabctl_gitlab_stop() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '--service[Specific service to stop (puma, sidekiq, etc.)]:name:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -406,12 +427,14 @@ _homelabctl_k8s_addon_install() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-v --version)'{-v,--version}'[Addon version (uses default if not specified)]:ver:' \
         '(-f --values)'{-f,--values}'[Custom values file for helm]:file:' \
+        '--dry-run[Show what would be done]' \
         '1:name:_files'
 }
 
 _homelabctl_k8s_addon_list() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--installed[Show only installed addons]' \
         '*:file:_files'
 }
 
@@ -447,12 +470,16 @@ _homelabctl_k8s_addon_profile() {
 _homelabctl_k8s_addon_profile_apply() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--dry-run[Show what would be installed]' \
+        '--continue[Continue on error]' \
+        '--skip-installed[Skip already installed addons]' \
         '1:name:_files'
 }
 
 _homelabctl_k8s_addon_profile_list() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--names-only[Output profile names only (for completion)]' \
         '*:file:_files'
 }
 
@@ -465,12 +492,16 @@ _homelabctl_k8s_addon_profile_show() {
 _homelabctl_k8s_addon_quickstart() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--dry-run[Show what would be done]' \
+        '--continue[Continue on error]' \
+        '--skip-installed[Skip already installed addons]' \
         '*:file:_files'
 }
 
 _homelabctl_k8s_addon_uninstall() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--dry-run[Show what would be done]' \
         '1:name:_files'
 }
 
@@ -507,6 +538,7 @@ _homelabctl_k8s_backup_create() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-d --dir)'{-d,--dir}'[Backup directory (default: /var/opt/k8s/backups/etcd)]:path:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -521,12 +553,15 @@ _homelabctl_k8s_backup_restore() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '--data-dir[etcd data directory (default: /var/lib/etcd)]:path:' \
+        '--dry-run[Show what would be done]' \
+        '--force[Skip confirmation prompt]' \
         '1:file:_files'
 }
 
 _homelabctl_k8s_health() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--verbose[Show detailed output]' \
         '*:file:_files'
 }
 
@@ -563,6 +598,7 @@ _homelabctl_k8s_init_master() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-a --apiserver-advertise-address)'{-a,--apiserver-advertise-address}'[]:ip:' \
         '(-p --pod-network-cidr)'{-p,--pod-network-cidr}'[Pod network CIDR (default: 10.244.0.0/16)]:cidr:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -572,6 +608,7 @@ _homelabctl_k8s_init_worker() {
         '(-c --control-plane)'{-c,--control-plane}'[]:host:port:' \
         '(-t --token)'{-t,--token}'[Join token (optional, will retrieve from master if not provided)]:token:' \
         '--discovery-token-ca-cert-hash[CA cert hash (optional, will retrieve if not provided)]:hash:' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -580,6 +617,9 @@ _homelabctl_k8s_install() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-t --type)'{-t,--type}'[Install type: kubeadm or minikube (default: kubeadm)]:type:' \
         '(-v --version)'{-v,--version}'[Kubernetes version (default: 1.30)]:ver:' \
+        '--skip-prerequisites[Skip prerequisites configuration]' \
+        '--skip-container-runtime[Skip container runtime installation]' \
+        '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
 
@@ -614,12 +654,15 @@ _homelabctl_k8s_token() {
 _homelabctl_k8s_token_create() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--print-join-command[Print full join command after creation]' \
         '*:file:_files'
 }
 
 _homelabctl_k8s_token_get() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--create[Create new token if no valid token exists]' \
+        '--join-command[Print full join command instead of just token]' \
         '*:file:_files'
 }
 
@@ -695,6 +738,8 @@ _homelabctl_setup_configure_chrony() {
         '--servers[Comma-separated NTP servers (e.g., "ntp.aliyun.com,ntp1.aliyun.com")]:list:' \
         '--pool[NTP pool to use if servers not specified (default: pool.ntp.org)]:pool:' \
         '--timezone[Timezone to set (e.g., "Asia/Shanghai")]:tz:' \
+        '--sync-now[Force immediate time sync after configuration]' \
+        '--dry-run[Show what would be done without making changes]' \
         '*:file:_files'
 }
 
@@ -733,6 +778,8 @@ _homelabctl_setup_configure_docker_acceleration() {
         '--https-proxy[HTTPS proxy URL (default: same as --proxy)]:url:' \
         '--no-proxy[Comma-separated hosts to bypass proxy (default: localhost,127.0.0.1)]:list:' \
         '--mirrors[Comma-separated registry mirror URLs]:list:' \
+        '--remove-proxy[Remove existing proxy configuration]' \
+        '--dry-run[Show what would be done without making changes]' \
         '*:file:_files'
 }
 
@@ -740,6 +787,7 @@ _homelabctl_setup_configure_docker_rootless() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-u --user)'{-u,--user}'[Target user (default: current user)]:user:' \
+        '--dry-run[Show what would be done without making changes]' \
         '*:file:_files'
 }
 
@@ -749,6 +797,7 @@ _homelabctl_setup_configure_expand_lvm() {
         '--partition[LVM partition to expand (e.g., /dev/sda3). Auto-detected if not specified.]:dev:' \
         '--vg[Volume group name. Auto-detected if not specified.]:name:' \
         '--lv[Logical volume to expand. Auto-detected if not specified.]:name:' \
+        '--dry-run[Show what would be done without making changes]' \
         '*:file:_files'
 }
 
@@ -765,6 +814,7 @@ _homelabctl_setup_configure_gpg_import() {
         '--trust-level[Trust level (2=unknown, 3=marginal, 4=full, 5=ultimate)]:level:' \
         '--ownertrust-file[Path to ownertrust file]:file:' \
         '--user[Target user (default: current user, requires sudo for other users)]:name:' \
+        '--dry-run[Show what would be done without making changes]' \
         '*:file:_files'
 }
 
@@ -775,6 +825,8 @@ _homelabctl_setup_configure_gpg_preset() {
         '--passphrase[Passphrase content]:pass:' \
         '--passphrase-file[Path to file containing passphrase]:file:' \
         '--user[Target user (default: current user, requires sudo for other users)]:name:' \
+        '--no-auto-config[Skip auto-configuring gpg-agent.conf with allow-preset-passphrase]' \
+        '--dry-run[Show what would be done without making changes]' \
         '*:file:_files'
 }
 
@@ -796,6 +848,10 @@ _homelabctl_setup_configure_yadm() {
         '--ssh-host[Override SSH hostname/IP (for private servers)]:host:' \
         '--ssh-port[Override SSH port (default 22)]:port:' \
         '--user[Target user (default: current user, requires sudo for other users)]:name:' \
+        '--bootstrap[Run yadm bootstrap after clone]' \
+        '--decrypt[Run yadm decrypt after clone (requires GPG key imported)]' \
+        '--strict-host-key[Enable strict host key checking (default: disabled for automation)]' \
+        '--dry-run[Show what would be done without making changes]' \
         '*:file:_files'
 }
 
@@ -888,6 +944,8 @@ _homelabctl_setup_profile_show() {
 _homelabctl_setup_uninstall() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--purge[Remove configuration files as well]' \
+        '--dry-run[Show what would be uninstalled without uninstalling]' \
         '1:name:_homelabctl_arg_setup_uninstall_name'
 }
 

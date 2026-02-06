@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.7.18
+
+### feat
+
+- optimize install gitlab-runner
+
+### fix
+
+- fix use wrong cli annotations
+
 ## v0.2.0
 
 ### feat
