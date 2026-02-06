@@ -4,8 +4,8 @@
 # @arg name! Package name to install
 # @complete name _homelabctl_complete_packages
 # @option -v, --version <ver> Specific version (default: latest)
-# @option --dry-run Show what would be installed without installing
-# @option --no-deps Skip automatic dependency installation
+# @flag --dry-run Show what would be installed without installing
+# @flag --no-deps Skip automatic dependency installation
 # @example setup install fzf
 # @example setup install nodejs -v 20.10.0
 # @example setup install jdk -v 17

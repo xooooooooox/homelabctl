@@ -3,7 +3,7 @@
 # @desc Show package dependency tree
 # @arg name! Package name
 # @complete name _homelabctl_complete_packages
-# @option --reverse Show reverse dependencies (packages that depend on this one)
+# @flag --reverse Show reverse dependencies (packages that depend on this one)
 # @example setup deps markdownlint-cli
 # @example setup deps nodejs --reverse
 

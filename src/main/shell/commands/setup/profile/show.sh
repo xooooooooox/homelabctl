@@ -4,6 +4,7 @@
 # @arg name! Profile name
 # @complete name _homelabctl_complete_profiles
 # @example setup profile show recommend
+# @example setup profile show devops
 
 cmd_setup_profile_show() {
   local name="${1:-}"

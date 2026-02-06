@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 # @cmd
 # @desc Initialize k8s user configuration directory
-# @option --force Overwrite existing files
-# @option --dry-run Show what would be created without making changes
+# @flag --force Overwrite existing files
+# @flag --dry-run Show what would be created without making changes
 # @example init k8s
 # @example init k8s --dry-run
 # @example init k8s --force
 
 cmd_init_k8s() {
   local force="${opt_force:-false}"
-  local dry_run="${opt_dry_run:-false}"
-
-  [[ "$dry_run" == "true" ]] && radp_set_dry_run
+  radp_set_dry_run "${opt_dry_run:-}"
 
   local user_dir
   user_dir=$(_k8s_get_extra_config_path)

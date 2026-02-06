@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # @cmd
 # @desc Show version information
+# @example version
 
 # Application version
 # Update this value when releasing a new version

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # @cmd
 # @desc Initialize all user configuration directories
-# @option --force Overwrite existing files
-# @option --dry-run Show what would be created without making changes
+# @flag --force Overwrite existing files
+# @flag --dry-run Show what would be created without making changes
 # @example init all
 # @example init all --dry-run
 # @example init all --force
@@ -12,7 +12,6 @@ cmd_init_all() {
   local dry_run="${opt_dry_run:-false}"
   local failed=
 
-  # TODO v-2026/2/6:
   local flags=()
   [[ "$force" == "true" ]] && flags+=(--force)
   [[ "$dry_run" == "true" ]] && flags+=(--dry-run)

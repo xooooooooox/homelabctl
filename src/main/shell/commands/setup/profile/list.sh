@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # @cmd
 # @desc List available setup profiles
-# @option --names-only Output profile names only (for completion)
+# @flag --names-only Output profile names only (for completion)
 # @example setup profile list
+# @example setup profile list --names-only
 
 cmd_setup_profile_list() {
   local names_only="${opt_names_only:-}"

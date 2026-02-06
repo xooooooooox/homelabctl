@@ -2,7 +2,7 @@
 # @cmd
 # @desc Show package details
 # @arg name! Package name
-# @option --all-platforms Show dependencies for all platforms
+# @flag --all-platforms Show dependencies for all platforms
 # @complete name _homelabctl_complete_packages
 # @example setup info fzf
 # @example setup info nodejs

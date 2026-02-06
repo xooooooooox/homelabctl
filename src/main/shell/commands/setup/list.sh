@@ -3,10 +3,10 @@
 # @desc List available packages
 # @option -c, --category <name> Filter by category
 # @complete category _homelabctl_complete_categories
-# @option --installed Show only installed packages
-# @option --categories List available categories
-# @option --names-only Output package names only (for completion)
-# @option --category-names Output category names only (for completion)
+# @flag --installed Show only installed packages
+# @flag --categories List available categories
+# @flag --names-only Output package names only (for completion)
+# @flag --category-names Output category names only (for completion)
 # @example setup list
 # @example setup list -c cli-tools
 # @example setup list --installed

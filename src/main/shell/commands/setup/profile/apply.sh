@@ -3,10 +3,10 @@
 # @desc Apply a setup profile (install multiple packages)
 # @arg name! Profile name
 # @complete name _homelabctl_complete_profiles
-# @option --dry-run Show what would be installed
-# @option --continue Continue on error
-# @option --skip-installed Skip already installed packages
-# @option --no-deps Skip automatic dependency installation
+# @flag --dry-run Show what would be installed
+# @flag --continue Continue on error
+# @flag --skip-installed Skip already installed packages
+# @flag --no-deps Skip automatic dependency installation
 # @example setup profile apply recommend
 # @example setup profile apply recommend --dry-run
 # @example setup profile apply recommend --continue
