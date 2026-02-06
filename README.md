@@ -99,7 +99,8 @@ chmod +x homelabctl
 ./homelabctl --help
 ```
 
-> **Note**: Portable binary requires [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework) to be installed.
+> **Note**: Portable binary requires [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework) to be
+> installed.
 
 See [Installation Guide](docs/installation.md) for more options including Debian/Ubuntu, manual installation, and
 upgrading.
@@ -139,9 +140,9 @@ homelabctl vf vg up
 **Target VMs by cluster** (instead of full machine names):
 
 ```shell
-homelabctl vf vg up -C my-cluster           # All VMs in cluster
-homelabctl vf vg up -C my-cluster -G 1,2    # Specific guests
-homelabctl vf vg up -C cluster1,cluster2    # Multiple clusters
+homelabctl vf vg up -C my-cluster # All VMs in cluster
+homelabctl vf vg up -C my-cluster -G 1,2 # Specific guests
+homelabctl vf vg up -C cluster1,cluster2 # Multiple clusters
 ```
 
 Requires [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework).
@@ -196,7 +197,8 @@ homelabctl completion zsh >~/.zfunc/_homelabctl
 
 ### VF Completion
 
-The `homelabctl vf` command supports dynamic completion for cluster names, guest IDs, and machine names. Config is automatically read from homelabctl's config file:
+The `homelabctl vf` command supports dynamic completion for cluster names, guest IDs, and machine names. Config is
+automatically read from homelabctl's config file:
 
 ```yaml
 # ~/.config/homelabctl/config.yaml
@@ -210,7 +212,7 @@ radp:
 This allows completion to work without specifying `-c` on command line:
 
 ```bash
-homelabctl vf vg --cluster <tab>        # Shows cluster names
+homelabctl vf vg --cluster <tab> # Shows cluster names
 homelabctl vf vg --cluster dev -G <tab> # Shows guest IDs
 ```
 
@@ -225,7 +227,8 @@ homelabctl vf vg --cluster dev -G <tab> # Shows guest IDs
 
 ## Related Projects
 
-- [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework) - Bash CLI framework (dependency)
+- [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework) - Bash engineering & CLI framework (
+  dependency)
 - [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework) - YAML-driven Vagrant framework
 
 ## Contributing
