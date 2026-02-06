@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # @cmd
 # @desc Initialize k8s user configuration directory
-# @flag --force Overwrite existing files
-# @flag --dry-run Show what would be created without making changes
+# @option --force Overwrite existing files
+# @option --dry-run Show what would be created without making changes
 # @example init k8s
 # @example init k8s --dry-run
 # @example init k8s --force

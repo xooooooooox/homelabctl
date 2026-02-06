@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # @cmd
 # @desc Initialize all user configuration directories
-# @flag --force Overwrite existing files
-# @flag --dry-run Show what would be created without making changes
+# @option --force Overwrite existing files
+# @option --dry-run Show what would be created without making changes
 # @example init all
 # @example init all --dry-run
 # @example init all --force
