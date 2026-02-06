@@ -18,7 +18,16 @@ radp:
   # Variables defined here will be available as gr_radp_extend_* in shell
   extend:
     homelabctl:
-      # Add your application-specific configuration here
+      # radp-vagrant-framework settings
+      # Override via GX_RADP_EXTEND_HOMELABCTL_VF_* environment variables
+      vf:
+        # Config directory (override: GX_RADP_EXTEND_HOMELABCTL_VF_CONFIG_DIR or RADP_VAGRANT_CONFIG_DIR)
+        # config_dir:
+        # Base config filename (override: GX_RADP_EXTEND_HOMELABCTL_VF_CONFIG_BASE_FILENAME or RADP_VAGRANT_CONFIG_BASE_FILENAME)
+        # Auto-detect: vagrant.yaml > config.yaml
+        config_base_filename: "vagrant.yaml"
+        # Active environment (override: GX_RADP_EXTEND_HOMELABCTL_VF_ENV or RADP_VAGRANT_ENV)
+        env: ${radp.env}
 
       # GitLab configuration
       gitlab:

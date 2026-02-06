@@ -21,6 +21,10 @@ homelabctl is a CLI tool for managing homelab infrastructure, built on radp-bash
 
 | Command | Description |
 |---------|-------------|
+| `init all` | Initialize all user configurations |
+| `init setup` | Initialize setup configuration |
+| `init k8s` | Initialize k8s configuration |
+| `init vf` | Initialize VF configuration (passthrough to radp-vf) |
 | `vf <cmd>` | Passthrough to radp-vf |
 | `setup install <name>` | Install a package |
 | `setup list` | List available packages |
@@ -30,6 +34,15 @@ homelabctl is a CLI tool for managing homelab infrastructure, built on radp-bash
 | `setup configure <name>` | Run system configuration |
 | `version` | Show version |
 | `completion <bash\|zsh>` | Generate completion |
+
+### Init Commands
+
+```bash
+homelabctl init all          # Initialize all configurations
+homelabctl init all --force  # Force overwrite existing
+homelabctl init vf           # Initialize VF config (uses config from config.yaml)
+homelabctl init vf --force   # Force overwrite
+```
 
 ## Architecture
 

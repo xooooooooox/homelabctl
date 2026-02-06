@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 # @cmd
-# @desc Initialize vagrant project (passthrough to radp-vf init)
+# @desc Initialize VF configuration directory
 # @meta passthrough
-# @example init vf myproject
-# @example init vf myproject -t k8s-cluster
-# @example init vf --list-templates
+# @example init vf
+# @example init vf --dry-run
+# @example init vf --force
 
-# All arguments are passed through to radp-vf init
 cmd_init_vf() {
-  if ! _common_is_command_available radp-vf; then
-    radp_log_error "radp-vf not found in PATH. Install radp-vagrant-framework first."
-    radp_log_error "See: https://github.com/xooooooooox/radp-vagrant-framework#installation"
-    return 1
+  # Set environment variables from homelabctl config
+  if [[ -n "${gr_radp_extend_homelabctl_vf_config_dir:-}" ]]; then
+    export RADP_VAGRANT_CONFIG_DIR="$gr_radp_extend_homelabctl_vf_config_dir"
+  else
+    # Default to homelabctl config path + vagrant
+    export RADP_VAGRANT_CONFIG_DIR="${gr_fw_user_config_path}/vagrant"
   fi
 
-  # Pass through to radp-vf init
+  if [[ -n "${gr_radp_extend_homelabctl_vf_env:-}" ]]; then
+    export RADP_VAGRANT_ENV="$gr_radp_extend_homelabctl_vf_env"
+  fi
+
+  # Passthrough all arguments to radp-vf init
   exec radp-vf init "$@"
 }

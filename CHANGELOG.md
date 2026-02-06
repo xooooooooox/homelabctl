@@ -4,6 +4,13 @@
 
 ### feat
 
+- Improve `init vf` command
+  - Now uses passthrough mode to support all radp-vf options
+  - Sets `RADP_VAGRANT_CONFIG_DIR` and `RADP_VAGRANT_ENV` from homelabctl config
+  - Supports all radp-vf init options (--force, --dry-run, --template, --set)
+- Improve `init all` command
+  - Uses `RADP_VF_INIT_RESULT_FILE` to get the actual VF config directory
+  - Displays accurate VF config path in summary
 - Add `gitlab` command group for complete GitLab management
   - `gitlab install` - Install GitLab (CE/EE) via linux_package
   - `gitlab init` - Initialize GitLab after installation
@@ -50,6 +57,12 @@
 
 - Remove `gitlab-runner` installer (migrated to `gitlab` command group)
 
+### fix
+
+- Fix potential `set -e` exit on `((var++))` when var is 0
+  - Changed `((var++))` to `((++var))` in multiple files
+  - Affected: `init/all.sh`, `k8s/addon/list.sh`, `k8s/addon/profile/list.sh`, `k8s/addon/_installer.sh`
+
 ## v0.1.32
 
 ### feat
@@ -87,7 +100,8 @@
 - Optimize package categories
 - Optimize builtin profiles
 - Add installer: pinentry, ansible, docker, eza, go, python, ripgrep, rust, starship, terraform
-- Add installer: git, git-credential-manager, gpg, lazygit, markdownlint-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux, vim, yadm, zoxide
+- Add installer: git, git-credential-manager, gpg, lazygit, markdownlint-cli, mvn, ohmyzsh, pass, shellcheck, tig, tmux,
+  vim, yadm, zoxide
 - Update entrypoint to use the latest bash framework
 - Update completion help example
 - Add global cli args
