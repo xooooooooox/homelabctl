@@ -201,7 +201,7 @@ _k8s_addon_run_post_install() {
         ;;
     esac
 
-    ((i++))
+    ((++i))
   done
 
   return 0
@@ -295,7 +295,7 @@ _k8s_addon_cleanup_post_install() {
         ;;
     esac
 
-    ((i++))
+    ((++i))
   done
 
   return 0

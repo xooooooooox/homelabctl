@@ -19,7 +19,7 @@ cmd_k8s_addon_profile_list() {
   local found=0
   while IFS='|' read -r name desc source; do
     printf "  %-20s %-10s %s\n" "$name" "[$source]" "$desc"
-    ((found++))
+    ((++found))
   done < <(_k8s_addon_list_profiles)
 
   if [[ $found -eq 0 ]]; then

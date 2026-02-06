@@ -31,7 +31,7 @@ cmd_k8s_addon_list() {
         status=$(helm status "$addon" -n "$namespace" -o json 2>/dev/null | yq -r '.info.status // "unknown"' 2>/dev/null)
 
         printf "  %-30s %-15s %s\n" "$addon" "$namespace" "$status"
-        ((found++))
+        ((++found))
       fi
     done
 
