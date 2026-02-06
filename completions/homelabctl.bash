@@ -112,46 +112,46 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "cleanup create list  --help" -- "$cur"))
             ;;
         'gitlab backup cleanup')
-            COMPREPLY=($(compgen -W "--help  --keep-days" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --keep-days --dry-run" -- "$cur"))
             ;;
         'gitlab backup create')
-            COMPREPLY=($(compgen -W "--help  --target --type" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --target --type --skip-remote --dry-run" -- "$cur"))
             ;;
         'gitlab backup list')
             COMPREPLY=($(compgen -W "--help  --type" -- "$cur"))
             ;;
         'gitlab healthcheck')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --verbose --check-secrets --dry-run" -- "$cur"))
             ;;
         'gitlab init')
-            COMPREPLY=($(compgen -W "--help  --user-config --backup-schedule" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --user-config --backup-schedule --skip-crontab --skip-reconfigure --dry-run" -- "$cur"))
             ;;
         'gitlab install')
-            COMPREPLY=($(compgen -W "--help  -t --type -v --version --data-dir" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -t --type -v --version --data-dir --skip-postfix --dry-run" -- "$cur"))
             ;;
         'gitlab reset-password')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --force --dry-run" -- "$cur"))
             ;;
         'gitlab restart')
-            COMPREPLY=($(compgen -W "--help  --service" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --service --dry-run" -- "$cur"))
             ;;
         'gitlab restore')
-            COMPREPLY=($(compgen -W "--help  --type --source" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --type --source --force --dry-run" -- "$cur"))
             ;;
         'gitlab runner')
             COMPREPLY=($(compgen -W "install  --help" -- "$cur"))
             ;;
         'gitlab runner install')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -v --version --dry-run" -- "$cur"))
             ;;
         'gitlab start')
-            COMPREPLY=($(compgen -W "--help  --service" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --service --dry-run" -- "$cur"))
             ;;
         'gitlab status')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --services" -- "$cur"))
             ;;
         'gitlab stop')
-            COMPREPLY=($(compgen -W "--help  --service" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --service --dry-run" -- "$cur"))
             ;;
         'init')
             COMPREPLY=($(compgen -W "all k8s setup vf  --help" -- "$cur"))
@@ -175,64 +175,64 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "install list profile quickstart uninstall  --help" -- "$cur"))
             ;;
         'k8s addon install')
-            COMPREPLY=($(compgen -W "--help  -v --version -f --values" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -v --version -f --values --dry-run" -- "$cur"))
             ;;
         'k8s addon list')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --installed" -- "$cur"))
             ;;
         'k8s addon profile')
             COMPREPLY=($(compgen -W "apply list show  --help" -- "$cur"))
             ;;
         'k8s addon profile apply')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --dry-run --continue --skip-installed" -- "$cur"))
             ;;
         'k8s addon profile list')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --names-only" -- "$cur"))
             ;;
         'k8s addon profile show')
             COMPREPLY=($(compgen -W "--help " -- "$cur"))
             ;;
         'k8s addon quickstart')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --dry-run --continue --skip-installed" -- "$cur"))
             ;;
         'k8s addon uninstall')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --dry-run" -- "$cur"))
             ;;
         'k8s backup')
             COMPREPLY=($(compgen -W "create list restore  --help" -- "$cur"))
             ;;
         'k8s backup create')
-            COMPREPLY=($(compgen -W "--help  -d --dir" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -d --dir --dry-run" -- "$cur"))
             ;;
         'k8s backup list')
             COMPREPLY=($(compgen -W "--help  -d --dir" -- "$cur"))
             ;;
         'k8s backup restore')
-            COMPREPLY=($(compgen -W "--help  --data-dir" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --data-dir --dry-run --force" -- "$cur"))
             ;;
         'k8s health')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --verbose" -- "$cur"))
             ;;
         'k8s init')
             COMPREPLY=($(compgen -W "master worker  --help" -- "$cur"))
             ;;
         'k8s init master')
-            COMPREPLY=($(compgen -W "--help  -a --apiserver-advertise-address -p --pod-network-cidr" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -a --apiserver-advertise-address -p --pod-network-cidr --dry-run" -- "$cur"))
             ;;
         'k8s init worker')
-            COMPREPLY=($(compgen -W "--help  -c --control-plane -t --token --discovery-token-ca-cert-hash" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -c --control-plane -t --token --discovery-token-ca-cert-hash --dry-run" -- "$cur"))
             ;;
         'k8s install')
-            COMPREPLY=($(compgen -W "--help  -t --type -v --version" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -t --type -v --version --skip-prerequisites --skip-container-runtime --dry-run" -- "$cur"))
             ;;
         'k8s token')
             COMPREPLY=($(compgen -W "create get  --help" -- "$cur"))
             ;;
         'k8s token create')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --print-join-command" -- "$cur"))
             ;;
         'k8s token get')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --create --join-command" -- "$cur"))
             ;;
         'setup')
             COMPREPLY=($(compgen -W "configure deps info install list profile uninstall  --help" -- "$cur"))
@@ -241,31 +241,31 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "chrony docker expand-lvm gpg-import gpg-preset list yadm  --help" -- "$cur"))
             ;;
         'setup configure chrony')
-            COMPREPLY=($(compgen -W "--help  --servers --pool --timezone" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --servers --pool --timezone --sync-now --dry-run" -- "$cur"))
             ;;
         'setup configure docker')
             COMPREPLY=($(compgen -W "acceleration rootless  --help" -- "$cur"))
             ;;
         'setup configure docker acceleration')
-            COMPREPLY=($(compgen -W "--help  --proxy --https-proxy --no-proxy --mirrors" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --proxy --https-proxy --no-proxy --mirrors --remove-proxy --dry-run" -- "$cur"))
             ;;
         'setup configure docker rootless')
-            COMPREPLY=($(compgen -W "--help  -u --user" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -u --user --dry-run" -- "$cur"))
             ;;
         'setup configure expand-lvm')
-            COMPREPLY=($(compgen -W "--help  --partition --vg --lv" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --partition --vg --lv --dry-run" -- "$cur"))
             ;;
         'setup configure gpg-import')
-            COMPREPLY=($(compgen -W "--help  --public-key --public-key-file --secret-key-file --passphrase --passphrase-file --key-id --keyserver --trust-level --ownertrust-file --user" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --public-key --public-key-file --secret-key-file --passphrase --passphrase-file --key-id --keyserver --trust-level --ownertrust-file --user --dry-run" -- "$cur"))
             ;;
         'setup configure gpg-preset')
-            COMPREPLY=($(compgen -W "--help  --key-uid --passphrase --passphrase-file --user" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --key-uid --passphrase --passphrase-file --user --no-auto-config --dry-run" -- "$cur"))
             ;;
         'setup configure list')
             COMPREPLY=($(compgen -W "--help " -- "$cur"))
             ;;
         'setup configure yadm')
-            COMPREPLY=($(compgen -W "--help  --repo-url --class --https-user --https-token --https-token-file --ssh-key-file --ssh-host --ssh-port --user" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --repo-url --class --https-user --https-token --https-token-file --ssh-key-file --ssh-host --ssh-port --user --bootstrap --decrypt --strict-host-key --dry-run" -- "$cur"))
             ;;
         'setup deps')
             # 计算参数位置（减去命令路径深度）
@@ -414,7 +414,7 @@ _homelabctl() {
                     return
                     ;;
             esac
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --purge --dry-run" -- "$cur"))
             ;;
         'version')
             COMPREPLY=($(compgen -W "--help " -- "$cur"))
