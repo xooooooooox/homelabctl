@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # @cmd
-# @desc Initialize all user configuration directories (setup + k8s)
+# @desc Initialize all user configuration directories
 # @flag --force Overwrite existing files
 # @flag --dry-run Show what would be created without making changes
 # @example init all
@@ -10,25 +10,42 @@
 cmd_init_all() {
   local force="${opt_force:-false}"
   local dry_run="${opt_dry_run:-false}"
-  local failed=0
+  local failed=
+
+  # TODO v-2026/2/6:
+  local flags=()
+  [[ "$force" == "true" ]] && flags+=(--force)
+  [[ "$dry_run" == "true" ]] && flags+=(--dry-run)
 
   radp_log_info "Initializing all user configurations..."
   echo
 
-  # Initialize setup
-  radp_log_info "=== Setup Configuration ==="
-  if ! cmd_init_setup; then
-    radp_log_error "Failed to initialize setup configuration"
-    ((failed++))
-  fi
-  echo
+  local vf_config_dir=""
 
-  # Initialize k8s
-  radp_log_info "=== K8s Configuration ==="
-  if ! cmd_init_k8s; then
-    radp_log_error "Failed to initialize k8s configuration"
-    ((failed++))
+  # Initialize setup and k8s modules
+  for module in setup k8s; do
+    radp_log_info "=== ${module^} Configuration ==="
+    if ! homelabctl init "$module" "${flags[@]}"; then
+      radp_log_error "Failed to initialize $module configuration"
+      ((++failed))
+    fi
+    echo
+  done
+
+  # VF module - use temp file to get real config dir
+  radp_log_info "=== Vf Configuration ==="
+  local result_file
+  result_file=$(mktemp)
+  export RADP_VF_INIT_RESULT_FILE="$result_file"
+
+  if homelabctl init vf "${flags[@]}"; then
+    [[ -f "$result_file" ]] && vf_config_dir=$(cat "$result_file")
+  else
+    radp_log_error "Failed to initialize vf configuration"
+    ((++failed))
   fi
+  rm -f "$result_file"
+  unset RADP_VF_INIT_RESULT_FILE
   echo
 
   if [[ $failed -gt 0 ]]; then
@@ -41,5 +58,6 @@ cmd_init_all() {
   radp_log_info "Configuration directories:"
   radp_log_info "  Setup: $(_setup_get_user_dir)"
   radp_log_info "  K8s:   $(_k8s_get_extra_config_path)"
+  [[ -n "$vf_config_dir" ]] && radp_log_info "  VF:    $vf_config_dir"
   return 0
 }
