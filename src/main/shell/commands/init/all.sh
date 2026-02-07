@@ -76,13 +76,12 @@ cmd_init_all() {
 
   radp_log_raw ""
 
+  # Always print summary so partial success is visible
+  radp_log_raw "$(_init_all_format_summary "$dry_run" "$module_count" "$total_created" "$total_overwritten" "$total_skipped" "$failed")"
+
   if [[ $failed -gt 0 ]]; then
-    radp_log_error "Initialization completed with $failed error(s)"
     return 1
   fi
-
-  # Summary line
-  radp_log_raw "$(_init_all_format_summary "$dry_run" "$module_count" "$total_created" "$total_overwritten" "$total_skipped")"
   return 0
 }
 
@@ -94,6 +93,7 @@ cmd_init_all() {
 #   3 - created count
 #   4 - overwritten count
 #   5 - skipped count
+#   6 - failed count
 #######################################
 _init_all_format_summary() {
   local dry_run="$1"
@@ -101,6 +101,7 @@ _init_all_format_summary() {
   local created="$3"
   local overwritten="$4"
   local skipped="$5"
+  local failed="${6:-0}"
   local parts=()
 
   # Module count always first
@@ -124,6 +125,10 @@ _init_all_format_summary() {
 
   if (( skipped > 0 )); then
     parts+=("${skipped} skipped")
+  fi
+
+  if (( failed > 0 )); then
+    parts+=("${failed} failed")
   fi
 
   local result="${parts[0]}"
