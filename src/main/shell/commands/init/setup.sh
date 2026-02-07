@@ -16,8 +16,8 @@ cmd_init_setup() {
   local user_dir
   user_dir=$(_setup_get_user_dir)
 
-  radp_log_info "Initializing setup user configuration..."
-  radp_log_info "  Directory: $user_dir"
+  echo "Initializing setup user configuration..."
+  echo "  Directory: $user_dir"
 
   # Create directory structure
   radp_exec "Create setup user directory" mkdir -p "$user_dir"/{profiles,installers}
@@ -26,21 +26,21 @@ cmd_init_setup() {
   if [[ ! -f "$user_dir/README.md" ]] || [[ "$force" == "true" ]]; then
     _init_create_setup_readme "$user_dir/README.md"
   else
-    radp_log_info "  Skipping README.md (already exists, use --force to overwrite)"
+    echo "  Skipping README.md (already exists, use --force to overwrite)"
   fi
 
   # Create sample registry.yaml
   if [[ ! -f "$user_dir/registry.yaml" ]] || [[ "$force" == "true" ]]; then
     _init_create_setup_registry "$user_dir/registry.yaml"
   else
-    radp_log_info "  Skipping registry.yaml (already exists, use --force to overwrite)"
+    echo "  Skipping registry.yaml (already exists, use --force to overwrite)"
   fi
 
   # Create .gitkeep files
   radp_exec "Create profiles .gitkeep" touch "$user_dir/profiles/.gitkeep"
   radp_exec "Create installers .gitkeep" touch "$user_dir/installers/.gitkeep"
 
-  radp_log_info "Setup user configuration initialized at: $user_dir"
+  echo "Setup user configuration initialized at: $user_dir"
   return 0
 }
 
@@ -52,10 +52,10 @@ cmd_init_setup() {
 _init_create_setup_readme() {
   local file_path="$1"
 
-  radp_log_info "  Creating README.md"
+  echo "  Creating README.md"
 
   if radp_is_dry_run; then
-    radp_log_info "[DRY-RUN] Would create: $file_path"
+    echo "[DRY-RUN] Would create: $file_path"
     return 0
   fi
 
@@ -131,10 +131,10 @@ EOF
 _init_create_setup_registry() {
   local file_path="$1"
 
-  radp_log_info "  Creating registry.yaml"
+  echo "  Creating registry.yaml"
 
   if radp_is_dry_run; then
-    radp_log_info "[DRY-RUN] Would create: $file_path"
+    echo "[DRY-RUN] Would create: $file_path"
     return 0
   fi
 

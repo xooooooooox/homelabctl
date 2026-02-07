@@ -22,7 +22,8 @@ _setup_is_installed() {
 #   Path to user setup directory
 #######################################
 _setup_get_user_dir() {
-  echo "${gr_radp_extend_homelabctl_setup_user_dir:-$HOME/.config/homelabctl/setup}"
+  local default_user_dir=${gr_fw_user_config_path}/setup
+  echo "${gr_radp_extend_homelabctl_setup_user_dir:-$default_user_dir}"
 }
 
 #######################################
