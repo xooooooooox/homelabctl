@@ -11,7 +11,7 @@ radp:
       debug: false
       level: info
       console:
-        enabled: false
+        enabled: true
       file:
         enabled: false
   # Application-specific extensions
@@ -28,6 +28,11 @@ radp:
         config_base_filename: "vagrant.yaml"
         # Active environment (override: GX_RADP_EXTEND_HOMELABCTL_VF_ENV or RADP_VAGRANT_ENV)
         env: ${radp.env}
+
+      # Setup configuration
+      setup:
+        # User configuration directory (override: GX_RADP_EXTEND_HOMELABCTL_SETUP_USER_DIR)
+        # user_dir:
 
       # GitLab configuration
       gitlab:
