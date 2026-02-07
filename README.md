@@ -146,7 +146,7 @@ homelabctl vf vg up -C cluster1,cluster2 # Multiple clusters
 ```
 
 Requires [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework).
-See [Vagrant Guide](docs/vagrant-guide.md) for details.
+See [Vagrant Guide](docs/user-guide/vagrant-guide.md) for details.
 
 ### Software Setup (setup)
 

@@ -143,7 +143,7 @@ homelabctl vf vg up -C cluster1,cluster2 # 多个集群
 ```
 
 需要 [radp-vagrant-framework](https://github.com/xooooooooox/radp-vagrant-framework)。
-详情请参阅 [Vagrant 指南](docs/vagrant-guide.md)。
+详情请参阅 [Vagrant 指南](docs/user-guide/vagrant-guide.md)。
 
 ### 软件安装 (setup)
 
