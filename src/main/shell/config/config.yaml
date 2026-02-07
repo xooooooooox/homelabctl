@@ -9,7 +9,7 @@ radp:
     banner-mode: off
     log:
       debug: false
-      level: info
+      level: warn
       console:
         enabled: true
       file:

@@ -16,8 +16,8 @@ cmd_init_k8s() {
   local k8s_version
   k8s_version=$(_k8s_get_default_version)
 
-  radp_log_info "Initializing k8s user configuration..."
-  radp_log_info "  Directory: $user_dir"
+  radp_log_raw "Initializing k8s user configuration..."
+  radp_log_raw "  Directory: $user_dir"
 
   # Create directory structure
   radp_exec "Create k8s user directory" mkdir -p "$user_dir"/addon/profiles
@@ -27,27 +27,27 @@ cmd_init_k8s() {
   if [[ ! -f "$user_dir/README.md" ]] || [[ "$force" == "true" ]]; then
     _init_create_k8s_readme "$user_dir/README.md"
   else
-    radp_log_info "  Skipping README.md (already exists, use --force to overwrite)"
+    radp_log_raw "  Skipping README.md (already exists, use --force to overwrite)"
   fi
 
   # Create sample addon registry.yaml
   if [[ ! -f "$user_dir/addon/registry.yaml" ]] || [[ "$force" == "true" ]]; then
     _init_create_k8s_addon_registry "$user_dir/addon/registry.yaml"
   else
-    radp_log_info "  Skipping addon/registry.yaml (already exists, use --force to overwrite)"
+    radp_log_raw "  Skipping addon/registry.yaml (already exists, use --force to overwrite)"
   fi
 
   # Create version directory README
   if [[ ! -f "$user_dir/$k8s_version/README.md" ]] || [[ "$force" == "true" ]]; then
     _init_create_k8s_version_readme "$user_dir/$k8s_version/README.md" "$k8s_version"
   else
-    radp_log_info "  Skipping $k8s_version/README.md (already exists, use --force to overwrite)"
+    radp_log_raw "  Skipping $k8s_version/README.md (already exists, use --force to overwrite)"
   fi
 
   # Create .gitkeep files
   radp_exec "Create addon/profiles .gitkeep" touch "$user_dir/addon/profiles/.gitkeep"
 
-  radp_log_info "K8s user configuration initialized at: $user_dir"
+  radp_log_raw "K8s user configuration initialized at: $user_dir"
   return 0
 }
 
@@ -59,10 +59,10 @@ cmd_init_k8s() {
 _init_create_k8s_readme() {
   local file_path="$1"
 
-  radp_log_info "  Creating README.md"
+  radp_log_raw "  Creating README.md"
 
   if radp_is_dry_run; then
-    radp_log_info "[dry-run] Would create: $file_path"
+    radp_log_raw "[dry-run] Would create: $file_path"
     return 0
   fi
 
@@ -143,10 +143,10 @@ EOF
 _init_create_k8s_addon_registry() {
   local file_path="$1"
 
-  radp_log_info "  Creating addon/registry.yaml"
+  radp_log_raw "  Creating addon/registry.yaml"
 
   if radp_is_dry_run; then
-    radp_log_info "[dry-run] Would create: $file_path"
+    radp_log_raw "[dry-run] Would create: $file_path"
     return 0
   fi
 
@@ -192,10 +192,10 @@ _init_create_k8s_version_readme() {
   local file_path="$1"
   local k8s_version="$2"
 
-  radp_log_info "  Creating $k8s_version/README.md"
+  radp_log_raw "  Creating $k8s_version/README.md"
 
   if radp_is_dry_run; then
-    radp_log_info "[dry-run] Would create: $file_path"
+    radp_log_raw "[dry-run] Would create: $file_path"
     return 0
   fi
 
