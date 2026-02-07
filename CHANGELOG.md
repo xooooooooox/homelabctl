@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.6
+
+### feat
+
+- optimize gitlab cmd groups
+
 ## v0.2.5
 
 ### feat
