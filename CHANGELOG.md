@@ -4,12 +4,6 @@
 
 ### feat
 
-- optimize gitlab cmd groups
-
-## v0.2.5
-
-### feat
-
 - Improve `init vf` command
   - Now uses passthrough mode to support all radp-vf options
   - Sets `RADP_VAGRANT_CONFIG_DIR` and `RADP_VAGRANT_ENV` from homelabctl config
