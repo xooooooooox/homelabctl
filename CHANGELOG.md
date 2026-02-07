@@ -2,13 +2,6 @@
 
 ## v0.2.3
 
-### refactor
-
-- optimize stdout log
-- init
-
-## v0.2.2
-
 ### feat
 
 - Improve `init vf` command
