@@ -9,62 +9,64 @@
 
 cmd_init_k8s() {
   local force="${opt_force:-false}"
-  radp_set_dry_run "${opt_dry_run:-}"
+  local dry_run="${opt_dry_run:-false}"
+  radp_set_dry_run "${dry_run}"
 
   local user_dir
   user_dir=$(_k8s_get_extra_config_path)
   local k8s_version
   k8s_version=$(_k8s_get_default_version)
+  local display_dir="${user_dir/#$HOME/~}"
 
-  radp_log_raw "Initializing k8s user configuration..."
-  radp_log_raw "  Directory: $user_dir"
+  local created=0 skipped=0 overwritten=0
+
+  # Print module header
+  radp_log_raw "[k8s] ${display_dir}/"
 
   # Create directory structure
-  radp_exec "Create k8s user directory" mkdir -p "$user_dir"/addon/profiles
-  radp_exec "Create k8s version directory" mkdir -p "$user_dir/$k8s_version"
+  if ! radp_is_dry_run; then
+    mkdir -p "$user_dir"/addon/profiles
+    mkdir -p "$user_dir/$k8s_version"
+  fi
 
   # Create README.md
-  if [[ ! -f "$user_dir/README.md" ]] || [[ "$force" == "true" ]]; then
+  _init_process_file "$user_dir" "README.md" "$force" "$dry_run" \
     _init_create_k8s_readme "$user_dir/README.md"
-  else
-    radp_log_raw "  Skipping README.md (already exists, use --force to overwrite)"
-  fi
 
   # Create sample addon registry.yaml
-  if [[ ! -f "$user_dir/addon/registry.yaml" ]] || [[ "$force" == "true" ]]; then
+  _init_process_file "$user_dir" "addon/registry.yaml" "$force" "$dry_run" \
     _init_create_k8s_addon_registry "$user_dir/addon/registry.yaml"
-  else
-    radp_log_raw "  Skipping addon/registry.yaml (already exists, use --force to overwrite)"
-  fi
 
   # Create version directory README
-  if [[ ! -f "$user_dir/$k8s_version/README.md" ]] || [[ "$force" == "true" ]]; then
+  _init_process_file "$user_dir" "${k8s_version}/README.md" "$force" "$dry_run" \
     _init_create_k8s_version_readme "$user_dir/$k8s_version/README.md" "$k8s_version"
-  else
-    radp_log_raw "  Skipping $k8s_version/README.md (already exists, use --force to overwrite)"
+
+  # Create .gitkeep files (silent, not tracked in counts)
+  if ! radp_is_dry_run; then
+    touch "$user_dir/addon/profiles/.gitkeep"
   fi
 
-  # Create .gitkeep files
-  radp_exec "Create addon/profiles .gitkeep" touch "$user_dir/addon/profiles/.gitkeep"
+  # Export counts for orchestrator
+  _init_result_created=$created
+  _init_result_skipped=$skipped
+  _init_result_overwritten=$overwritten
 
-  radp_log_raw "K8s user configuration initialized at: $user_dir"
+  # Print summary (only when standalone)
+  if [[ "${_init_orchestrated:-}" != "true" ]]; then
+    radp_log_raw ""
+    radp_log_raw "$(_init_format_summary "$dry_run")"
+  fi
+
   return 0
 }
 
 #######################################
-# Create k8s README.md
+# Create k8s README.md (silent file creator)
 # Arguments:
 #   1 - file path
 #######################################
 _init_create_k8s_readme() {
   local file_path="$1"
-
-  radp_log_raw "  Creating README.md"
-
-  if radp_is_dry_run; then
-    radp_log_raw "[dry-run] Would create: $file_path"
-    return 0
-  fi
 
   cat > "$file_path" << 'EOF'
 # K8s User Configuration
@@ -136,19 +138,12 @@ EOF
 }
 
 #######################################
-# Create sample k8s addon registry.yaml
+# Create sample k8s addon registry.yaml (silent file creator)
 # Arguments:
 #   1 - file path
 #######################################
 _init_create_k8s_addon_registry() {
   local file_path="$1"
-
-  radp_log_raw "  Creating addon/registry.yaml"
-
-  if radp_is_dry_run; then
-    radp_log_raw "[dry-run] Would create: $file_path"
-    return 0
-  fi
 
   cat > "$file_path" << 'EOF'
 # User-defined Kubernetes addons
@@ -183,7 +178,7 @@ EOF
 }
 
 #######################################
-# Create k8s version directory README
+# Create k8s version directory README (silent file creator)
 # Arguments:
 #   1 - file path
 #   2 - k8s version
@@ -191,13 +186,6 @@ EOF
 _init_create_k8s_version_readme() {
   local file_path="$1"
   local k8s_version="$2"
-
-  radp_log_raw "  Creating $k8s_version/README.md"
-
-  if radp_is_dry_run; then
-    radp_log_raw "[dry-run] Would create: $file_path"
-    return 0
-  fi
 
   cat > "$file_path" << EOF
 # K8s $k8s_version Configuration

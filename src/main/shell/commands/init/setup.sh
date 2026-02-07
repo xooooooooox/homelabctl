@@ -9,53 +9,58 @@
 
 cmd_init_setup() {
   local force="${opt_force:-false}"
-  radp_set_dry_run "${opt_dry_run:-}"
+  local dry_run="${opt_dry_run:-false}"
+  radp_set_dry_run "${dry_run}"
 
   local user_dir
   user_dir=$(_setup_get_user_dir)
+  local display_dir="${user_dir/#$HOME/~}"
 
-  radp_log_raw "Initializing setup user configuration..."
-  radp_log_raw "  Directory: $user_dir"
+  local created=0 skipped=0 overwritten=0
+
+  # Print module header
+  radp_log_raw "[setup] ${display_dir}/"
 
   # Create directory structure
-  radp_exec "Create setup user directory" mkdir -p "$user_dir"/{profiles,installers}
+  if ! radp_is_dry_run; then
+    mkdir -p "$user_dir"/{profiles,installers}
+  fi
 
   # Create README.md
-  if [[ ! -f "$user_dir/README.md" ]] || [[ "$force" == "true" ]]; then
+  _init_process_file "$user_dir" "README.md" "$force" "$dry_run" \
     _init_create_setup_readme "$user_dir/README.md"
-  else
-    radp_log_raw "  Skipping README.md (already exists, use --force to overwrite)"
-  fi
 
   # Create sample registry.yaml
-  if [[ ! -f "$user_dir/registry.yaml" ]] || [[ "$force" == "true" ]]; then
+  _init_process_file "$user_dir" "registry.yaml" "$force" "$dry_run" \
     _init_create_setup_registry "$user_dir/registry.yaml"
-  else
-    radp_log_raw "  Skipping registry.yaml (already exists, use --force to overwrite)"
+
+  # Create .gitkeep files (silent, not tracked in counts)
+  if ! radp_is_dry_run; then
+    touch "$user_dir/profiles/.gitkeep"
+    touch "$user_dir/installers/.gitkeep"
   fi
 
-  # Create .gitkeep files
-  radp_exec "Create profiles .gitkeep" touch "$user_dir/profiles/.gitkeep"
-  radp_exec "Create installers .gitkeep" touch "$user_dir/installers/.gitkeep"
+  # Export counts for orchestrator
+  _init_result_created=$created
+  _init_result_skipped=$skipped
+  _init_result_overwritten=$overwritten
 
-  radp_log_raw "Setup user configuration initialized at: $user_dir"
+  # Print summary (only when standalone)
+  if [[ "${_init_orchestrated:-}" != "true" ]]; then
+    radp_log_raw ""
+    radp_log_raw "$(_init_format_summary "$dry_run")"
+  fi
+
   return 0
 }
 
 #######################################
-# Create setup README.md
+# Create setup README.md (silent file creator)
 # Arguments:
 #   1 - file path
 #######################################
 _init_create_setup_readme() {
   local file_path="$1"
-
-  radp_log_raw "  Creating README.md"
-
-  if radp_is_dry_run; then
-    radp_log_raw "[dry-run] Would create: $file_path"
-    return 0
-  fi
 
   cat > "$file_path" << 'EOF'
 # Setup User Configuration
@@ -122,19 +127,12 @@ EOF
 }
 
 #######################################
-# Create sample setup registry.yaml
+# Create sample setup registry.yaml (silent file creator)
 # Arguments:
 #   1 - file path
 #######################################
 _init_create_setup_registry() {
   local file_path="$1"
-
-  radp_log_raw "  Creating registry.yaml"
-
-  if radp_is_dry_run; then
-    radp_log_raw "[dry-run] Would create: $file_path"
-    return 0
-  fi
 
   cat > "$file_path" << 'EOF'
 # User-defined packages for homelabctl setup
