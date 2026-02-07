@@ -35,7 +35,6 @@ cmd_gitlab_install() {
   radp_log_info "  Version: $version"
 
   # Step 1: Check system requirements
-  radp_log_info "Checking system requirements..."
   _gitlab_check_requirements || return 1
 
   # Step 2: Disable SELinux and firewalld
@@ -45,14 +44,12 @@ cmd_gitlab_install() {
 
   # Step 3: Install postfix
   if [[ -z "$skip_postfix" ]]; then
-    radp_log_info "Installing postfix..."
     _gitlab_install_postfix || {
       radp_log_warn "Failed to install postfix, continuing anyway..."
     }
   fi
 
   # Step 4: Add GitLab repository
-  radp_log_info "Adding GitLab package repository..."
   _gitlab_add_repo "$gitlab_type" || return 1
 
   # Step 5: Setup data directory symlink
@@ -68,7 +65,6 @@ cmd_gitlab_install() {
   fi
 
   # Step 6: Install GitLab package
-  radp_log_info "Installing GitLab package..."
   _gitlab_install_package "$gitlab_type" "$version" || return 1
 
   radp_log_info ""

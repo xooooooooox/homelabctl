@@ -2,6 +2,10 @@
 # GitLab common helper functions
 # Sourced by all gitlab commands and libs
 
+# GitLab minimum system requirements (constants)
+declare -gr __gitlab_min_cpu_cores=4
+declare -gr __gitlab_min_ram_gb=4
+
 #######################################
 # Check if GitLab is installed
 # Wrapper for _common_is_command_available
@@ -20,6 +24,19 @@ _gitlab_is_installed() {
 _gitlab_is_running() {
   _gitlab_is_installed || return 1
   $gr_sudo gitlab-ctl status &>/dev/null
+}
+
+#######################################
+# Require Linux platform
+# Exits with error if not running on Linux
+# Returns:
+#   0 if Linux, 1 otherwise
+#######################################
+_gitlab_require_linux() {
+  if [[ "$(_common_get_os)" != "linux" ]]; then
+    radp_log_error "GitLab commands are only supported on Linux"
+    return 1
+  fi
 }
 
 #######################################
@@ -208,28 +225,6 @@ _gitlab_get_user_config_file() {
 }
 
 #######################################
-# Get minimum CPU cores requirement
-# Globals:
-#   gr_radp_extend_homelabctl_gitlab_min_cpu_cores
-# Outputs:
-#   Minimum CPU cores
-#######################################
-_gitlab_get_min_cpu_cores() {
-  echo "${gr_radp_extend_homelabctl_gitlab_min_cpu_cores:-4}"
-}
-
-#######################################
-# Get minimum RAM requirement in GB
-# Globals:
-#   gr_radp_extend_homelabctl_gitlab_min_ram_gb
-# Outputs:
-#   Minimum RAM in GB
-#######################################
-_gitlab_get_min_ram_gb() {
-  echo "${gr_radp_extend_homelabctl_gitlab_min_ram_gb:-4}"
-}
-
-#######################################
 # Get external data directory (NAS mount point)
 # If configured, install will create symlink:
 #   {external_data_dir}/gitlab -> /var/opt/gitlab
@@ -261,8 +256,8 @@ _gitlab_get_today() {
 #######################################
 _gitlab_check_requirements() {
   _common_check_requirements \
-    --min-cpu "$(_gitlab_get_min_cpu_cores)" \
-    --min-ram "$(_gitlab_get_min_ram_gb)" \
+    --min-cpu "$__gitlab_min_cpu_cores" \
+    --min-ram "$__gitlab_min_ram_gb" \
     --product "GitLab" \
     "$@"
 }

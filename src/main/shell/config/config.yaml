@@ -18,7 +18,7 @@ radp:
   # Variables defined here will be available as gr_radp_extend_* in shell
   extend:
     homelabctl:
-      # radp-vagrant-framework settings
+      # radp-vagrant-framework user settings
       # Override via GX_RADP_EXTEND_HOMELABCTL_VF_* environment variables
       vf:
         # Config directory (override: GX_RADP_EXTEND_HOMELABCTL_VF_CONFIG_DIR or RADP_VAGRANT_CONFIG_DIR)
@@ -29,43 +29,26 @@ radp:
         # Active environment (override: GX_RADP_EXTEND_HOMELABCTL_VF_ENV or RADP_VAGRANT_ENV)
         env: ${radp.env}
 
-      # Setup configuration
-      setup:
+      # Setup user configuration
+      # setup:
         # User configuration directory (override: GX_RADP_EXTEND_HOMELABCTL_SETUP_USER_DIR)
         # user_dir:
 
       # GitLab configuration
       gitlab:
-        # Installation settings
-        default_type: gitlab-ce
-        default_version: latest
-
-        # Directory paths
-        config_home: /etc/gitlab
-        data_home: /var/opt/gitlab
-        backup_home: /var/opt/gitlab/backups
-        config_backup_home: /etc/gitlab/config_backup
-
-        # Remote/NAS backup location (optional, leave empty to disable)
-        backup_home_remote: "/backup_data"
-
         # Backup settings
         backup_keep_days: 15
         backup_schedule: "0 4 * * *"
 
-        # User configuration file (optional, applied during init)
-        user_config_file: "/data/homelab_gitlab.rb"
+        # External data directory / NAS mount point (optional)
+        # If set, 'gitlab install' creates symlink: {external_data_dir}/gitlab -> /var/opt/gitlab
+        # external_data_dir: "/data"
 
-        # System requirements
-        min_cpu_cores: 4
-        min_ram_gb: 4
+        # Remote/NAS backup location (optional)
+        # backup_home_remote: "/backup_data"
 
-        # External data directory (NAS mount point)
-        # If configured, install will create symlink:
-        #   {external_data_dir}/gitlab -> /var/opt/gitlab
-        # This allows GitLab data to be stored on NAS without changing default paths
-        # Original: g_guest_data_dir=/data
-        external_data_dir: "/data"
+        # User configuration file applied during 'gitlab init' (optional)
+        # user_config_file: "/data/homelab_gitlab.rb"
 
       # Kubernetes configuration
       k8s:
