@@ -220,7 +220,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help  -a --apiserver-advertise-address -p --pod-network-cidr --dry-run" -- "$cur"))
             ;;
         'k8s init worker')
-            COMPREPLY=($(compgen -W "--help  -c --control-plane -t --token --discovery-token-ca-cert-hash --dry-run" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -c --control-plane -t --token --discovery-token-ca-cert-hash -u --ssh-user --dry-run" -- "$cur"))
             ;;
         'k8s install')
             COMPREPLY=($(compgen -W "--help  -t --type -v --version --skip-prerequisites --skip-container-runtime --dry-run" -- "$cur"))
