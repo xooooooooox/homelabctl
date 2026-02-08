@@ -14,7 +14,7 @@ cmd_k8s_init_worker() {
   local ca_hash="${opt_discovery_token_ca_cert_hash:-}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Validate control plane format
   if [[ ! "$control_plane" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+$ ]]; then

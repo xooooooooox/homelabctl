@@ -11,7 +11,7 @@ cmd_gitlab_restart() {
   local service="${opt_service:-}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Check if GitLab is installed
   if ! _gitlab_is_installed; then

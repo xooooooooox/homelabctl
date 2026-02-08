@@ -12,7 +12,7 @@ cmd_k8s_init_master() {
   local pod_cidr="${opt_pod_network_cidr:-$(_k8s_get_default_pod_cidr)}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Validate IP address format
   if [[ ! "$apiserver_address" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

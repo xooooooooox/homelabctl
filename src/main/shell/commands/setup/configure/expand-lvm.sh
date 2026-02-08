@@ -14,7 +14,7 @@ cmd_setup_configure_expand_lvm() {
   local lv="${opt_lv:-}"
 
   # Set dry-run mode from flag
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   radp_log_info "Expanding LVM partition and filesystem..."
 

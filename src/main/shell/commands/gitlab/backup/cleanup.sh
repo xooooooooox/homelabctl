@@ -9,7 +9,7 @@
 cmd_gitlab_backup_cleanup() {
   local keep_days="${opt_keep_days:-$(_gitlab_get_backup_keep_days)}"
 
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   if ! _gitlab_is_installed; then
     radp_log_error "GitLab is not installed"

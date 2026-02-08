@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.2.7
+## v0.2.8
 
 ### feat
 
@@ -63,6 +63,7 @@
 - Fix potential `set -e` exit on `((var++))` when var is 0
   - Changed `((var++))` to `((++var))` in multiple files
   - Affected: `init/all.sh`, `k8s/addon/list.sh`, `k8s/addon/profile/list.sh`, `k8s/addon/_installer.sh`
+- Fix always in dry-run mode
 
 ## v0.1.32
 

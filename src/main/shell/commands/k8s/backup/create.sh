@@ -10,7 +10,7 @@ cmd_k8s_backup_create() {
   local backup_dir="${opt_dir:-$(_k8s_get_backup_home)}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   radp_log_info "Creating etcd backup..."
   radp_log_info "  Backup directory: $backup_dir"

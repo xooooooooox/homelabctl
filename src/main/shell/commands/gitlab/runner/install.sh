@@ -11,7 +11,7 @@ cmd_gitlab_runner_install() {
   local version="${opt_version:-latest}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Check if already installed
   if _gitlab_runner_is_installed; then

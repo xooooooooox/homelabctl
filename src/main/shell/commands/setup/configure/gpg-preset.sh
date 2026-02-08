@@ -18,7 +18,7 @@ cmd_setup_configure_gpg_preset() {
   local no_auto_config="${opt_no_auto_config:-}"
 
   # Set dry-run mode from flag
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Validate required variables
   if [[ -z "$key_uid" ]]; then

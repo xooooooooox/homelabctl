@@ -16,7 +16,7 @@ cmd_setup_configure_chrony() {
   local sync_now="${opt_sync_now:-}"
 
   # Set dry-run mode from flag
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   radp_log_info "Configuring chrony time synchronization..."
 

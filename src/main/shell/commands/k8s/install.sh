@@ -17,7 +17,7 @@ cmd_k8s_install() {
   local skip_container_runtime="${opt_skip_container_runtime:-}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   radp_log_info "Installing Kubernetes..."
   radp_log_info "  Install type: $install_type"

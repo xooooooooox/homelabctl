@@ -10,7 +10,7 @@ cmd_k8s_addon_uninstall() {
   local addon_name="${args_name}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Check if cluster is accessible
   if ! _k8s_is_cluster_accessible; then

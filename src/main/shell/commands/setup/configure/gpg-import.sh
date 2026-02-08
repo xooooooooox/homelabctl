@@ -29,7 +29,7 @@ cmd_setup_configure_gpg_import() {
   local target_user="${opt_user:-}"
 
   # Set dry-run mode from flag
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Validate input
   if [[ -z "$public_key" && -z "$public_key_file" && -z "$key_id" && -z "$secret_key_file" ]]; then

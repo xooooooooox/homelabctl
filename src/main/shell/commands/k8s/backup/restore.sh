@@ -13,7 +13,7 @@ cmd_k8s_backup_restore() {
   local force="${opt_force:-}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Validate backup file exists (skip in dry-run mode)
   if ! radp_is_dry_run && [[ ! -f "$backup_file" ]]; then

@@ -15,7 +15,7 @@ cmd_k8s_addon_profile_apply() {
   local skip_installed="${opt_skip_installed:-}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Find profile file
   local profile_file

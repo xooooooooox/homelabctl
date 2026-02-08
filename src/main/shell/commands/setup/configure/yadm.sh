@@ -33,7 +33,7 @@ cmd_setup_configure_yadm() {
   local strict_host_key="${opt_strict_host_key:-}"
 
   # Set dry-run mode from flag
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Validate required variables
   if [[ -z "$repo_url" ]]; then

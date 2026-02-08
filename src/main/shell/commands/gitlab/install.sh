@@ -17,7 +17,7 @@ cmd_gitlab_install() {
   local skip_postfix="${opt_skip_postfix:-}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   # Check if already installed
   if _gitlab_is_installed; then

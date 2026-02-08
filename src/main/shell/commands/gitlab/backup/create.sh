@@ -14,7 +14,7 @@ cmd_gitlab_backup_create() {
   local backup_type="${opt_type:-all}"
   local skip_remote="${opt_skip_remote:-}"
 
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   if ! _gitlab_is_installed; then
     radp_log_error "GitLab is not installed"

@@ -12,7 +12,7 @@ cmd_gitlab_reset_password() {
   local force="${opt_force:-}"
 
   # Enable dry-run mode if flag is set
-  radp_set_dry_run "${opt_dry_run:-}"
+  radp_set_dry_run "${opt_dry_run:-false}"
 
   if [[ -z "$username" ]]; then
     radp_cli_help_command "gitlab reset-password"
