@@ -61,6 +61,7 @@ Create profile files in `~/.config/homelabctl/setup/profiles/`:
 ```yaml
 name: my-profile
 desc: My custom development environment
+extends: recommend         # Optional: inherit packages from another profile
 platform: any              # any | linux | darwin
 
 packages:
@@ -113,6 +114,37 @@ packages:
   - name: terraform
   - name: ansible
 ```
+
+### Extending Profiles
+
+Profiles can inherit packages from a parent profile using the `extends` field. The child profile gets all packages from the parent, and can add new packages or override the version of inherited ones.
+
+**Semantics:**
+
+- Child inherits all packages from the parent profile
+- If the child declares a package that also exists in the parent, the child's version takes precedence
+- Multi-level extends is supported (e.g., A extends B extends C)
+- Circular extends are detected and reported as an error
+
+**Example: Extending the recommend profile for macOS**
+
+```yaml
+# ~/.config/homelabctl/setup/profiles/my-osx.yaml
+name: my-osx
+desc: macOS development environment based on recommend
+extends: recommend
+platform: darwin
+
+packages:
+  # Additional macOS-specific packages
+  - name: docker
+  - name: kubectl
+  # Override version from parent
+  - name: nodejs
+    version: "22"
+```
+
+This profile inherits all packages from `recommend` and adds `docker`, `kubectl`, while overriding `nodejs` to version 22.
 
 ## Profile Discovery
 

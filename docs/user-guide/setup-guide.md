@@ -392,6 +392,22 @@ packages:
 
 Then apply: `homelabctl setup profile apply my-profile`
 
+To create a profile that inherits from a builtin profile and adds extra packages:
+
+```yaml
+# ~/.config/homelabctl/setup/profiles/my-dev.yaml
+name: my-dev
+desc: "Extended development profile"
+extends: recommend
+platform: any
+
+packages:
+  - name: docker
+  - name: terraform
+  - name: nodejs
+    version: "22"          # Override version from parent
+```
+
 ### Registry YAML Schema
 
 ```yaml
@@ -438,6 +454,7 @@ categories:
 ```yaml
 name: <profile-name>                 # Profile identifier
 desc: <string>                       # Profile description
+extends: <parent-profile-name>       # Optional: inherit packages from parent
 platform: any                        # any, linux, darwin
 
 packages:

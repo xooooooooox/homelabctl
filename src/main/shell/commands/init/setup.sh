@@ -118,6 +118,21 @@ packages:
     desc: "Install my-tool"
 ```
 
+### Extending a Builtin Profile
+
+Inherit packages from a builtin profile and add your own:
+
+```yaml
+name: my-dev
+desc: "Extended development profile"
+extends: recommend
+platform: any
+
+packages:
+  - name: docker
+  - name: terraform
+```
+
 ## See Also
 
 - `homelabctl setup list` - List available packages

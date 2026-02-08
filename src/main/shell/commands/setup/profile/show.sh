@@ -26,9 +26,10 @@ cmd_setup_profile_show() {
   fi
 
   # Get profile metadata
-  local desc platform
+  local desc platform extends
   desc=$(_setup_yaml_get_value "desc" <"$profile_file")
   platform=$(_setup_yaml_get_value "platform" <"$profile_file")
+  extends=$(_setup_yaml_get_value "extends" <"$profile_file" || true)
 
   # Determine source
   local source="builtin"
@@ -40,6 +41,7 @@ cmd_setup_profile_show() {
   echo ""
   printf "  %-12s %s\n" "Description:" "$desc"
   printf "  %-12s %s\n" "Platform:" "${platform:-any}"
+  [[ -n "$extends" ]] && printf "  %-12s %s\n" "Extends:" "$extends"
   printf "  %-12s %s\n" "Source:" "$source"
   printf "  %-12s %s\n" "File:" "$profile_file"
   echo ""

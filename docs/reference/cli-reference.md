@@ -128,7 +128,8 @@ homelabctl setup profile list
 
 ### setup profile show
 
-Show profile details.
+Show profile details including description, platform, source, and package list with install status.
+If the profile uses `extends`, the `Extends:` field is displayed and the package list includes inherited packages.
 
 ```shell
 homelabctl setup profile show <name>

@@ -615,13 +615,13 @@ _setup_list_profiles() {
 }
 
 #######################################
-# Parse profile and return package list
+# Parse profile YAML and return raw package list (no extends handling)
 # Arguments:
 #   1 - profile file path
 # Outputs:
 #   package_name|version per line
 #######################################
-_setup_parse_profile() {
+_setup_parse_profile_raw() {
   local profile_file="$1"
   [[ ! -f "$profile_file" ]] && return 1
 
@@ -674,4 +674,91 @@ _setup_parse_profile() {
   if [[ -n "$current_pkg" ]]; then
     echo "${current_pkg}|${current_version}"
   fi
+}
+
+#######################################
+# Parse profile with extends support
+# Resolves extends chain, merges packages (parent first, child overrides)
+# Arguments:
+#   1 - profile file path
+#   2 - (internal) extends chain for cycle detection (space-separated names)
+# Outputs:
+#   package_name|version per line (merged)
+#######################################
+_setup_parse_profile() {
+  local profile_file="$1"
+  local extends_chain="${2:-}"
+  [[ ! -f "$profile_file" ]] && return 1
+
+  # Read extends field from profile
+  local extends_name
+  extends_name=$(_setup_yaml_get_value "extends" <"$profile_file" || true)
+
+  # No extends: just parse raw and return
+  if [[ -z "$extends_name" ]]; then
+    _setup_parse_profile_raw "$profile_file"
+    return
+  fi
+
+  # Get current profile name for cycle detection
+  local current_name
+  current_name=$(_setup_yaml_get_value "name" <"$profile_file")
+  [[ -z "$current_name" ]] && current_name=$(basename "$profile_file" .yaml)
+
+  # Cycle detection: check if current name is already in the chain
+  local chain_entry
+  for chain_entry in $extends_chain; do
+    if [[ "$chain_entry" == "$current_name" ]]; then
+      radp_log_error "Circular extends detected: $extends_chain -> $current_name"
+      return 1
+    fi
+  done
+
+  # Find the parent profile file
+  local parent_file
+  parent_file=$(_setup_find_profile "$extends_name")
+  if [[ -z "$parent_file" ]]; then
+    radp_log_error "Extended profile not found: $extends_name (referenced by $current_name)"
+    return 1
+  fi
+
+  # Recursively resolve parent (passing updated chain)
+  local parent_packages
+  parent_packages=$(_setup_parse_profile "$parent_file" "$extends_chain $current_name")
+  local rc=$?
+  [[ $rc -ne 0 ]] && return $rc
+
+  # Parse child packages
+  local child_packages
+  child_packages=$(_setup_parse_profile_raw "$profile_file")
+
+  # Merge: parent packages first, child packages override same-name entries
+  # Build associative array of child package names for override lookup
+  local -A child_pkg_map=()
+  local line pkg_name pkg_version
+  while IFS='|' read -r pkg_name pkg_version; do
+    [[ -z "$pkg_name" ]] && continue
+    child_pkg_map["$pkg_name"]="$pkg_version"
+  done <<<"$child_packages"
+
+  # Output parent packages (with child overrides applied)
+  local -A emitted=()
+  while IFS='|' read -r pkg_name pkg_version; do
+    [[ -z "$pkg_name" ]] && continue
+    if [[ -n "${child_pkg_map[$pkg_name]+_}" ]]; then
+      # Child overrides this package's version
+      echo "${pkg_name}|${child_pkg_map[$pkg_name]}"
+    else
+      echo "${pkg_name}|${pkg_version}"
+    fi
+    emitted["$pkg_name"]=1
+  done <<<"$parent_packages"
+
+  # Append child-only packages (not already emitted from parent)
+  while IFS='|' read -r pkg_name pkg_version; do
+    [[ -z "$pkg_name" ]] && continue
+    if [[ -z "${emitted[$pkg_name]+_}" ]]; then
+      echo "${pkg_name}|${pkg_version}"
+    fi
+  done <<<"$child_packages"
 }
