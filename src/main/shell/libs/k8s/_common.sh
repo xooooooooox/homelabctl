@@ -25,6 +25,17 @@ _k8s_get_default_install_type() {
 }
 
 #######################################
+# Get SSH user for connecting to master node
+# Globals:
+#   gr_radp_extend_homelabctl_k8s_ssh_user
+# Outputs:
+#   SSH username
+#######################################
+_k8s_get_ssh_user() {
+  echo "${gr_radp_extend_homelabctl_k8s_ssh_user:-vagrant}"
+}
+
+#######################################
 # Get default pod CIDR
 # Globals:
 #   gr_radp_extend_homelabctl_k8s_default_pod_cidr

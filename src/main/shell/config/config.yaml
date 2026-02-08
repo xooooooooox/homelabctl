@@ -56,6 +56,9 @@ radp:
         default_version: "1.30"
         default_install_type: kubeadm
 
+        # SSH user for connecting to master node (used by worker join)
+        ssh_user: root
+
         # Cluster network settings
         default_pod_cidr: "10.244.0.0/16"
         default_cni: flannel
