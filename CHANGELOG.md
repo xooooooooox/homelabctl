@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## v0.2.6
+## v0.2.7
 
 ### feat
 
+- Add installer: `glow` (terminal-based Markdown renderer by Charm)
 - Improve `init vf` command
   - Now uses passthrough mode to support all radp-vf options
   - Sets `RADP_VAGRANT_CONFIG_DIR` and `RADP_VAGRANT_ENV` from homelabctl config

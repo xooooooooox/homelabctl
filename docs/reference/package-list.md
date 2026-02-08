@@ -100,6 +100,7 @@ Available packages for `homelabctl setup install`.
 | bat | Cat with syntax highlighting |
 | eza | Modern ls replacement |
 | shellcheck | Shell script analyzer |
+| glow | Render Markdown on the CLI |
 | markdownlint-cli | Markdown linter |
 | vfox | Cross-platform version manager |
 
