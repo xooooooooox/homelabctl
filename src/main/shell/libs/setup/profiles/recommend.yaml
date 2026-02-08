@@ -30,6 +30,7 @@ packages:
 
   # dev-tools
   - name: jq
+  - name: glow
 
   # search
   - name: fzf

@@ -353,6 +353,12 @@ packages:
     check-cmd: shellcheck
     homepage: https://www.shellcheck.net/
 
+  glow:
+    desc: Render Markdown on the CLI
+    category: dev-tools
+    check-cmd: glow
+    homepage: https://github.com/charmbracelet/glow
+
   markdownlint-cli:
     desc: Markdown linting tool
     category: dev-tools
