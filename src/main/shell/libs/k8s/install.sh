@@ -405,6 +405,7 @@ _k8s_install_flannel() {
 # Arguments:
 #   1 - control_plane: Master node address (ip:port format)
 #   2 - ssh_user: SSH user for connecting to master (optional, default from config)
+#   3 - ssh_key: Path to SSH private key (optional, default from config)
 # Returns:
 #   0 - Success
 #   1 - Failure
@@ -412,6 +413,7 @@ _k8s_install_flannel() {
 _k8s_init_worker() {
   local control_plane="${1:?'Control plane address required (ip:port)'}"
   local ssh_user="${2:-$(_k8s_get_ssh_user)}"
+  local ssh_key="${3:-$(_k8s_get_ssh_key)}"
 
   # Validate control plane format
   if [[ ! "$control_plane" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+$ ]]; then
@@ -424,6 +426,12 @@ _k8s_init_worker() {
 
   radp_log_info "Joining Kubernetes cluster..."
   radp_log_info "  Master: $master_ip:$master_port"
+
+  # Build SSH options
+  local ssh_opts="-o StrictHostKeyChecking=no"
+  if [[ -n "$ssh_key" ]]; then
+    ssh_opts+=" -i ${ssh_key}"
+  fi
 
   # In dry-run mode, show what would be done
   if radp_is_dry_run; then
@@ -440,13 +448,13 @@ _k8s_init_worker() {
   if _common_is_command_available ssh; then
     radp_log_info "Retrieving join credentials from master..."
 
-    token=$(ssh -o StrictHostKeyChecking=no "${ssh_user}@${master_ip}" "kubeadm token create" 2>/dev/null) || {
+    token=$(ssh $ssh_opts "${ssh_user}@${master_ip}" "kubeadm token create" 2>/dev/null) || {
       radp_log_error "Failed to get token from master. Ensure SSH access is configured."
       radp_log_info "Alternatively, run on master: kubeadm token create --print-join-command"
       return 1
     }
 
-    discovery_hash=$(ssh -o StrictHostKeyChecking=no "${ssh_user}@${master_ip}" \
+    discovery_hash=$(ssh $ssh_opts "${ssh_user}@${master_ip}" \
       "openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'" 2>/dev/null)
 
     if [[ -z "$discovery_hash" ]]; then
@@ -473,7 +481,7 @@ _k8s_init_worker() {
   # Setup kubeconfig
   radp_log_info "Setting up kubeconfig..."
   mkdir -p "$HOME/.kube"
-  scp -o StrictHostKeyChecking=no "${ssh_user}@${master_ip}:/etc/kubernetes/admin.conf" "$HOME/.kube/config" 2>/dev/null || {
+  scp $ssh_opts "${ssh_user}@${master_ip}:/etc/kubernetes/admin.conf" "$HOME/.kube/config" 2>/dev/null || {
     radp_log_warn "Failed to copy kubeconfig from master"
   }
 

@@ -36,6 +36,17 @@ _k8s_get_ssh_user() {
 }
 
 #######################################
+# Get SSH private key for connecting to master node
+# Globals:
+#   gr_radp_extend_homelabctl_k8s_ssh_key
+# Outputs:
+#   SSH private key path (empty if not configured)
+#######################################
+_k8s_get_ssh_key() {
+  echo "${gr_radp_extend_homelabctl_k8s_ssh_key:-}"
+}
+
+#######################################
 # Get default pod CIDR
 # Globals:
 #   gr_radp_extend_homelabctl_k8s_default_pod_cidr

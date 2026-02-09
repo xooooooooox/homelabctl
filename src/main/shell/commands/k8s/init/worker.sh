@@ -5,6 +5,7 @@
 # @option -t, --token <token> Join token (optional, will retrieve from master if not provided)
 # @option --discovery-token-ca-cert-hash <hash> CA cert hash (optional, will retrieve if not provided)
 # @option -u, --ssh-user <user> SSH user for connecting to master (default: from config, typically root)
+# @option -i, --ssh-key <path> SSH private key for connecting to master
 # @flag --dry-run Show what would be done
 # @example k8s init worker -c 192.168.1.100:6443
 # @example k8s init worker -c 192.168.1.100:6443 -u vagrant
@@ -15,6 +16,7 @@ cmd_k8s_init_worker() {
   local token="${opt_token:-}"
   local ca_hash="${opt_discovery_token_ca_cert_hash:-}"
   local ssh_user="${opt_ssh_user:-}"
+  local ssh_key="${opt_ssh_key:-}"
 
   # Enable dry-run mode if flag is set
   radp_set_dry_run "${opt_dry_run:-false}"
@@ -55,7 +57,7 @@ cmd_k8s_init_worker() {
     }
   else
     # Use the library function to handle SSH-based join
-    _k8s_init_worker "$control_plane" "$ssh_user" || return 1
+    _k8s_init_worker "$control_plane" "$ssh_user" "$ssh_key" || return 1
   fi
 
   radp_log_info ""
