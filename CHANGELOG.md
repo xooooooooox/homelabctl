@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.2.9
+## v0.3.0
 
 ### feat
 
