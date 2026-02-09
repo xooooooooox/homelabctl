@@ -609,6 +609,7 @@ _homelabctl_k8s_init_worker() {
         '(-t --token)'{-t,--token}'[Join token (optional, will retrieve from master if not provided)]:token:' \
         '--discovery-token-ca-cert-hash[CA cert hash (optional, will retrieve if not provided)]:hash:' \
         '(-u --ssh-user)'{-u,--ssh-user}'[SSH user for connecting to master (default: from config, typically root)]:user:' \
+        '(-i --ssh-key)'{-i,--ssh-key}'[SSH private key for connecting to master]:path:' \
         '--dry-run[Show what would be done]' \
         '*:file:_files'
 }
