@@ -8,8 +8,10 @@
   - Bash: `cmd_path` builder no longer breaks on positional args or option values
   - Bash: `arg_idx` calculation correctly skips option values (e.g., `setup install -v 1.0 <TAB>`)
   - Fixes completion for commands like `setup install fzf <TAB>`, `setup list -c mycat <TAB>`
-
-## v0.2.10
+- Fix potential `set -e` exit on `((var++))` when var is 0
+  - Changed `((var++))` to `((++var))` in multiple files
+  - Affected: `init/all.sh`, `k8s/addon/list.sh`, `k8s/addon/profile/list.sh`, `k8s/addon/_installer.sh`
+- Fix always in dry-run mode  
 
 ### feat
 
@@ -66,13 +68,6 @@
 ### removed
 
 - Remove `gitlab-runner` installer (migrated to `gitlab` command group)
-
-### fix
-
-- Fix potential `set -e` exit on `((var++))` when var is 0
-  - Changed `((var++))` to `((++var))` in multiple files
-  - Affected: `init/all.sh`, `k8s/addon/list.sh`, `k8s/addon/profile/list.sh`, `k8s/addon/_installer.sh`
-- Fix always in dry-run mode
 
 ## v0.1.32
 
