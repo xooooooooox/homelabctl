@@ -1,12 +1,13 @@
 # CHANGELOG
 
-## v0.2.11
+## v0.2.12
 
 ### fix
 
-- Regenerate completion scripts with upstream framework fixes
+- Regenerate completion scripts with upstream fixes
   - Bash: `cmd_path` builder no longer breaks on positional args or option values
   - Bash: `arg_idx` calculation correctly skips option values (e.g., `setup install -v 1.0 <TAB>`)
+  - Zsh: `vf vg` subcommands now complete machine names (upstream fix for `_vagrant` not completing them)
   - Fixes completion for commands like `setup install fzf <TAB>`, `setup list -c mycat <TAB>`
 - Fix potential `set -e` exit on `((var++))` when var is 0
   - Changed `((var++))` to `((++var))` in multiple files
