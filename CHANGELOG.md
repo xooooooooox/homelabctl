@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.2.11
+
+### fix
+
+- Regenerate completion scripts with upstream framework fixes
+  - Bash: `cmd_path` builder no longer breaks on positional args or option values
+  - Bash: `arg_idx` calculation correctly skips option values (e.g., `setup install -v 1.0 <TAB>`)
+  - Fixes completion for commands like `setup install fzf <TAB>`, `setup list -c mycat <TAB>`
+
 ## v0.2.10
 
 ### feat
