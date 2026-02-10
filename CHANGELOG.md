@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.2.12
+## v0.2.13
 
 ### fix
 
@@ -8,6 +8,7 @@
   - Bash: `cmd_path` builder no longer breaks on positional args or option values
   - Bash: `arg_idx` calculation correctly skips option values (e.g., `setup install -v 1.0 <TAB>`)
   - Zsh: `vf vg` subcommands now complete machine names (upstream fix for `_vagrant` not completing them)
+  - Zsh/Bash: `vf vg provision --provision-with <TAB>` now completes provision names (via radp-vf delegation)
   - Fixes completion for commands like `setup install fzf <TAB>`, `setup list -c mycat <TAB>`
 - Fix potential `set -e` exit on `((var++))` when var is 0
   - Changed `((var++))` to `((++var))` in multiple files
