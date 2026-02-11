@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.2.13
+## v0.2.14
 
 ### fix
 
@@ -17,6 +17,7 @@
 
 ### feat
 
+- Add installer: `jenkins`
 - Add installer: `glow` (terminal-based Markdown renderer by Charm)
 - Improve `init vf` command
   - Now uses passthrough mode to support all radp-vf options

@@ -218,6 +218,14 @@ packages:
     recommends: docker
     homepage: https://docs.docker.com/compose/
 
+  jenkins:
+    desc: Open source CI/CD automation server
+    category: devops
+    check-cmd: jenkins
+    requires: jdk
+    recommends: git docker
+    homepage: https://www.jenkins.io/
+
   terraform:
     desc: Infrastructure as code tool
     category: devops
