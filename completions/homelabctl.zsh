@@ -952,7 +952,13 @@ _homelabctl_setup_uninstall() {
 }
 
 _homelabctl_upgrade() {
-    _files
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--check[Only check for updates]' \
+        '--force[Force upgrade even if at latest]' \
+        '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
+        '--version[Target specific version]:version:' \
+        '*:file:_files'
 }
 
 _homelabctl_version() {

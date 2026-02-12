@@ -426,7 +426,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help  --purge --dry-run" -- "$cur"))
             ;;
         'upgrade')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --check --force -y --yes --version" -- "$cur"))
             ;;
         'version')
             COMPREPLY=($(compgen -W "--help " -- "$cur"))
