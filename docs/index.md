@@ -28,7 +28,7 @@ Welcome to the homelabctl documentation. homelabctl is a CLI tool for managing h
 
 ### Software Setup
 
-Install 40+ CLI tools, languages, and DevOps tools across platforms:
+Install 50+ CLI tools, languages, and DevOps tools across platforms:
 
 ```shell
 homelabctl setup install fzf
