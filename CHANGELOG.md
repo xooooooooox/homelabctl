@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.2.14
+## v0.2.15
 
 ### fix
 
@@ -17,7 +17,7 @@
 
 ### feat
 
-- Add installer: `jenkins`
+- Add installer: `jenkins`,`pet`, `navi`
 - Add installer: `glow` (terminal-based Markdown renderer by Charm)
 - Improve `init vf` command
   - Now uses passthrough mode to support all radp-vf options
@@ -71,6 +71,10 @@
 ### removed
 
 - Remove `gitlab-runner` installer (migrated to `gitlab` command group)
+
+### refactor
+
+- Upgrade CLI scaffold
 
 ## v0.1.32
 

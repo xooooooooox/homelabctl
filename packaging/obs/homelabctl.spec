@@ -53,6 +53,10 @@ mkdir -p %{buildroot}%{_datadir}/zsh/site-functions
 cp -a completions/homelabctl.bash %{buildroot}%{_datadir}/bash-completion/completions/homelabctl
 cp -a completions/homelabctl.zsh %{buildroot}%{_datadir}/zsh/site-functions/_homelabctl
 
+%post
+echo "xooooooooox/homelabctl" > %{_libdir}/homelabctl/.install-repo
+echo "rpm" > %{_libdir}/homelabctl/.install-method
+
 %files
 %license LICENSE
 %doc README.md

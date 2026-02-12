@@ -39,6 +39,11 @@ class Homelabctl < Formula
     zsh_completion.install "completions/homelabctl.zsh" => "_homelabctl"
   end
 
+  def post_install
+    (libexec/".install-repo").write("xooooooooox/homelabctl\n")
+    (libexec/".install-method").write("homebrew\n")
+  end
+
   def caveats
     <<~EOS
       homelabctl requires radp-bash-framework (installed as dependency).

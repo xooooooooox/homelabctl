@@ -625,7 +625,8 @@ install_manual() {
   chmod 0755 "${install_dir}/bin/homelabctl"
   find "${install_dir}/src" -type f -name "*.sh" -exec chmod 0755 {} \;
 
-  # Write install method marker for uninstall.sh
+  # Write install metadata
+  echo "${REPO_OWNER}/${REPO_NAME}" >"${install_dir}/.install-repo"
   echo "manual" >"${install_dir}/.install-method"
   echo "${ref}" >"${install_dir}/.install-ref"
 

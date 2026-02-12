@@ -68,7 +68,7 @@ _homelabctl() {
     local i cmd_path=""
 
     # Known command paths (generated)
-    local _all_cmds=" completion gitlab gitlab_backup gitlab_backup_cleanup gitlab_backup_create gitlab_backup_list gitlab_healthcheck gitlab_init gitlab_install gitlab_reset-password gitlab_restart gitlab_restore gitlab_runner gitlab_runner_install gitlab_start gitlab_status gitlab_stop init init_all init_k8s init_setup init_vf k8s k8s_addon k8s_addon_install k8s_addon_list k8s_addon_profile k8s_addon_profile_apply k8s_addon_profile_list k8s_addon_profile_show k8s_addon_quickstart k8s_addon_uninstall k8s_backup k8s_backup_create k8s_backup_list k8s_backup_restore k8s_health k8s_init k8s_init_master k8s_init_worker k8s_install k8s_token k8s_token_create k8s_token_get setup setup_configure setup_configure_chrony setup_configure_docker setup_configure_docker_acceleration setup_configure_docker_rootless setup_configure_expand-lvm setup_configure_gpg-import setup_configure_gpg-preset setup_configure_list setup_configure_yadm setup_deps setup_info setup_install setup_list setup_profile setup_profile_apply setup_profile_list setup_profile_show setup_uninstall version vf  "
+    local _all_cmds=" completion gitlab gitlab_backup gitlab_backup_cleanup gitlab_backup_create gitlab_backup_list gitlab_healthcheck gitlab_init gitlab_install gitlab_reset-password gitlab_restart gitlab_restore gitlab_runner gitlab_runner_install gitlab_start gitlab_status gitlab_stop init init_all init_k8s init_setup init_vf k8s k8s_addon k8s_addon_install k8s_addon_list k8s_addon_profile k8s_addon_profile_apply k8s_addon_profile_list k8s_addon_profile_show k8s_addon_quickstart k8s_addon_uninstall k8s_backup k8s_backup_create k8s_backup_list k8s_backup_restore k8s_health k8s_init k8s_init_master k8s_init_worker k8s_install k8s_token k8s_token_create k8s_token_get setup setup_configure setup_configure_chrony setup_configure_docker setup_configure_docker_acceleration setup_configure_docker_rootless setup_configure_expand-lvm setup_configure_gpg-import setup_configure_gpg-preset setup_configure_list setup_configure_yadm setup_deps setup_info setup_install setup_list setup_profile setup_profile_apply setup_profile_list setup_profile_show setup_uninstall upgrade version vf  "
 
     # Build cmd_path: skip global option values, validate against known commands
     for ((i = 1; i < cword; i++)); do
@@ -91,7 +91,7 @@ _homelabctl() {
     # Command completions
     case "$cmd_path" in
         '')
-            COMPREPLY=($(compgen -W "completion gitlab init k8s setup version vf  -q --quiet -v --verbose --debug --show-config --all --json  --help --version" -- "$cur"))
+            COMPREPLY=($(compgen -W "completion gitlab init k8s setup upgrade version vf  -q --quiet -v --verbose --debug --show-config --all --json  --help --version" -- "$cur"))
             ;;
         'completion')
             # 计算参数位置（减去命令路径深度）
@@ -424,6 +424,9 @@ _homelabctl() {
                     ;;
             esac
             COMPREPLY=($(compgen -W "--help  --purge --dry-run" -- "$cur"))
+            ;;
+        'upgrade')
+            COMPREPLY=($(compgen -W "--help  --check --force --yes -y --version" -- "$cur"))
             ;;
         'version')
             COMPREPLY=($(compgen -W "--help " -- "$cur"))

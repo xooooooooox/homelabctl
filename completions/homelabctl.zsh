@@ -951,6 +951,10 @@ _homelabctl_setup_uninstall() {
         '1:name:_homelabctl_arg_setup_uninstall_name'
 }
 
+_homelabctl_upgrade() {
+    _files
+}
+
 _homelabctl_version() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
@@ -1002,6 +1006,7 @@ _homelabctl() {
                 'init:Manage init'
                 'k8s:Manage k8s'
                 'setup:Manage setup'
+                'upgrade:Upgrade homelabctl to the latest version'
                 'version:Show version information'
                 'vf:Run radp-vagrant-framework commands (passthrough to radp-vf)'
             )
