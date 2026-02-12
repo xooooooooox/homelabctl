@@ -367,6 +367,20 @@ packages:
     check-cmd: glow
     homepage: https://github.com/charmbracelet/glow
 
+  pet:
+    desc: Simple command-line snippet manager
+    category: dev-tools
+    check-cmd: pet
+    requires: fzf
+    homepage: https://github.com/knqyf263/pet
+
+  navi:
+    desc: Interactive cheatsheet tool for the command line
+    category: dev-tools
+    check-cmd: navi
+    requires: fzf
+    homepage: https://github.com/denisidoro/navi
+
   markdownlint-cli:
     desc: Markdown linting tool
     category: dev-tools

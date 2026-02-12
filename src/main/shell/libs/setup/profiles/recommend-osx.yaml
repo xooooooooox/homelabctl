@@ -5,6 +5,10 @@ extends: recommend
 platform: darwin
 
 packages:
+  # dev-tools
+  - name: pet
+  - name: navi
+
   # DevOPS
   - name: vagrant
   - name: virtualbox

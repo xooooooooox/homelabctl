@@ -32,6 +32,7 @@ homelabctl is a CLI tool for managing homelab infrastructure, built on radp-bash
 | `setup deps <name>` | Show dependency tree |
 | `setup profile list/show/apply` | Manage profiles |
 | `setup configure <name>` | Run system configuration |
+| `upgrade` | Upgrade homelabctl to the latest version |
 | `version` | Show version |
 | `completion <bash\|zsh>` | Generate completion |
 
