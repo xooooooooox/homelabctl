@@ -40,7 +40,7 @@
 
 - **Vagrant 集成** - 透传 Vagrant 命令，自动检测 Vagrantfile
 - **RADP Vagrant 框架** - 初始化、配置和管理多虚拟机环境
-- **软件安装** - 跨平台安装 40+ CLI 工具、编程语言和 DevOps 工具
+- **软件安装** - 跨平台安装 50+ CLI 工具、编程语言和 DevOps 工具
 - **Profile 配置** - 通过 Profile 批量安装软件包，实现可复现的环境
 - **Shell 补全** - Bash 和 Zsh 补全，支持动态建议
 

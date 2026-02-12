@@ -133,6 +133,7 @@ Packages are organized into categories. Use `homelabctl setup list --categories`
 | docker        | Container platform                 |
 | terraform     | Infrastructure as Code             |
 | ansible       | IT automation platform             |
+| jenkins       | CI/CD automation server            |
 
 ### vcs - Version Control
 
@@ -198,6 +199,7 @@ Packages can declare three types of dependencies:
 | pass                                 | gpg             | -                 |
 | git-credential-manager               | git             | pass, gpg (Linux) |
 | git-credential-manager (linux-arm64) | git, dotnet-sdk | pass, gpg         |
+| jenkins                              | jdk             | git, docker       |
 
 ### Dependency Resolution
 

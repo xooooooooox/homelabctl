@@ -41,7 +41,7 @@ on [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework).
 
 - **Vagrant Integration** - Passthrough to Vagrant commands with automatic Vagrantfile detection
 - **RADP Vagrant Framework** - Initialize, configure, and manage multi-VM environments
-- **Software Setup** - Install 40+ CLI tools, languages, and DevOps tools across platforms
+- **Software Setup** - Install 50+ CLI tools, languages, and DevOps tools across platforms
 - **Profiles** - Batch install packages via profiles for reproducible environments
 - **Shell Completion** - Bash and Zsh completion with dynamic suggestions
 

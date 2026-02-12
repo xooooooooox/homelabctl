@@ -64,6 +64,7 @@ Available packages for `homelabctl setup install`.
 | terraform | Infrastructure as code |
 | ansible | IT automation |
 | vagrant | Development environments |
+| jenkins | CI/CD automation server |
 
 ### vcs
 
@@ -124,6 +125,7 @@ Some packages have dependencies that are auto-installed:
 | fzf-tab-completion | fzf |
 | pass | gpg |
 | git-credential-manager | git |
+| jenkins | jdk |
 
 ## Platform Notes
 
