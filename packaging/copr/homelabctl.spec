@@ -56,6 +56,7 @@ cp -a completions/homelabctl.zsh %{buildroot}%{_datadir}/zsh/site-functions/_hom
 %post
 echo "xooooooooox/homelabctl" > %{_libdir}/homelabctl/.install-repo
 echo "rpm" > %{_libdir}/homelabctl/.install-method
+echo "v%{version}" > %{_libdir}/homelabctl/.install-version
 
 %files
 %license LICENSE

@@ -3,5 +3,7 @@ set -e
 
 echo "xooooooooox/homelabctl" > /usr/lib/homelabctl/.install-repo
 echo "apt" > /usr/lib/homelabctl/.install-method
+pkg_version=$(dpkg-query -W -f='${Version}' homelabctl 2>/dev/null || true)
+[ -n "$pkg_version" ] && echo "v${pkg_version}" > /usr/lib/homelabctl/.install-version
 
 #DEBHELPER#
