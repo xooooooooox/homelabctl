@@ -346,7 +346,7 @@ packages:
     desc: Fast tldr client written in Rust (tldr)
     category: search
     check-cmd: tldr
-    homepage: https://github.com/dbrgn/tealdeer
+    homepage: https://github.com/tealdeer-rs/tealdeer
 
   # Development Tools
   jq:

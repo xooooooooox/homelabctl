@@ -19,7 +19,7 @@ _setup_install_fd() {
             ;;
         dnf|yum)
             radp_log_info "Installing fd via dnf..."
-            if ! radp_os_install_pkgs fd-find 2>/dev/null; then
+            if ! radp_os_install_pkgs fd-find &>/dev/null; then
                 radp_log_info "fd-find not available in repos, falling back to binary release..."
                 _setup_fd_from_release "$version"
             fi
@@ -51,7 +51,7 @@ _setup_fd_from_release() {
     # Get latest version if needed
     if [[ "$version" == "latest" ]]; then
         version=$(_setup_github_latest_version "sharkdp/fd")
-        [[ -z "$version" ]] && version="10.1.0"
+        [[ -z "$version" ]] && version="10.3.0"
     fi
 
     local arch os

@@ -19,7 +19,7 @@ _setup_install_bat() {
     ;;
   dnf | yum)
     radp_log_info "Installing bat via dnf..."
-    if ! radp_os_install_pkgs bat 2>/dev/null; then
+    if ! radp_os_install_pkgs bat &>/dev/null; then
       radp_log_info "bat not available in repos, falling back to binary release..."
       _setup_bat_from_release "$version"
     fi
@@ -51,7 +51,7 @@ _setup_bat_from_release() {
   # Get latest version if needed
   if [[ "$version" == "latest" ]]; then
     version=$(_setup_github_latest_version "sharkdp/bat")
-    [[ -z "$version" ]] && version="0.24.0"
+    [[ -z "$version" ]] && version="0.26.1"
   fi
 
   local arch os

@@ -19,14 +19,14 @@ _setup_install_tealdeer() {
     ;;
   dnf | yum)
     radp_log_info "Installing tealdeer via dnf..."
-    if ! radp_os_install_pkgs tealdeer 2>/dev/null; then
+    if ! radp_os_install_pkgs tealdeer &>/dev/null; then
       radp_log_info "tealdeer not available in repos, falling back to binary release..."
       _setup_tealdeer_from_release "$version"
     fi
     ;;
   apt | apt-get)
     radp_log_info "Installing tealdeer via apt..."
-    if ! radp_os_install_pkgs tealdeer 2>/dev/null; then
+    if ! radp_os_install_pkgs tealdeer &>/dev/null; then
       radp_log_info "tealdeer not available in repos, falling back to binary release..."
       _setup_tealdeer_from_release "$version"
     fi
@@ -52,8 +52,8 @@ _setup_tealdeer_from_release() {
 
   # Get latest version if needed
   if [[ "$version" == "latest" ]]; then
-    version=$(_setup_github_latest_version "dbrgn/tealdeer")
-    [[ -z "$version" ]] && version="1.6.1"
+    version=$(_setup_github_latest_version "tealdeer-rs/tealdeer")
+    [[ -z "$version" ]] && version="1.8.1"
   fi
 
   local arch os
@@ -65,11 +65,11 @@ _setup_tealdeer_from_release() {
   case "$os" in
   darwin)
     target="tealdeer-macos-x86_64"
-    [[ "$arch" == "arm64" ]] && target="tealdeer-macos-arm64"
+    [[ "$arch" == "arm64" ]] && target="tealdeer-macos-aarch64"
     ;;
   linux)
     target="tealdeer-linux-x86_64-musl"
-    [[ "$arch" == "arm64" ]] && target="tealdeer-linux-arm64-musleabi"
+    [[ "$arch" == "arm64" ]] && target="tealdeer-linux-aarch64-musl"
     ;;
   *)
     radp_log_error "Unsupported OS: $os"
@@ -77,7 +77,7 @@ _setup_tealdeer_from_release() {
     ;;
   esac
 
-  local url="https://github.com/dbrgn/tealdeer/releases/download/v${version}/${target}"
+  local url="https://github.com/tealdeer-rs/tealdeer/releases/download/v${version}/${target}"
 
   local tmpdir
   tmpdir=$(_setup_mktemp_dir)
