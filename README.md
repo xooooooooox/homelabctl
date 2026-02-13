@@ -55,8 +55,7 @@ on [radp-bash-framework](https://github.com/xooooooooox/radp-bash-framework).
 
 | OS                 | Architecture          | Package Manager | Notes                         |
 |--------------------|-----------------------|-----------------|-------------------------------|
-| macOS              | Intel (x86_64)        | Homebrew        | Requires `bash` from Homebrew |
-| macOS              | Apple Silicon (arm64) | Homebrew        | Requires `bash` from Homebrew |
+| macOS              | Intel (x86_64), Apple Silicon        | Homebrew        | Requires `bash` from Homebrew |
 | Fedora/RHEL/CentOS | x86_64, aarch64       | DNF/YUM (COPR)  | RHEL 8+, Fedora 38+           |
 | Ubuntu/Debian      | amd64, arm64          | APT (OBS)       | Ubuntu 20.04+, Debian 11+     |
 | openSUSE           | x86_64                | Zypper (OBS)    | Tumbleweed, Leap 15.4+        |
