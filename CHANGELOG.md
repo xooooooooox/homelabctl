@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.2.19
+## v0.2.20
 
 ### fix
 
@@ -14,6 +14,7 @@
   - Changed `((var++))` to `((++var))` in multiple files
   - Affected: `init/all.sh`, `k8s/addon/list.sh`, `k8s/addon/profile/list.sh`, `k8s/addon/_installer.sh`
 - Fix always in dry-run mode  
+- Fix `fzf-tab-completion` install dir
 
 ### feat
 

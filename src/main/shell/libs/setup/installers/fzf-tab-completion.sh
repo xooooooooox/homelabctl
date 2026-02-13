@@ -3,7 +3,7 @@
 
 _setup_install_fzf_tab_completion() {
   local version="${1:-latest}"
-  local install_dir="$HOME/.fzf-tab-completion"
+  local install_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fzf-tab-completion"
 
   if [[ -d "$install_dir" ]] && [[ "$version" == "latest" ]]; then
     radp_log_info "fzf-tab-completion is already installed"
@@ -34,10 +34,10 @@ _setup_install_fzf_tab_completion() {
   radp_log_info "Add the following to your shell config:"
   radp_log_info ""
   radp_log_info "  # For bash (~/.bashrc):"
-  radp_log_info "  source ~/.fzf-tab-completion/bash/fzf-bash-completion.sh"
+  radp_log_info "  source $install_dir/bash/fzf-bash-completion.sh"
   radp_log_info "  bind -x '\"\\t\": fzf_bash_completion'"
   radp_log_info ""
   radp_log_info "  # For zsh (~/.zshrc):"
-  radp_log_info "  source ~/.fzf-tab-completion/zsh/fzf-zsh-completion.sh"
+  radp_log_info "  source $install_dir/zsh/fzf-zsh-completion.sh"
   radp_log_info "  bindkey '^I' fzf_completion"
 }
