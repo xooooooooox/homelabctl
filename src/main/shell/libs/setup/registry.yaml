@@ -84,7 +84,7 @@ packages:
   fzf-tab-completion:
     desc: Tab completion using fzf for bash/zsh
     category: shell
-    check-cmd: "dir:~/.fzf-tab-completion"
+    check-cmd: "dir:~/.local/share/fzf-tab-completion"
     requires: fzf
     homepage: https://github.com/lincheney/fzf-tab-completion
 
