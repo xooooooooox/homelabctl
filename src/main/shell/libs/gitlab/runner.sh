@@ -6,6 +6,19 @@ declare -gr __gitlab_runner_repo_script_rpm="https://packages.gitlab.com/install
 declare -gr __gitlab_runner_repo_script_deb="https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh"
 
 #######################################
+# Check if version $1 >= version $2 (semver)
+# Arguments:
+#   1 - version to check
+#   2 - minimum version
+# Returns:
+#   0 if $1 >= $2, 1 otherwise
+#######################################
+_gitlab_runner_version_gte() {
+  local ver="$1" min="$2"
+  [[ "$(printf '%s\n%s' "$min" "$ver" | sort -V | head -1)" == "$min" ]]
+}
+
+#######################################
 # Check if GitLab Runner is installed
 # Returns:
 #   0 if installed, 1 if not
@@ -133,7 +146,7 @@ _gitlab_runner_install_package() {
   case "$pm" in
     dnf|yum)
       local yum_pkg="gitlab-runner"
-      [[ "$version" != "latest" ]] && yum_pkg="gitlab-runner-${version}"
+      [[ "$version" != "latest" ]] && yum_pkg="gitlab-runner-${version}-1"
       radp_log_info "Installing ${yum_pkg}..."
       radp_exec_sudo "Install $yum_pkg" "$pm" install -y "$yum_pkg" || {
         radp_log_error "Failed to install gitlab-runner"
@@ -141,13 +154,24 @@ _gitlab_runner_install_package() {
       }
       ;;
     apt|apt-get)
-      local apt_pkg="gitlab-runner"
-      [[ "$version" != "latest" ]] && apt_pkg="gitlab-runner=${version}"
-      radp_log_info "Installing ${apt_pkg}..."
-      radp_exec_sudo "Install $apt_pkg" apt-get install -y "$apt_pkg" || {
-        radp_log_error "Failed to install gitlab-runner"
-        return 1
-      }
+      if [[ "$version" != "latest" ]]; then
+        local apt_pkgs="gitlab-runner=${version}-1"
+        # Since 17.7.1, helper images must be installed explicitly
+        if _gitlab_runner_version_gte "$version" "17.7.1"; then
+          apt_pkgs+=" gitlab-runner-helper-images=${version}-1"
+        fi
+        radp_log_info "Installing ${apt_pkgs}..."
+        radp_exec_sudo "Install gitlab-runner ${version}" apt-get install -y $apt_pkgs || {
+          radp_log_error "Failed to install gitlab-runner"
+          return 1
+        }
+      else
+        radp_log_info "Installing gitlab-runner..."
+        radp_exec_sudo "Install gitlab-runner" apt-get install -y gitlab-runner || {
+          radp_log_error "Failed to install gitlab-runner"
+          return 1
+        }
+      fi
       ;;
     brew)
       radp_log_info "Installing via Homebrew..."
