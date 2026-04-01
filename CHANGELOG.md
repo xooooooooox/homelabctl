@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.24
+
+### fix
+
+- fix install neovim
+
 ## v0.2.23
 
 ### fix
