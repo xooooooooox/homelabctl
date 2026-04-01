@@ -90,9 +90,9 @@ cmd_setup_install() {
   # Install packages in order
   local pkg
   for pkg in "${install_order[@]}"; do
-    # Skip if already installed (unless specific version requested for target)
+    # Skip if already installed (unless -v explicitly passed for target)
     if _setup_check_installed "$pkg"; then
-      if [[ "$pkg" == "$name" && "$version" != "latest" ]]; then
+      if [[ "$pkg" == "$name" && -n "$opt_version" ]]; then
         radp_log_info "Reinstalling $pkg with version $version..."
       else
         local installed_ver

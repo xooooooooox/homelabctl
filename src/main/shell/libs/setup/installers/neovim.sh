@@ -4,11 +4,6 @@
 _setup_install_neovim() {
     local version="${1:-latest}"
 
-    if _setup_is_installed nvim && [[ "$version" == "latest" ]]; then
-        radp_log_info "neovim is already installed"
-        return 0
-    fi
-
     local pm
     pm=$(radp_os_get_distro_pm 2>/dev/null || echo "unknown")
 
@@ -18,11 +13,8 @@ _setup_install_neovim() {
             brew install neovim || return 1
             ;;
         dnf|yum)
-            radp_log_info "Installing neovim via dnf..."
-            if ! radp_os_install_pkgs neovim 2>/dev/null; then
-                radp_log_info "neovim not available in repos, falling back to binary release..."
-                _setup_neovim_from_release "$version"
-            fi
+            # dnf version is often outdated (0.10.x), use binary release for latest
+            _setup_neovim_from_release "$version"
             ;;
         apt|apt-get)
             # apt version is often outdated, use appimage or PPA
