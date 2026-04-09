@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.25
+
+### fix
+
+- gitlab backup cleanup --dry-run not show file list
+
 ## v0.2.24
 
 ### fix
