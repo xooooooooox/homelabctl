@@ -198,24 +198,55 @@ _gitlab_backup_cleanup() {
 
   # Clean local data backups
   if [[ -d "$backup_home" ]]; then
-    radp_exec_sudo "Clean old data backups in $backup_home" \
-      find "$backup_home" -type f -name "$data_pattern" -mtime "+$keep_days" -delete
+    __cleanup_find "$backup_home" "$keep_days" \
+      "Clean old data backups in $backup_home" "sudo" \
+      -name "$data_pattern"
   fi
 
   # Clean local config backups
   if [[ -d "$config_backup_home" ]]; then
-    radp_exec_sudo "Clean old config backups in $config_backup_home" \
-      find "$config_backup_home" -type f -name "$config_pattern" -mtime "+$keep_days" -delete
+    __cleanup_find "$config_backup_home" "$keep_days" \
+      "Clean old config backups in $config_backup_home" "sudo" \
+      -name "$config_pattern"
   fi
 
   # Clean remote backups
   if [[ -n "$remote_home" && -d "$remote_home" ]]; then
-    radp_exec "Clean old backups in remote $remote_home" \
-      find "$remote_home" -type f \( -name "$data_pattern" -o -name "$config_pattern" \) -mtime "+$keep_days" -delete
+    __cleanup_find "$remote_home" "$keep_days" \
+      "Clean old backups in remote $remote_home" "" \
+      \( -name "$data_pattern" -o -name "$config_pattern" \)
   fi
 
   radp_log_info "Backup cleanup completed"
   return 0
+}
+
+# Internal helper: find and delete (or list in dry-run) old backup files
+# Arguments:
+#   $1 - directory path
+#   $2 - keep_days
+#   $3 - description for logging
+#   $4 - "sudo" to use sudo, "" otherwise
+#   $@ - remaining args passed as find name conditions
+__cleanup_find() {
+  local dir="$1" keep_days="$2" desc="$3" use_sudo="$4"
+  shift 4
+
+  local sudo_cmd=""
+  [[ "$use_sudo" == "sudo" ]] && sudo_cmd="${gr_sudo:-}"
+
+  if radp_is_dry_run; then
+    radp_log_info "[dry-run] $desc"
+    local files
+    files=$($sudo_cmd find "$dir" -type f "$@" -mtime "+$keep_days" 2>/dev/null)
+    if [[ -n "$files" ]]; then
+      echo "$files"
+    else
+      radp_log_info "  (no files to clean)"
+    fi
+  else
+    $sudo_cmd find "$dir" -type f "$@" -mtime "+$keep_days" -delete
+  fi
 }
 
 #######################################
