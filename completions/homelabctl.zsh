@@ -377,6 +377,7 @@ _homelabctl_k8s() {
                 'init:Manage init'
                 'install:Install Kubernetes (kubeadm, kubelet, kubectl)'
                 'token:Manage token'
+                'upgrade:Manage upgrade'
             )
             _describe 'subcommand' commands
             ;;
@@ -665,6 +666,69 @@ _homelabctl_k8s_token_get() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '--create[Create new token if no valid token exists]' \
         '--join-command[Print full join command instead of just token]' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_upgrade() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments -C -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case "$state" in
+        command)
+            local commands=(
+                'apply:Upgrade the first control plane node (runs kubeadm upgrade apply + drain + kubelet upgrade + uncordon)'
+                'cluster:Orchestrate a full cluster upgrade (first CP -> other CPs -> workers) via SSH'
+                'node:Upgrade an additional control plane or worker node (runs kubeadm upgrade node)'
+                'plan:Show kubeadm upgrade plan (run on the first control plane node)'
+            )
+            _describe 'subcommand' commands
+            ;;
+        args)
+            local cmd_func="_homelabctl_k8s_upgrade_${words[1]//-/_}"
+            if (( $+functions[$cmd_func] )); then
+                $cmd_func
+            else
+                _files
+            fi
+            ;;
+    esac
+}
+
+_homelabctl_k8s_upgrade_apply() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
+        '--dry-run[Show what would be done]' \
+        '1:version:_files'
+}
+
+_homelabctl_k8s_upgrade_cluster() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
+        '--dry-run[Show what would be done]' \
+        '1:version:_files'
+}
+
+_homelabctl_k8s_upgrade_node() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-v --version)'{-v,--version}'[]:ver:' \
+        '(-r --role)'{-r,--role}'[Node role: control-plane or worker (default: auto-detect)]:role:' \
+        '--skip-drain[Skip local drain/uncordon (used when orchestrated from master)]' \
+        '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
+        '--dry-run[Show what would be done]' \
+        '*:file:_files'
+}
+
+_homelabctl_k8s_upgrade_plan() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
         '*:file:_files'
 }
 
