@@ -702,6 +702,7 @@ _homelabctl_k8s_upgrade() {
 _homelabctl_k8s_upgrade_apply() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--ignore-preflight-errors[Comma-separated preflight errors to ignore (e.g., CoreDNSUnsupportedPlugins,CoreDNSMigration)]:list:' \
         '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
         '--dry-run[Show what would be done]' \
         '1:version:_files'
@@ -710,6 +711,7 @@ _homelabctl_k8s_upgrade_apply() {
 _homelabctl_k8s_upgrade_cluster() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--ignore-preflight-errors[Comma-separated preflight errors to ignore (passed to every node)]:list:' \
         '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
         '--dry-run[Show what would be done]' \
         '1:version:_files'
@@ -720,6 +722,7 @@ _homelabctl_k8s_upgrade_node() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-v --version)'{-v,--version}'[]:ver:' \
         '(-r --role)'{-r,--role}'[Node role: control-plane or worker (default: auto-detect)]:role:' \
+        '--ignore-preflight-errors[Comma-separated preflight errors to ignore]:list:' \
         '--skip-drain[Skip local drain/uncordon (used when orchestrated from master)]' \
         '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
         '--dry-run[Show what would be done]' \
@@ -729,6 +732,7 @@ _homelabctl_k8s_upgrade_node() {
 _homelabctl_k8s_upgrade_plan() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
+        '--ignore-preflight-errors[Comma-separated preflight errors to ignore (e.g., CoreDNSUnsupportedPlugins,CoreDNSMigration)]:list:' \
         '*:file:_files'
 }
 

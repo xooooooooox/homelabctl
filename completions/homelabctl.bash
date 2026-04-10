@@ -245,16 +245,16 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "apply cluster node plan  --help" -- "$cur"))
             ;;
         'k8s upgrade apply')
-            COMPREPLY=($(compgen -W "--help  -y --yes --dry-run" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --ignore-preflight-errors -y --yes --dry-run" -- "$cur"))
             ;;
         'k8s upgrade cluster')
-            COMPREPLY=($(compgen -W "--help  -y --yes --dry-run" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --ignore-preflight-errors -y --yes --dry-run" -- "$cur"))
             ;;
         'k8s upgrade node')
-            COMPREPLY=($(compgen -W "--help  -v --version -r --role --skip-drain -y --yes --dry-run" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -v --version -r --role --ignore-preflight-errors --skip-drain -y --yes --dry-run" -- "$cur"))
             ;;
         'k8s upgrade plan')
-            COMPREPLY=($(compgen -W "--help " -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --ignore-preflight-errors" -- "$cur"))
             ;;
         'setup')
             COMPREPLY=($(compgen -W "configure deps info install list profile uninstall  --help" -- "$cur"))
