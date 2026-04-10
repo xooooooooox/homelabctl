@@ -200,12 +200,17 @@ _k8s_upgrade_kubelet_kubectl_package() {
 
 #######################################
 # Run kubeadm upgrade plan
+# Arguments:
+#   1 - ignore_preflight_errors (optional, comma-separated list)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
 _k8s_upgrade_plan() {
+  local ignore_errors="${1:-}"
+  local -a args=(kubeadm upgrade plan)
+  [[ -n "$ignore_errors" ]] && args+=("--ignore-preflight-errors=${ignore_errors}")
   radp_log_info "Running kubeadm upgrade plan..."
-  radp_exec_sudo "kubeadm upgrade plan" kubeadm upgrade plan || return 1
+  radp_exec_sudo "${args[*]}" "${args[@]}" || return 1
   return 0
 }
 
@@ -213,25 +218,33 @@ _k8s_upgrade_plan() {
 # Run kubeadm upgrade apply (first control plane node)
 # Arguments:
 #   1 - full version (e.g., "1.31.0")
+#   2 - ignore_preflight_errors (optional, comma-separated list)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
 _k8s_upgrade_apply_first_cp() {
   local version="${1:?'version required'}"
+  local ignore_errors="${2:-}"
+  local -a args=(kubeadm upgrade apply "v${version}" -y)
+  [[ -n "$ignore_errors" ]] && args+=("--ignore-preflight-errors=${ignore_errors}")
   radp_log_info "Running kubeadm upgrade apply v${version}..."
-  radp_exec_sudo "kubeadm upgrade apply v${version}" \
-    kubeadm upgrade apply "v${version}" -y || return 1
+  radp_exec_sudo "kubeadm upgrade apply v${version}" "${args[@]}" || return 1
   return 0
 }
 
 #######################################
 # Run kubeadm upgrade node (other CP / worker)
+# Arguments:
+#   1 - ignore_preflight_errors (optional, comma-separated list)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
 _k8s_upgrade_node_local() {
+  local ignore_errors="${1:-}"
+  local -a args=(kubeadm upgrade node)
+  [[ -n "$ignore_errors" ]] && args+=("--ignore-preflight-errors=${ignore_errors}")
   radp_log_info "Running kubeadm upgrade node..."
-  radp_exec_sudo "kubeadm upgrade node" kubeadm upgrade node || return 1
+  radp_exec_sudo "${args[*]}" "${args[@]}" || return 1
   return 0
 }
 
@@ -349,19 +362,21 @@ __k8s_local_node_name() {
 # Full local upgrade flow for the FIRST control plane node
 # Arguments:
 #   1 - full version (e.g., "1.31.0")
+#   2 - ignore_preflight_errors (optional, comma-separated list)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
 _k8s_upgrade_local_first_cp() {
   local version="${1:?'version required'}"
+  local ignore_errors="${2:-}"
   local node
   node=$(__k8s_local_node_name)
 
   radp_log_info "=== Upgrading first control plane node (${node}) to v${version} ==="
 
   _k8s_upgrade_kubeadm_package "$version" || return 1
-  _k8s_upgrade_plan || radp_log_warn "kubeadm upgrade plan returned non-zero (continuing)"
-  _k8s_upgrade_apply_first_cp "$version" || return 1
+  _k8s_upgrade_plan "$ignore_errors" || radp_log_warn "kubeadm upgrade plan returned non-zero (continuing)"
+  _k8s_upgrade_apply_first_cp "$version" "$ignore_errors" || return 1
   _k8s_drain_node "$node" "control-plane" || return 1
   _k8s_upgrade_kubelet_kubectl_package "$version" || return 1
   _k8s_restart_kubelet || return 1
@@ -379,6 +394,7 @@ _k8s_upgrade_local_first_cp() {
 #   2 - role ("control-plane" or "worker"); auto-detected if omitted
 #   3 - skip_drain ("true" to skip local drain/uncordon, e.g. when orchestrator
 #                    already drained from master side)
+#   4 - ignore_preflight_errors (optional, comma-separated list)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
@@ -386,13 +402,14 @@ _k8s_upgrade_local_node() {
   local version="${1:?'version required'}"
   local role="${2:-$(__k8s_detect_local_role)}"
   local skip_drain="${3:-false}"
+  local ignore_errors="${4:-}"
   local node
   node=$(__k8s_local_node_name)
 
   radp_log_info "=== Upgrading ${role} node (${node}) to v${version} ==="
 
   _k8s_upgrade_kubeadm_package "$version" || return 1
-  _k8s_upgrade_node_local || return 1
+  _k8s_upgrade_node_local "$ignore_errors" || return 1
 
   # Drain before kubelet upgrade requires kubectl access.
   # Workers typically don't have kubeconfig; drain is usually initiated from
@@ -487,11 +504,13 @@ __k8s_list_nodes_by_label() {
 # Orchestrate full cluster upgrade from the first control plane node
 # Arguments:
 #   1 - full version (e.g., "1.31.0")
+#   2 - ignore_preflight_errors (optional, comma-separated list)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
 _k8s_upgrade_cluster() {
   local version="${1:?'version required'}"
+  local ignore_errors="${2:-}"
 
   if ! _k8s_is_cluster_accessible; then
     radp_log_error "Cluster not accessible via kubectl — run this from a control plane node"
@@ -528,14 +547,14 @@ _k8s_upgrade_cluster() {
   fi
 
   # Step 1: first CP (local)
-  _k8s_upgrade_local_first_cp "$version" || {
+  _k8s_upgrade_local_first_cp "$version" "$ignore_errors" || {
     radp_log_error "First control plane upgrade failed"
     return 1
   }
 
   # Step 2: other CPs (remote)
   for n in "${other_cps[@]}"; do
-    __k8s_upgrade_remote_node "$n" "$version" "control-plane" || {
+    __k8s_upgrade_remote_node "$n" "$version" "control-plane" "$ignore_errors" || {
       radp_log_error "Remote CP upgrade failed: $n"
       return 1
     }
@@ -543,7 +562,7 @@ _k8s_upgrade_cluster() {
 
   # Step 3: workers (remote)
   for n in "${workers[@]}"; do
-    __k8s_upgrade_remote_node "$n" "$version" "worker" || {
+    __k8s_upgrade_remote_node "$n" "$version" "worker" "$ignore_errors" || {
       radp_log_error "Remote worker upgrade failed: $n"
       return 1
     }
@@ -560,6 +579,7 @@ _k8s_upgrade_cluster() {
 #   1 - node name
 #   2 - full version
 #   3 - role (control-plane / worker)
+#   4 - ignore_preflight_errors (optional, comma-separated list)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
@@ -567,6 +587,7 @@ __k8s_upgrade_remote_node() {
   local node="${1:?'node required'}"
   local version="${2:?'version required'}"
   local role="${3:?'role required'}"
+  local ignore_errors="${4:-}"
 
   radp_log_info "--- Upgrading remote ${role} ${node} to v${version} ---"
 
@@ -584,7 +605,9 @@ __k8s_upgrade_remote_node() {
   # Run upgrade remotely via homelabctl
   # Use --role to bypass local auto-detection, --skip-drain (already drained),
   # and --yes to skip confirmation prompt over non-interactive SSH.
-  __k8s_ssh_exec "$ip" "sudo homelabctl k8s upgrade node -v ${version} --role ${role} --skip-drain --yes" || {
+  local remote_cmd="sudo homelabctl k8s upgrade node -v ${version} --role ${role} --skip-drain --yes"
+  [[ -n "$ignore_errors" ]] && remote_cmd+=" --ignore-preflight-errors=${ignore_errors}"
+  __k8s_ssh_exec "$ip" "$remote_cmd" || {
     radp_log_error "Remote upgrade failed on ${node}"
     _k8s_uncordon_node "$node" || true
     return 1

@@ -2,13 +2,16 @@
 # @cmd
 # @desc Upgrade the first control plane node (runs kubeadm upgrade apply + drain + kubelet upgrade + uncordon)
 # @arg version! Target Kubernetes version (e.g., 1.31.0)
+# @option --ignore-preflight-errors <list> Comma-separated preflight errors to ignore (e.g., CoreDNSUnsupportedPlugins,CoreDNSMigration)
 # @flag -y, --yes Skip confirmation prompt
 # @flag --dry-run Show what would be done
 # @example k8s upgrade apply 1.31.0
 # @example k8s upgrade apply 1.31.0 --dry-run
+# @example k8s upgrade apply 1.31.0 --ignore-preflight-errors=CoreDNSUnsupportedPlugins,CoreDNSMigration
 
 cmd_k8s_upgrade_apply() {
   local version="${1:-}"
+  local ignore_errors="${opt_ignore_preflight_errors:-}"
   local auto_yes="${opt_yes:-}"
 
   radp_set_dry_run "${opt_dry_run:-false}"
@@ -45,7 +48,7 @@ cmd_k8s_upgrade_apply() {
     fi
   fi
 
-  _k8s_upgrade_local_first_cp "$version" || return 1
+  _k8s_upgrade_local_first_cp "$version" "$ignore_errors" || return 1
 
   radp_log_info ""
   radp_log_info "First control plane upgraded to v${version}"

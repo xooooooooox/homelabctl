@@ -3,16 +3,19 @@
 # @desc Upgrade an additional control plane or worker node (runs kubeadm upgrade node)
 # @option -v, --version! <ver> Target Kubernetes version (e.g., 1.31.0)
 # @option -r, --role <role> Node role: control-plane or worker (default: auto-detect)
+# @option --ignore-preflight-errors <list> Comma-separated preflight errors to ignore
 # @flag --skip-drain Skip local drain/uncordon (used when orchestrated from master)
 # @flag -y, --yes Skip confirmation prompt
 # @flag --dry-run Show what would be done
 # @example k8s upgrade node -v 1.31.0
 # @example k8s upgrade node -v 1.31.0 --role worker
 # @example k8s upgrade node -v 1.31.0 --skip-drain --yes
+# @example k8s upgrade node -v 1.31.0 --ignore-preflight-errors=CoreDNSUnsupportedPlugins
 
 cmd_k8s_upgrade_node() {
   local version="${opt_version:-}"
   local role="${opt_role:-}"
+  local ignore_errors="${opt_ignore_preflight_errors:-}"
   local skip_drain="false"
   [[ -n "${opt_skip_drain:-}" ]] && skip_drain="true"
   local auto_yes="${opt_yes:-}"
@@ -52,7 +55,7 @@ cmd_k8s_upgrade_node() {
     fi
   fi
 
-  _k8s_upgrade_local_node "$version" "$role" "$skip_drain" || return 1
+  _k8s_upgrade_local_node "$version" "$role" "$skip_drain" "$ignore_errors" || return 1
 
   radp_log_info ""
   radp_log_info "Node upgraded to v${version}"
