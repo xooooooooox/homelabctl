@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.3.0
+
+### feat
+
+- Add multi subcmd to upgrade kubeadm clusters
+
 ## v0.2.25
 
 ### fix
