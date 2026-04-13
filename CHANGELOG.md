@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.3.3
+
+### fix
+
+- check if a node's kubelet version already matches the target
+- wait for API server to fully stabilize after kubelet restart
+
 ## v0.3.2
 
 ### fix
