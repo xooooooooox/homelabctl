@@ -712,6 +712,8 @@ _homelabctl_k8s_upgrade_cluster() {
     _arguments -s \
         '(-h --help)'{-h,--help}'[Show help]' \
         '--ignore-preflight-errors[Comma-separated preflight errors to ignore (passed to every node)]:list:' \
+        '(-u --ssh-user)'{-u,--ssh-user}'[SSH user for remote nodes (default: from config)]:user:' \
+        '(-i --ssh-key)'{-i,--ssh-key}'[SSH private key for remote nodes]:path:' \
         '(-y --yes)'{-y,--yes}'[Skip confirmation prompt]' \
         '--dry-run[Show what would be done]' \
         '1:version:_files'
