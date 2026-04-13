@@ -248,7 +248,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "--help  --ignore-preflight-errors -y --yes --dry-run" -- "$cur"))
             ;;
         'k8s upgrade cluster')
-            COMPREPLY=($(compgen -W "--help  --ignore-preflight-errors -y --yes --dry-run" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  --ignore-preflight-errors -u --ssh-user -i --ssh-key -y --yes --dry-run" -- "$cur"))
             ;;
         'k8s upgrade node')
             COMPREPLY=($(compgen -W "--help  -v --version -r --role --ignore-preflight-errors --skip-drain -y --yes --dry-run" -- "$cur"))

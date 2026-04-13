@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.3.4
+
+### fix
+
+- fix orchestrat a full cluster upgrade failed caused by missing ssh key
+
 ## v0.3.3
 
 ### fix
