@@ -3,15 +3,19 @@
 # @desc Orchestrate a full cluster upgrade (first CP -> other CPs -> workers) via SSH
 # @arg version! Target Kubernetes version (e.g., 1.31.0)
 # @option --ignore-preflight-errors <list> Comma-separated preflight errors to ignore (passed to every node)
+# @option -u, --ssh-user <user> SSH user for remote nodes (default: from config)
+# @option -i, --ssh-key <path> SSH private key for remote nodes
 # @flag -y, --yes Skip confirmation prompt
 # @flag --dry-run Show what would be done
 # @example k8s upgrade cluster 1.31.0
-# @example k8s upgrade cluster 1.31.0 --dry-run
+# @example k8s upgrade cluster 1.31.0 -u vagrant -i ~/.ssh/id_rsa
 # @example k8s upgrade cluster 1.31.0 --ignore-preflight-errors=CoreDNSUnsupportedPlugins,CoreDNSMigration
 
 cmd_k8s_upgrade_cluster() {
   local version="${1:-}"
   local ignore_errors="${opt_ignore_preflight_errors:-}"
+  local ssh_user="${opt_ssh_user:-}"
+  local ssh_key="${opt_ssh_key:-}"
   local auto_yes="${opt_yes:-}"
 
   radp_set_dry_run "${opt_dry_run:-false}"
@@ -49,7 +53,7 @@ cmd_k8s_upgrade_cluster() {
     fi
   fi
 
-  _k8s_upgrade_cluster "$version" "$ignore_errors" || return 1
+  _k8s_upgrade_cluster "$version" "$ignore_errors" "$ssh_user" "$ssh_key" || return 1
 
   return 0
 }

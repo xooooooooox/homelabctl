@@ -387,11 +387,6 @@ _k8s_upgrade_local_first_cp() {
 
   radp_log_info "=== Upgrading first control plane node (${node}) to v${version} ==="
 
-  if ! radp_is_dry_run && __k8s_node_at_version "$node" "$version"; then
-    radp_log_info "Node ${node} already at v${version}, skipping"
-    return 0
-  fi
-
   _k8s_upgrade_kubeadm_package "$version" || return 1
   _k8s_upgrade_plan "$ignore_errors" || radp_log_warn "kubeadm upgrade plan returned non-zero (continuing)"
   _k8s_upgrade_apply_first_cp "$version" "$ignore_errors" || return 1
@@ -523,12 +518,20 @@ __k8s_list_nodes_by_label() {
 # Arguments:
 #   1 - full version (e.g., "1.31.0")
 #   2 - ignore_preflight_errors (optional, comma-separated list)
+#   3 - ssh_user (optional, overrides config)
+#   4 - ssh_key (optional, overrides config)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
 _k8s_upgrade_cluster() {
   local version="${1:?'version required'}"
   local ignore_errors="${2:-}"
+  local ssh_user="${3:-}"
+  local ssh_key="${4:-}"
+
+  # Override SSH config if provided via command line
+  [[ -n "$ssh_user" ]] && gr_radp_extend_homelabctl_k8s_ssh_user="$ssh_user"
+  [[ -n "$ssh_key" ]] && gr_radp_extend_homelabctl_k8s_ssh_key="$ssh_key"
 
   if ! _k8s_is_cluster_accessible; then
     radp_log_error "Cluster not accessible via kubectl — run this from a control plane node"
@@ -565,13 +568,19 @@ _k8s_upgrade_cluster() {
   fi
 
   # Step 1: first CP (local)
-  _k8s_upgrade_local_first_cp "$version" "$ignore_errors" || {
-    radp_log_error "First control plane upgrade failed"
-    return 1
-  }
+  local first_cp_upgraded=false
+  if ! radp_is_dry_run && __k8s_node_at_version "$local_node" "$version"; then
+    radp_log_info "First CP ${local_node} already at v${version}, skipping"
+  else
+    _k8s_upgrade_local_first_cp "$version" "$ignore_errors" || {
+      radp_log_error "First control plane upgrade failed"
+      return 1
+    }
+    first_cp_upgraded=true
+  fi
 
-  # Wait for API server to fully stabilize after kubelet restart
-  if ! radp_is_dry_run; then
+  # Wait for API server to stabilize only if first CP was actually upgraded
+  if [[ "$first_cp_upgraded" == "true" ]] && ! radp_is_dry_run; then
     radp_log_info "Waiting for API server to stabilize after control plane upgrade..."
     sleep 15
     if ! radp_wait_until "kubectl get nodes" --max-attempts 12 --interval 10; then
