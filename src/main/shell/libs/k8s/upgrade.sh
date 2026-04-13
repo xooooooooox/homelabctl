@@ -325,6 +325,21 @@ _k8s_wait_node_ready() {
 }
 
 #######################################
+# Check if a node's kubelet version already matches the target
+# Arguments:
+#   1 - node name
+#   2 - target version (e.g., "1.32.13")
+# Returns:
+#   0 if already at target, 1 if not
+#######################################
+__k8s_node_at_version() {
+  local node="$1" target="$2"
+  local current
+  current=$(kubectl get node "$node" -o jsonpath='{.status.nodeInfo.kubeletVersion}' 2>/dev/null)
+  [[ "$current" == "v${target}" ]]
+}
+
+#######################################
 # Detect local node role via local kubeadm artifacts
 # Falls back to checking /etc/kubernetes/manifests/kube-apiserver.yaml
 # Outputs:
@@ -371,6 +386,11 @@ _k8s_upgrade_local_first_cp() {
   node=$(__k8s_local_node_name)
 
   radp_log_info "=== Upgrading first control plane node (${node}) to v${version} ==="
+
+  if ! radp_is_dry_run && __k8s_node_at_version "$node" "$version"; then
+    radp_log_info "Node ${node} already at v${version}, skipping"
+    return 0
+  fi
 
   _k8s_upgrade_kubeadm_package "$version" || return 1
   _k8s_upgrade_plan "$ignore_errors" || radp_log_warn "kubeadm upgrade plan returned non-zero (continuing)"
@@ -599,6 +619,11 @@ __k8s_upgrade_remote_node() {
   local ignore_errors="${4:-}"
 
   radp_log_info "--- Upgrading remote ${role} ${node} to v${version} ---"
+
+  if ! radp_is_dry_run && __k8s_node_at_version "$node" "$version"; then
+    radp_log_info "Node ${node} already at v${version}, skipping"
+    return 0
+  fi
 
   local ip
   ip=$(__k8s_node_internal_ip "$node")
