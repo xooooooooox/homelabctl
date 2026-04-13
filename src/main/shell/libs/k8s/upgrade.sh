@@ -550,6 +550,17 @@ _k8s_upgrade_cluster() {
     return 1
   }
 
+  # Wait for API server to fully stabilize after kubelet restart
+  if ! radp_is_dry_run; then
+    radp_log_info "Waiting for API server to stabilize after control plane upgrade..."
+    sleep 15
+    if ! radp_wait_until "kubectl get nodes" --max-attempts 12 --interval 10; then
+      radp_log_error "API server not responsive after first CP upgrade"
+      return 1
+    fi
+    radp_log_info "API server is ready"
+  fi
+
   # Step 2: other CPs (remote)
   for n in "${other_cps[@]}"; do
     __k8s_upgrade_remote_node "$n" "$version" "control-plane" "$ignore_errors" || {
