@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.3.2
+
+### fix
+
+- fix drain failed on cp node
+
 ## v0.3.1
 
 ### feat
