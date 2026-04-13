@@ -264,7 +264,8 @@ _k8s_restart_kubelet() {
 # Drain a node
 # Arguments:
 #   1 - node name
-#   2 - role hint ("worker" to add --delete-emptydir-data, anything else for CP)
+#   2 - role hint (for logging only; --delete-emptydir-data is always used
+#        since emptyDir data is ephemeral and homelab CPs often run workloads)
 # Returns:
 #   0 on success, 1 on failure
 #######################################
@@ -274,10 +275,7 @@ _k8s_drain_node() {
 
   radp_log_info "Draining node ${node}..."
 
-  local -a drain_args=("$node" --ignore-daemonsets)
-  if [[ "$role" == "worker" ]]; then
-    drain_args+=(--delete-emptydir-data)
-  fi
+  local -a drain_args=("$node" --ignore-daemonsets --delete-emptydir-data)
 
   radp_exec "kubectl drain ${drain_args[*]}" \
     kubectl drain "${drain_args[@]}" || return 1
