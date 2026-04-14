@@ -648,7 +648,7 @@ __k8s_upgrade_remote_node() {
   # Run upgrade remotely via homelabctl
   # Use --role to bypass local auto-detection, --skip-drain (already drained),
   # and --yes to skip confirmation prompt over non-interactive SSH.
-  local remote_cmd="sudo homelabctl k8s upgrade node -v ${version} --role ${role} --skip-drain --yes"
+  local remote_cmd="sudo -i homelabctl k8s upgrade node -v ${version} --role ${role} --skip-drain --yes"
   [[ -n "$ignore_errors" ]] && remote_cmd+=" --ignore-preflight-errors=${ignore_errors}"
   __k8s_ssh_exec "$ip" "$remote_cmd" || {
     radp_log_error "Remote upgrade failed on ${node}"
