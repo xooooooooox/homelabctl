@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.0
+
+### feat
+
+- Add setup installer lsd and yazi
+
 ## v0.3.5
 
 ### fix
