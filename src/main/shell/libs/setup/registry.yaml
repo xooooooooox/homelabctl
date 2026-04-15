@@ -342,6 +342,18 @@ packages:
     check-cmd: eza
     homepage: https://github.com/eza-community/eza
 
+  lsd:
+    desc: Modern ls with colors and icons
+    category: cli-tools
+    check-cmd: lsd
+    homepage: https://github.com/lsd-rs/lsd
+
+  yazi:
+    desc: Blazing fast terminal file manager
+    category: cli-tools
+    check-cmd: yazi
+    homepage: https://github.com/sxyazi/yazi
+
   tealdeer:
     desc: Fast tldr client written in Rust (tldr)
     category: search
