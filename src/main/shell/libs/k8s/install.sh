@@ -271,10 +271,12 @@ _k8s_install_kubeadm() {
 _k8s_init_master() {
   local apiserver_advertise_address="${1:?'API server address required'}"
   local pod_network_cidr="${2:-$(_k8s_get_default_pod_cidr)}"
+  local control_plane_endpoint="${3:-}"
 
   radp_log_info "Initializing Kubernetes master node..."
   radp_log_info "  API Server Address: $apiserver_advertise_address"
   radp_log_info "  Pod Network CIDR: $pod_network_cidr"
+  [[ -n "$control_plane_endpoint" ]] && radp_log_info "  Control Plane Endpoint: $control_plane_endpoint"
 
   # Step 1: Pull required images
   radp_log_info "Pulling Kubernetes images..."
@@ -285,10 +287,14 @@ _k8s_init_master() {
 
   # Step 2: Initialize kubeadm
   radp_log_info "Running kubeadm init..."
+  local -a init_args=(
+    --apiserver-advertise-address="$apiserver_advertise_address"
+    --pod-network-cidr="$pod_network_cidr"
+  )
+  [[ -n "$control_plane_endpoint" ]] && init_args+=(--control-plane-endpoint="$control_plane_endpoint")
+
   radp_exec_sudo "Initialize Kubernetes control plane" \
-    kubeadm init \
-      --apiserver-advertise-address="$apiserver_advertise_address" \
-      --pod-network-cidr="$pod_network_cidr" || {
+    kubeadm init "${init_args[@]}" || {
     radp_log_error "Failed to initialize Kubernetes master"
     return 1
   }

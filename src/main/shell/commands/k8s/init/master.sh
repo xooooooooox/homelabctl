@@ -3,13 +3,16 @@
 # @desc Initialize Kubernetes master node
 # @option -a, --apiserver-advertise-address! <ip> API server advertise address (required)
 # @option -p, --pod-network-cidr <cidr> Pod network CIDR (default: 10.244.0.0/16)
+# @option -e, --control-plane-endpoint <endpoint> Shared API endpoint for HA (e.g., k8s-api.homelab:6443 or VIP:6443)
 # @flag --dry-run Show what would be done
 # @example k8s init master -a 192.168.1.100
 # @example k8s init master -a 192.168.1.100 -p 10.244.0.0/16
+# @example k8s init master -a 192.168.1.100 -e 192.168.1.200:6443
 
 cmd_k8s_init_master() {
   local apiserver_address="${opt_apiserver_advertise_address}"
   local pod_cidr="${opt_pod_network_cidr:-$(_k8s_get_default_pod_cidr)}"
+  local control_plane_endpoint="${opt_control_plane_endpoint:-}"
 
   # Enable dry-run mode if flag is set
   radp_set_dry_run "${opt_dry_run:-false}"
@@ -38,8 +41,9 @@ cmd_k8s_init_master() {
   radp_log_info "Initializing Kubernetes master node..."
   radp_log_info "  API Server Address: $apiserver_address"
   radp_log_info "  Pod Network CIDR: $pod_cidr"
+  [[ -n "$control_plane_endpoint" ]] && radp_log_info "  Control Plane Endpoint: $control_plane_endpoint"
 
-  _k8s_init_master "$apiserver_address" "$pod_cidr" || return 1
+  _k8s_init_master "$apiserver_address" "$pod_cidr" "$control_plane_endpoint" || return 1
 
   radp_log_info ""
   radp_log_info "Master node initialized successfully!"
