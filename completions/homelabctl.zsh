@@ -599,6 +599,7 @@ _homelabctl_k8s_init_master() {
         '(-h --help)'{-h,--help}'[Show help]' \
         '(-a --apiserver-advertise-address)'{-a,--apiserver-advertise-address}'[]:ip:' \
         '(-p --pod-network-cidr)'{-p,--pod-network-cidr}'[Pod network CIDR (default: 10.244.0.0/16)]:cidr:' \
+        '(-e --control-plane-endpoint)'{-e,--control-plane-endpoint}'[Shared API endpoint for HA (e.g., k8s-api.homelab:6443 or VIP:6443)]:endpoint:' \
         '--dry-run[Show what would be done]' \
         '*:file:_files'
 }

@@ -224,7 +224,7 @@ _homelabctl() {
             COMPREPLY=($(compgen -W "master worker  --help" -- "$cur"))
             ;;
         'k8s init master')
-            COMPREPLY=($(compgen -W "--help  -a --apiserver-advertise-address -p --pod-network-cidr --dry-run" -- "$cur"))
+            COMPREPLY=($(compgen -W "--help  -a --apiserver-advertise-address -p --pod-network-cidr -e --control-plane-endpoint --dry-run" -- "$cur"))
             ;;
         'k8s init worker')
             COMPREPLY=($(compgen -W "--help  -c --control-plane -t --token --discovery-token-ca-cert-hash -u --ssh-user -i --ssh-key --dry-run" -- "$cur"))
