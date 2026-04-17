@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.1
+
+### fix
+
+- Add option --control-plane-endpoint
+
 ## v0.4.0
 
 ### feat
