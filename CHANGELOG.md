@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.2
+
+### feat
+
+- Support cleanup old etcd backups
+
 ## v0.4.1
 
 ### fix

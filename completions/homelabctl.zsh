@@ -518,6 +518,7 @@ _homelabctl_k8s_backup() {
     case "$state" in
         command)
             local commands=(
+                'cleanup:Clean old etcd backups'
                 'create:Create etcd backup'
                 'list:List available etcd backups'
                 'restore:Restore etcd from backup'
@@ -533,6 +534,15 @@ _homelabctl_k8s_backup() {
             fi
             ;;
     esac
+}
+
+_homelabctl_k8s_backup_cleanup() {
+    _arguments -s \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '--keep-days[Days to keep backups (default: from config)]:n:' \
+        '(-d --dir)'{-d,--dir}'[Backup directory (default: /var/opt/k8s/backups/etcd)]:path:' \
+        '--dry-run[Show what would be done]' \
+        '*:file:_files'
 }
 
 _homelabctl_k8s_backup_create() {
