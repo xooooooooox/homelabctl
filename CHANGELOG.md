@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.3
+
+### feat
+
+- Add installer k9s and lazydocker
+
 ## v0.4.2
 
 ### feat
