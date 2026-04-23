@@ -211,6 +211,20 @@ packages:
     check-cmd: containerd
     homepage: https://containerd.io/
 
+  k9s:
+    desc: Kubernetes TUI to manage clusters
+    category: devops
+    check-cmd: k9s
+    recommends: kubectl
+    homepage: https://k9scli.io/
+
+  lazydocker:
+    desc: Simple terminal UI for Docker
+    category: devops
+    check-cmd: lazydocker
+    recommends: docker
+    homepage: https://github.com/jesseduffield/lazydocker
+
   docker-compose:
     desc: Multi-container Docker applications
     category: devops
