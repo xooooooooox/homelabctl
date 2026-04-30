@@ -147,7 +147,7 @@ _gitlab_backup_copy_to_remote() {
 
   local result=0
 
-  if [[ -n "$data_file" && -f "$data_file" ]]; then
+  if [[ -n "$data_file" ]] && $gr_sudo test -f "$data_file"; then
     radp_log_info "Copying data backup to remote: $remote_dir"
     radp_exec_sudo "Copy data backup to $remote_dir" cp -v "$data_file" "$remote_dir/" || {
       radp_log_error "Failed to copy data backup to remote"
@@ -155,7 +155,7 @@ _gitlab_backup_copy_to_remote() {
     }
   fi
 
-  if [[ -n "$config_file" && -f "$config_file" ]]; then
+  if [[ -n "$config_file" ]] && $gr_sudo test -f "$config_file"; then
     radp_log_info "Copying config backup to remote: $remote_dir"
     radp_exec_sudo "Copy config backup to $remote_dir" cp -v "$config_file" "$remote_dir/" || {
       radp_log_error "Failed to copy config backup to remote"
