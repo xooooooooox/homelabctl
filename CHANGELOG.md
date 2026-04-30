@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.4
+
+### fix
+
+- fix gitlab backup and create not work
+
 ## v0.4.3
 
 ### feat
