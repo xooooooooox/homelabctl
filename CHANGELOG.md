@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.6
+
+### fix
+
+- gitlab backup create copy to remote not work
+
 ## v0.4.5
 
 ### fix
