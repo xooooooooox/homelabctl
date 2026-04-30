@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.5
+
+### fix
+
+- fix gitlab backup create dryrun not print complete process
+
 ## v0.4.4
 
 ### fix
