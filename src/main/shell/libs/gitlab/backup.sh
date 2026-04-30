@@ -249,6 +249,25 @@ __cleanup_find() {
   fi
 }
 
+# Internal helper: list backup files in a directory using find (avoids glob expansion permission issues)
+# Arguments:
+#   $1 - directory path
+#   $2 - filename glob pattern
+#   $3 - "sudo" to use sudo, "" otherwise
+__backup_list_dir() {
+  local dir="$1" pattern="$2" use_sudo="$3"
+  local sudo_cmd=""
+  [[ "$use_sudo" == "sudo" ]] && sudo_cmd="${gr_sudo:-}"
+
+  local files
+  files=$($sudo_cmd find "$dir" -maxdepth 1 -type f -name "$pattern" -exec ls -lh {} + 2>/dev/null | sort -k9)
+  if [[ -n "$files" ]]; then
+    echo "$files"
+  else
+    echo "  (none)"
+  fi
+}
+
 #######################################
 # List all backup files
 # Arguments:
@@ -279,11 +298,11 @@ _gitlab_backup_list() {
     echo "=== Data Backups ==="
     if [[ -d "$backup_home" ]]; then
       echo "Local ($backup_home):"
-      $gr_sudo ls -lh "$backup_home"/$data_pattern 2>/dev/null || echo "  (none)"
+      __backup_list_dir "$backup_home" "$data_pattern" "sudo"
     fi
     if [[ -n "$remote_home" && -d "$remote_home" ]]; then
       echo "Remote ($remote_home):"
-      ls -lh "$remote_home"/$data_pattern 2>/dev/null || echo "  (none)"
+      __backup_list_dir "$remote_home" "$data_pattern" ""
     fi
     echo
   fi
@@ -292,11 +311,11 @@ _gitlab_backup_list() {
     echo "=== Config Backups ==="
     if [[ -d "$config_backup_home" ]]; then
       echo "Local ($config_backup_home):"
-      $gr_sudo ls -lh "$config_backup_home"/$config_pattern 2>/dev/null || echo "  (none)"
+      __backup_list_dir "$config_backup_home" "$config_pattern" "sudo"
     fi
     if [[ -n "$remote_home" && -d "$remote_home" ]]; then
       echo "Remote ($remote_home):"
-      ls -lh "$remote_home"/$config_pattern 2>/dev/null || echo "  (none)"
+      __backup_list_dir "$remote_home" "$config_pattern" ""
     fi
   fi
 }

@@ -238,6 +238,24 @@ _gitlab_get_external_data_dir() {
 }
 
 #######################################
+# Get data backup filename glob pattern
+# Outputs:
+#   Glob pattern matching data backup files
+#######################################
+_gitlab_get_data_backup_pattern() {
+  echo "*_gitlab_backup.tar"
+}
+
+#######################################
+# Get config backup filename glob pattern
+# Outputs:
+#   Glob pattern matching config backup files
+#######################################
+_gitlab_get_config_backup_pattern() {
+  echo "gitlab_config_*.tar"
+}
+
+#######################################
 # Get current date in YYYYMMDD format
 # Outputs:
 #   Date string
