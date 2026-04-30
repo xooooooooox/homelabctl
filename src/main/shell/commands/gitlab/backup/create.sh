@@ -29,25 +29,17 @@ cmd_gitlab_backup_create() {
   case "$backup_type" in
     all)
       _gitlab_backup_data || return 1
-      if ! radp_is_dry_run; then
-        data_backup_file=$(_gitlab_find_latest_data_backup)
-      fi
+      data_backup_file=$(_gitlab_find_latest_data_backup) || true
       _gitlab_backup_config || return 1
-      if ! radp_is_dry_run; then
-        config_backup_file=$(_gitlab_find_latest_config_backup)
-      fi
+      config_backup_file=$(_gitlab_find_latest_config_backup) || true
       ;;
     data)
       _gitlab_backup_data || return 1
-      if ! radp_is_dry_run; then
-        data_backup_file=$(_gitlab_find_latest_data_backup)
-      fi
+      data_backup_file=$(_gitlab_find_latest_data_backup) || true
       ;;
     config)
       _gitlab_backup_config || return 1
-      if ! radp_is_dry_run; then
-        config_backup_file=$(_gitlab_find_latest_config_backup)
-      fi
+      config_backup_file=$(_gitlab_find_latest_config_backup) || true
       ;;
     *)
       radp_log_error "Invalid backup type: $backup_type (use: all, data, config)"
